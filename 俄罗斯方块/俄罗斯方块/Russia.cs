@@ -127,7 +127,7 @@ namespace 俄罗斯方块
         {
             ConvertorDelete();
             ConvertorMode(Convertor);
-
+            Protract(Mycontrol);
         }
 
         public void MyPaint(Graphics g,SolidBrush SolidB,Rectangle rect)
@@ -135,6 +135,10 @@ namespace 俄罗斯方块
             g.FillRectangle(SolidB, rect);
         }
 
+        /// <summary>
+        /// 方块变换
+        /// </summary>
+        /// <param name="n"></param>
         public void ConvertorMode(int n)
         {
             Point[] tem_ArrayPoi = new Point[4];
@@ -386,7 +390,9 @@ namespace 俄罗斯方块
             }
         }
 
-
+        /// <summary>
+        /// 初始化
+        /// </summary>
         public void PlaceInitialization()
         {
             conWidth = Mycontrol.Width / 20;
@@ -403,6 +409,11 @@ namespace 俄罗斯方块
             maxY = conHeight * Cake;
         }
 
+        /// <summary>
+        /// 检查出界
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
         public bool MoveStop(int n)
         {
             bool tem_bool = true;
