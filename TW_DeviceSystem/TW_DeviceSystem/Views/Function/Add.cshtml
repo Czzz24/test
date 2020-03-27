@@ -1,0 +1,103 @@
+﻿
+@{
+    Layout = null;
+}
+
+@using EF.Application.Model;
+@model EF.Application.Model.t_function
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        菜单添加
+    </blockquote>
+    @using (Html.BeginForm("addComit", "Function", FormMethod.Post, new { @class = "layui-form" }))
+    {
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.CreateTime)
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">菜单名称</label>
+                <div class="layui-input-block">
+                    @Html.EditorFor(model => model.functionName, new { htmlAttributes = new { @class = "layui-input", @placeholder = "请输入功能名称", @autocomplete = "off", } })
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">菜单地址</label>
+                <div class="layui-input-block">
+                    @Html.EditorFor(model => model.actionAddress, new { htmlAttributes = new { @class = "layui-input", @placeholder = "请输入功能地址" } })
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">Icon图标</label>
+                <div class="layui-input-block">
+                    @Html.EditorFor(model => model.iconFont, new { htmlAttributes = new { @class = "layui-input", @placeholder = "请输入Icon图标" } })
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">排序号</label>
+                <div class="layui-input-block">
+                    @Html.EditorFor(model => model.orderNo, new { htmlAttributes = new { @class = "layui-input", @placeholder = "请输入排序号" } })
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">菜单说明</label>
+            <div class="layui-input-block">
+                @Html.TextAreaFor(model => model.functionDescription, new { @class = "layui-textarea", @placeholder = "请输入功能说明" })
+            </div>
+        </div>
+    }
+    <div class="layui-input-block">
+        <button class="layui-btn layui-btn-normal" id="commit">提交</button>
+        <button class="layui-btn layui-btn-primary" onclick="window.history.back()">返回</button>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        var layer;
+        layui.use("layer", function () {
+            layer = layui.layer;  //layer初始化
+        });
+        /*form表单提交*/
+        document.getElementById("commit").addEventListener("click", function (e) {
+            var functionName = $("#functionName").val();
+            var actionAddress = $("#actionAddress").val();
+            var iconFont = $("#iconFont").val();
+            var functionDescription = $("#functionDescription").val();
+            if (functionName == "" || functionName == null || functionName == "undefined") {
+                layer.tips('请输入菜单地址!', '#functionName');
+                return;
+            }
+            if (actionAddress == "" || actionAddress == null || actionAddress == "undefined") {
+                layer.tips('请输入菜单地址!', '#actionAddress');
+                return;
+            }
+            if (iconFont == "" || iconFont == null || iconFont == "undefined") {
+                layer.tips('请输入Icon图标!', '#iconFont');
+                return;
+            }
+            if (functionDescription == "" || functionDescription == null || functionDescription == "undefined") {
+                layer.tips('请输入菜单说明!', '#functionDescription');
+                return;
+            }
+            $("form").submit();
+        });
+    </script>
+</body>
+</html>

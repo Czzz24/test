@@ -1,0 +1,72 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        密码反查
+    </blockquote>
+    <div class="content_Area">
+        <div class="layui-form">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">密文密码：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" placeholder="请输入原始密码" id="PrimitivePwd" />
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">解密密码：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" placeholder="解密结果" id="DecryptPwd" />
+                    </div>
+                </div>
+            </div>
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-warm" id="DecryptBtn">解密</button>
+            </div>
+        </div>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        var layer;
+        layui.use("layer", function () {
+            layer = layui.layer;  //layer初始化
+        });
+        $("#DecryptBtn").on("click", function () {
+            var originalText = $("#PrimitivePwd").val();
+            if (originalText == null || originalText == "" || originalText == "undefined") {
+                layer.tips('请输入原始密码!', '#PrimitivePwd');
+                return;
+            }
+            var url = "/PwdLook/DecryptString";
+            $.ajax({
+                url: url,
+                type: 'post',
+                async: true,
+                data: { originalText: originalText },
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    $("#DecryptPwd").val(data);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        });
+    </script>
+</body>
+</html>

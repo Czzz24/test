@@ -1,0 +1,134 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        角色管理
+    </blockquote>
+    <div class="content_Area">
+        <div class="layui-inline">
+            <button class="layui-btn layui-btn-normal" onclick="AddRole()">添加角色</button>
+            <button class="layui-btn layui-btn-primary" onclick="toRolePower()">角色权限</button>
+        </div>
+        <table class="layui-hide" id="jsgl" lay-filter="demo"></table>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    </script>
+    <script type="text/javascript">
+        layui.use('form', function () {
+            var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+        });
+        layui.use('table', function () {
+            var table = layui.table;
+            table.render({
+                elem: '#jsgl',
+                even: true,
+                cellMinWidth: 80,
+                height:500,
+                url: '/RoleManager/GetPageList',
+                page: true,
+                done: function (res, curr, count) {
+                    $("[data-field='Id']").css('display', 'none');
+                },
+                cols: [
+                    [
+                         {
+                             field: 'Id',
+                             title: 'ID',
+                         },
+                        {
+                            field: 'roleName',
+                            title: '角色名称',
+                            width: 150,
+                        },
+                        {
+                            field: 'roleDescription',
+                            title: '角色说明',
+                            width: 800,
+                        },
+                        {
+                            field: 'CreateTime',
+                            title: '录入日期',
+                            width: 150,
+                            templet: function (row) { return dateFormat(row.CreateTime); }
+                        },
+                        {
+                            field: 'test3',
+                            title: '操作',
+                            fixed: 'right',
+                            width: 190,
+                            toolbar: '#barDemo'
+                        }
+                   ]
+                ]
+            });
+
+            function dateFormat(item) {
+                var time = new Date(parseInt(item.substr(6))).Format("yyyy-MM-dd hh:mm:ss");
+                return time;
+            }
+
+            Date.prototype.Format = function (fmt) {
+                var o = {
+                    "M+": this.getMonth() + 1, //月份 
+                    "d+": this.getDate(), //日 
+                    "h+": this.getHours(), //小时 
+                    "m+": this.getMinutes(), //分 
+                    "s+": this.getSeconds() //秒 
+                };
+                if (/(y+)/.test(fmt)) { //根据y的长度来截取年
+                    fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                }
+                for (var k in o) {
+                    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                }
+                return fmt;
+            }
+
+            //监听工具条
+            table.on('tool(demo)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'detail') {
+                    var url = "/RoleManager/Details?Id=" + data.Id;
+                    window.top.frameUrl(url);
+                } else if (obj.event === 'edit') {
+                    if (data.Id == 1) {
+                        layer.msg("超级管理员信息不能被编辑!");
+                        return;
+                    } else {
+                        var url = "/RoleManager/Edit?Id=" + data.Id;
+                        window.top.frameUrl(url);
+                    }
+                   
+                }
+            });
+        });
+
+        function AddRole() {
+            var url = "/RoleManager/Add";
+            window.top.frameUrl(url);
+        }
+
+        function toRolePower() {
+            var url = "/RoleManager/RolePower";
+            window.top.frameUrl(url);
+        }
+    </script>
+</body>
+</html>

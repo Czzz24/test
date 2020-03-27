@@ -1,0 +1,761 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.js"></script>
+    <script src="/google/js/api.js"></script>
+    <script src="/google/js/drawing.js"></script>
+    <script src="/google/js/geometry.js"></script>
+    <script src="/google/js/places.js"></script>
+    <script src="/google/js/maplabel.js"></script>
+    <script src="/google/js/visualization.js"></script>
+    <script src="/google/js/maplabel.js"></script>
+    <script src="/Scripts/map/bigMap.js"></script>
+    <script src="~/Scripts/linqjs/linq.js"></script>
+    <style type="text/css">
+        .mapDiv {
+            width: 100%;
+            height: 100%;
+            float: left;
+        }
+
+        .button-group {
+            width: 120px;
+            height: 60px;
+            position: relative;
+            bottom: 0px;
+            left: calc(100% - 120px);
+            font-size: 12px;
+            padding: 10px;
+            z-index: 9999;
+        }
+
+        .sbtj_Map {
+            width: 100%;
+            height: 400px;
+        }
+
+        .button-group .divbtn {
+            width: 40px;
+            height: 40px;
+            background-color: #0D9BF2;
+            float: left;
+            margin-left: 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .divbtn img {
+            margin: 4px 0px 0px 4px;
+        }
+    </style>
+</head>
+<body>
+    <input type="hidden" id="TerminalId" value="@ViewBag.TerminalId" />
+    <input type="hidden" id="ElectricId" value="@ViewBag.ElectricId" />
+    <input type="hidden" id="LineId" value="@ViewBag.LineId" />
+    <blockquote class="layui-elem-quote layui-text" id="FreeServicingTitle"></blockquote>
+
+    <div class="jd_detailsColumns" style="height:250px">
+        <div id="mapDiv" class="mapDiv"></div>
+    </div>
+    <div class="tabbar_Container">
+        <div class="layui-tab layui-tab-brief" lay-filter="demo">
+            <ul class="layui-tab-title">
+                <li class="layui-this">历史数据</li>
+                <li>报警数据<span class="layui-badge" id="alarmCount"></span></li>
+                <li>坐标设置</li>
+                <li>设备状态</li>
+            </ul>
+            <div class="layui-tab-content">
+                <!--1-->
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="historystartTime" placeholder="请选择开始时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="hitoryendTime" placeholder="请选择结束时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn layui-btn-normal" data-type="reloadhistory" id="btnHitorySearch">查询</button>
+                    </div>
+                    <table class="layui-hide" id="historydata"></table>
+
+                </div>
+                <!--2-->
+                <div class="layui-tab-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="alarmStartTime" placeholder="请选择开始时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="alarmEndTime" name="phone" placeholder="请选择结束时间" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn layui-btn-normal" data-type="reloadAlarm" id="btnAlarmSearch">查询</button>
+                        <button class="layui-btn layui-btn-danger" lay-event="getCheckLength" id="confirmAlarm">确认告警</button>
+                    </div>
+                    <table class="layui-hide" id="alarmdata"></table>
+                </div>
+                <!--3-->
+                <div class="layui-tab-item">
+                    <div class="layui-form">
+                        <div class="chart_Container">
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label">左方经度:</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" class="layui-input" id="leftLongitude" placeholder="请输入经度" />
+                                    </div>
+                                </div>
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label">左方纬度:</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" class="layui-input" id="leftLatitude" placeholder="请输入纬度" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label">右方经度:</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" class="layui-input" id="rightLongitude" placeholder="请输入经度" />
+                                    </div>
+                                </div>
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label">左方纬度:</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" class="layui-input" id="rightLatitude" placeholder="请输入纬度" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-inline" style="margin-left: 10px;">
+                                    <button class="layui-btn layui-btn-normal" data-type="btnErrorSet" id="btnErrorSet">设置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--4-->
+                <div class="layui-tab-item">
+                    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                        <legend>设备通讯状态曲线</legend>
+                    </fieldset>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="netStartTime" placeholder="请选择开始时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="netEndTime" placeholder="请选择结束时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn layui-btn-normal" id="btnNetWork">查询</button>
+                    </div>
+                    <div class="legendRow">
+                        <div class="legend green"></div>
+                        <p class="legendTitle">校验通过</p>
+                        <div class="legend red"></div>
+                        <p class="legendTitle">校验不通过</p>
+                        <div class="legend blue"></div>
+                        <p class="legendTitle">没回复模块正常</p>
+                        <div class="legend yellow"></div>
+                        <p class="legendTitle">网络无连接</p>
+                        <div class="legend Violet"></div>
+                        <p class="legendTitle">网络已连接</p>
+                    </div>
+                    <div class="form_Area">
+                        <div class="partial_ChartArea" style="width:calc(100% - 10px)" id="networkTrend"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--实时分析网络状态-->
+    <div class="netWordStatePanelIcon shrink" id="networkBtn"></div>
+    <div class="netWordStatePanel" id="netWordState">
+    </div>
+
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script src="~/Scripts/Views/FreeServicing/dataChart.js"></script>
+    @*通讯状态曲线*@
+    <script src="~/Scripts/Views/NetWord/networkTrend.js"></script>
+    @*滚动条插件*@
+    <script src="~/Scripts/scroll/jquery.nicescroll.js"></script>
+    <script type="text/html" id="handle">
+        @*箱柜门打开可查看照片/其他变处理*@
+        {{#  if(d.AlarmCode === 257 && d.Status===1){ }}
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看照片</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">处理</a>
+        {{#  } else if(d.Status===2 && d.AlarmCode===257) { }}
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看照片</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">处理</a>
+        {{#  } else if(d.Status===3 && d.AlarmCode===257) { }}
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看照片</a>
+        {{#  } else if(d.Status===3) { }}
+
+        {{#  } else { }}
+        <a class="layui-btn layui-btn-xs" lay-event="edit">处理</a>
+        {{#  } }}
+    </script>
+    <script type="text/javascript">
+        var oldNetData = null;
+
+        function GetBestNewNetWork() {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var url = "/Partial/GetBestNewNetWork";
+            $.ajax({
+                url: url,
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId },
+                type: 'post',
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    if (JSON.stringify(data) != JSON.stringify(oldNetData)) {
+                        if ($("#netWordState")[0].children.length == 20) {
+                            $("#netWordState")[0].children[0].remove();
+                        }
+                        var time = dateFormat(data.CreateTime);
+                        var msg = "";
+                        var status = data.Status;
+                        if (status == 1) {
+                            msg = "校验通过";
+                        } else if (status == 2) {
+                            msg = "校验不通过";
+                        } else if (status == 3) {
+                            msg = "没回复模块正常";
+                        } else if (status == 4) {
+                            msg = "网络无连接";
+                        } else {
+                            msg = "网络已连接";
+                        }
+                        var html = "<p>" + time + "&nbsp;" + msg + "</p>";
+                        $("#netWordState").append(html);
+                        var scrollDom = document.getElementById('netWordState');
+                        scrollDom.scrollTop = scrollDom.scrollHeight
+                        oldNetData = data;
+                    }
+
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*面板伸缩*/
+        var isAnimate = true;
+        $("#networkBtn").click(function () {
+            if (isAnimate) {
+                $("#networkBtn").removeClass();
+                $("#networkBtn").addClass("netWordStatePanelIcon collect");
+                $("#networkBtn").animate({ right: "250px" })
+                $("#netWordState").animate({ right: "0px" });
+                isAnimate = false;
+            } else {
+                $("#networkBtn").removeClass();
+                $("#networkBtn").addClass("netWordStatePanelIcon shrink");
+                $("#networkBtn").animate({ right: "0px" })
+                $("#netWordState").animate({ right: "-250px" });
+                isAnimate = true;
+            }
+
+        })
+
+        $('#netWordState').niceScroll({
+            cursorcolor: "#4A4E51",//#CC0071 光标颜色
+            cursoropacitymax: 1, //改变不透明度非常光标处于活动状态（scrollabar“可见”状态），范围从1到0
+            touchbehavior: false, //使光标拖动滚动像在台式电脑触摸设备
+            cursorwidth: "5px", //像素光标的宽度
+            cursorborder: "0", // 游标边框css定义
+            cursorborderradius: "5px",//以像素为光标边界半径
+            autohidemode: false //是否隐藏滚动条
+        });
+
+        layui.use(['element', 'laydate', 'table'], function () {
+			var historyTable = layui.table;
+			historyTable.render({
+			    elem: '#historydata',
+			    url: '/Error/GetHistoryData',
+			    cellMinWidth: 80,
+			    even: 'true',
+			    height: 400,
+			    id: 'reloadhistory',
+			    page: true,
+			    cols: [
+                    [
+                        {
+                            field: 'Time',
+                            title: '时间',
+                            templet: function (row) { return dateFormat(row.Time); }
+                        }
+                        ,
+                        {
+                            field: 'distance',
+                            title: '距离'
+                        },
+                        {
+                            field: 'longitude',
+                            title: '经度'
+                        },
+                        {
+                            field: 'latitude',
+                            title: '纬度'
+                        },
+                        {
+                            field: 'CreateTime',
+                            title: '录入时间',
+                            templet: function (row) { return dateFormat(row.CreateTime); }
+                        }
+                    ]
+			    ], where: {
+			        TerminalId: document.getElementById("TerminalId").value,
+			        ElectricId: document.getElementById("ElectricId").value,
+			        LineId: document.getElementById("LineId").value
+			    }
+			});
+
+			var alarmTable = layui.table;
+			alarmTable.render({
+			    elem: '#alarmdata',
+			    url: '/Alarm/GetAlarmPageList',
+			    cellMinWidth: 80,
+			    even: 'true',
+			    height: 400,
+			    id: 'reloadAlarm',
+			    page: true,
+			    cols: [
+                        [
+                            {
+                                field: 'test1',
+                                title: '全选',
+                                type: 'checkbox'
+                            },
+                            {
+                                field: 'DeviceName',
+                                title: '终端名称',
+                                width: 170,
+                            },
+                            {
+                                field: 'TerminalId',
+                                title: '终端ID',
+                                width: 130,
+                            },
+                            {
+                                field: 'ElectricName',
+                                title: '供电或公司',
+                                width: 170,
+                            },
+                            {
+                                field: 'LineName',
+                                title: '线路名称',
+                                width: 170,
+                            },
+                            {
+                                field: 'JointName',
+                                title: '接头名称',
+                                width: 170,
+                            },
+                            {
+                                field: 'Flag',
+                                title: '报警状态',
+                                templet: '#FlagStatus',
+                                width: 130,
+                            },
+                             {
+                                 field: 'StatusName',
+                                 title: '处理状态',
+                                 templet: '#StatusName',
+                                 width: 130,
+                             },
+                            {
+                                field: 'Value',
+                                title: '告警值'
+                            },
+                            {
+                                field: 'StartTime',
+                                title: '告警时间',
+                                templet: function (row) { return dateFormat(row.StartTime); },
+                                width: 170,
+                            },
+                            {
+                                field: 'EndTime',
+                                title: '结束时间',
+                                templet: function (row) { return dateFormat(row.EndTime); },
+                                width: 170,
+                            },
+                            {
+                                field: 'Content',
+                                title: '告警详情',
+                                width: 170,
+                            },
+                            {
+                                fixed: 'right',
+                                field: 'handle',
+                                title: '操作',
+                                templet: '#handle',
+                                width: 140,
+                            }
+                        ]
+			    ], where: {
+			        TerminalId: document.getElementById("TerminalId").value,
+			        ElectricId: document.getElementById("ElectricId").value,
+			        LineId: document.getElementById("LineId").value
+			    }
+			});
+
+            //监听工具条
+			alarmTable.on('tool(alarm)', function (obj) {
+			    var data = obj.data;
+			    if (obj.event === 'edit') {
+			        var Id = data.Id;
+			        var ElectricId = data.ElectricId;
+			        var LineId = data.LineId;
+			        var TerminalId = data.TerminalId;
+			        var url = "/Alarm/HandleAlarm?Id=" + Id + "&ElectricId=" + ElectricId + "&LineId=" + LineId + "&TerminalId=" + TerminalId;
+			        window.top.frameUrl(url);
+			    }
+			});
+
+			var $ = layui.$, active = {
+			    reloadhistory: function () {
+			        var TerminalId = $("#TerminalId").val();
+			        var ElectricId = $("#ElectricId").val();
+			        var LineId = $("#LineId").val();
+			        var historystartTime = $("#historystartTime").val();
+			        var hitoryendTime = $("#hitoryendTime").val();
+			        historyTable.reload('reloadhistory', {
+			            page: { curr: 1 },
+			            where: {
+			                TerminalId: TerminalId,
+			                ElectricId: ElectricId,
+			                LineId: LineId,
+			                startTime: historystartTime,
+			                endTime: hitoryendTime
+			            }
+			        });
+			    },
+			    reloadAlarm: function () {
+			        var TerminalId = $("#TerminalId").val();
+			        var ElectricId = $("#ElectricId").val();
+			        var LineId = $("#LineId").val();
+			        var alarmStartTime = $("#alarmStartTime").val();
+			        var alarmEndTime = $("#alarmEndTime").val();
+			        alarmTable.reload('reloadAlarm', {
+			            page: { curr: 1 },
+			            where: {
+			                TerminalId: TerminalId,
+			                ElectricId: ElectricId,
+			                LineId: LineId,
+			                startTime: alarmStartTime,
+			                endTime: alarmEndTime
+			            }
+			        });
+			    }
+			};
+
+			$('#btnHitorySearch').on('click', function () {
+			    var type = $(this).data('type');
+			    active[type] ? active[type].call(this) : '';
+			});
+
+			$('#btnAlarmSearch').on('click', function () {
+			    var type = $(this).data('type');
+			    active[type] ? active[type].call(this) : '';
+			});
+
+			$('#confirmAlarm').on('click', function () {
+			    var checkStatus = alarmTable.checkStatus("reloadAlarm");
+			    var data = checkStatus.data;
+			    var arrayAlarmId = new Array();
+			    $.each(data, function (idx, obj) {
+			        arrayAlarmId.push(obj.Id);
+			    });
+			    if (arrayAlarmId.length > 0) {
+			        layer.confirm('是否确认报警', { title: "提示" }, function () {
+			            var TerminalId = $("#TerminalId").val();
+			            var ElectricId = $("#ElectricId").val();
+			            var LineId = $("#LineId").val();
+			            var url = '/Alarm/confirmAlarm';
+			            $.ajax({
+			                url: url,
+			                type: 'post',
+			                data: { listId: arrayAlarmId, TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId },
+			                async: true,
+			                dataType: 'json',
+			                success: function (data, jqxhr, txtStatus) {
+			                    if (data.code == 0) {
+			                        layer.msg(data.msg);
+			                        var type = "reloadAlarm";
+			                        active[type] ? active[type].call(this) : '';
+			                    }
+			                }, error: function (xhr, txtStatus) {
+			                    console.log(txtStatus);
+			                }
+			            })
+			        });
+			    } else {
+			        layer.alert('请选择需要处理的告警!', { title: "提示" });
+			    }
+			});
+
+            /*坐标设置*/
+			$("#btnErrorSet").on("click", function () {
+			    $.ajax({
+			        url: '/Error/AddErrorSet',
+                    type:'post',
+			        async: true,
+			        dataType: 'json',
+			        data: { TerminalId: $("#TerminalId").val(), leftLongitude: $("#leftLongitude").val(), leftLatitude: $("#leftLatitude").val(), rightLongitude: $("#rightLongitude").val(), rightLatitude: $("#rightLatitude").val() },
+			        success: function (data, jqxhr, txtStatus) {
+			            if (data.code == 0) {
+			                layer.msg(data.msg);
+			            } else {
+			                layer.msg(data.msg);
+			            }
+			        }, error: function (xhr, txtStatus) {
+			            console.log(txtStatus);
+			        }
+			    })
+			});
+
+			var element = layui.element;
+			element.on('tab(demo)', function (data) {
+			    var index = data.index;
+			    switch (index) {
+			        case 0:
+			            var type = "reloadhistory";
+			            active[type] ? active[type].call(this) : '';
+			            break;
+			        case 1:
+			            var type = "reloadAlarm";
+			            active[type] ? active[type].call(this) : '';
+			            break;
+			        case 2:
+			            break;
+			        case 3:
+			            historyNetWorkTrend(null, null);
+			            break;
+			        default:
+			            break;
+			    }
+			});
+
+			var laydate = layui.laydate;
+            //1
+			laydate.render({
+			    elem: '#historystartTime',
+			    type: 'datetime'
+			});
+			laydate.render({
+			    elem: '#hitoryendTime',
+			    type: 'datetime'
+			});
+            //2
+			laydate.render({
+			    elem: '#alarmStartTime',
+			    type: 'datetime'
+			});
+			laydate.render({
+			    elem: '#alarmEndTime',
+			    type: 'datetime'
+			});
+            //3
+			laydate.render({
+			    elem: '#chartStartTime',
+			    type: 'datetime'
+			});
+			laydate.render({
+			    elem: '#chartEndTime',
+			    type: 'datetime'
+			});
+			laydate.render({
+			    elem: '#netStartTime',
+			    type: 'datetime'
+			});
+			laydate.render({
+			    elem: '#netEndTime',
+			    type: 'datetime'
+			});
+        });
+
+        $("#chartBtnSearch").on('click', function () {
+            initDataChart();
+        });
+
+		function dateFormat(item) {
+		    if (item == null || item == "" || item == "undefined") {
+		        return "";
+		    } else {
+		        var time = new Date(parseInt(item.substr(6))).Format("yyyy-MM-dd hh:mm:ss");
+		        return time;
+		    }
+		}
+
+		Date.prototype.Format = function (fmt) {
+		    var o = {
+		        "M+": this.getMonth() + 1, //月份
+		        "d+": this.getDate(), //日
+		        "h+": this.getHours(), //小时
+		        "m+": this.getMinutes(), //分
+		        "s+": this.getSeconds() //秒
+		    };
+		    if (/(y+)/.test(fmt)) { //根据y的长度来截取年
+		        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+		    }
+		    for (var k in o) {
+		        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+		    }
+		    return fmt;
+		}
+
+		var maps = bigmap.prototype;
+		var mapObj;
+		var errorLine = null;
+		var lable=null;
+		$(document).ready(function () {
+		    setInterval("GetBestNewNetWork()", 1000);
+		    GetSingData();
+		    GetAlarmCount();
+		    GetErrorSet();
+		    var mapcontainer = document.getElementById("mapDiv");
+		    mapObj = maps.init(mapOption, myOption, mapcontainer);
+		});
+
+		setInterval(GetSingData, 10000);
+
+		function GetSingData() {
+		    var TerminalId = $("#TerminalId").val();
+		    var ElectricId = $("#ElectricId").val();
+		    var LineId = $("#LineId").val();
+		    var url = "/Error/GetSingle";
+		    $.ajax({
+		        url: url,
+		        async: true,
+		        type: 'post',
+		        data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId },
+		        dataType: 'json',
+		        success: function (data, jqxhr, txtStatus) {
+		            if (errorLine) {
+		                maps.clearMap(errorLine);
+		            }
+		            if (lable) {
+		                maps.clearMap(lable);
+		            }
+		            if (data.Id == 0) {
+		                return;
+		            } else {
+		                polylineOption.path = data.errorPath;
+		                polylineOption.strokeColor = "#F54024";
+		                errorLine = maps.addPolyline(polylineOption, mapObj);
+		                lableOption.lat = data.errorPath[0].lat;
+		                lableOption.lng = data.errorPath[1].lng;
+		                lableOption.text = data.distance + "米";
+		                lable = maps.addLable(mapObj, lableOption);
+		                $("#FreeServicingTitle").html("数据接入时间:" + "<span style='color:red'>" + dateFormat(data.CreateTime) + "</span>");
+		            }
+		        }, error: function (xhr, txtStatus) {
+		            console.log(txtStatus);
+		        }
+		    })
+		}
+
+		var desData = null;
+		function GetErrorSet() {
+		    $.ajax({
+		        url: '/Error/GetErrorSet',
+		        type: 'post',
+		        async: false,
+		        dataType: 'json',
+		        data: { TerminalId: $("#TerminalId").val() },
+		        success: function (data, jqxhr, txtStatus) {
+		            if (data) {
+		                $("#leftLongitude").val(data.leftLongitude);
+		                $("#leftLatitude").val(data.leftLatitude);
+		                $("#rightLongitude").val(data.rightLongitude);
+		                $("#rightLatitude").val(data.rightLatitude);
+		                desData = data;
+		            }
+		        }, error: function (xhr, txtStatus) {
+		            console.log(txtStatus);
+		        }
+		    })
+		}
+
+		/*历史查询*/
+		$("#btnNetWork").on('click', function () {
+		    var startTime = $("#netStartTime").val();
+		    var endTime = $("#netEndTime").val();
+		    historyNetWorkTrend(startTime, endTime);
+		});
+
+		/*加载网络曲线*/
+		function historyNetWorkTrend(startTime, endTime) {
+		    var TerminalId = $("#TerminalId").val();
+		    var ElectricId = $("#ElectricId").val();
+		    var LineId = $("#LineId").val();
+		    var url = "/Partial/GetNetWorkTrend"
+		    $.ajax({
+		        url: url,
+		        type: 'post',
+		        data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId, startTime: startTime, endTime: endTime },
+		        async: true,
+		        dataType: 'json',
+		        success: function (data, jqxhr, txtStatus) {
+		            resetnetworkChart(data);
+		        }, error: function (jaxhr, txtStatus) {
+		            console.log(txtStatus);
+		        }
+		    })
+		}
+
+		function GetAlarmCount() {
+		    var url = "/Alarm/GetAlarmCount";
+		    var TerminalId = $("#TerminalId").val();
+		    var ElectricId = $("#ElectricId").val();
+		    var LineId = $("#LineId").val();
+		    var data = { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId };
+		    $.ajax({
+		        url: url,
+		        type: 'post',
+		        async: true,
+		        dataType: 'json',
+		        data: data,
+		        success: function (data, jqxhr, txtStatus) {
+		            $("#alarmCount").text(data.count);
+		        }, error: function (xhr, txtStatus) {
+		            console.log(txtStatus);
+		        }
+		    })
+		}
+    </script>
+</body>
+</html>

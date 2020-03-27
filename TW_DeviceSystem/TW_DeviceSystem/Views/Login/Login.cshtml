@@ -1,0 +1,105 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>登录</title>
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/login.css" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            height: 100%;
+            background: #005DA3;
+            overflow: hidden;
+        }
+
+        canvas {
+            z-index: -1;
+            position: absolute;
+        }
+    </style>
+
+    <script src="~/Scripts/particle/jquery.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+    <script src="~/Scripts/particle/Particleground.js"></script>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            //判断一下当前是不是做顶层，如果不是，则做一下顶层页面重定向
+            if (window != top) {
+                top.location.href = location.href;
+            }
+        });
+
+        $(document).ready(function () {
+            $('html').particleground({
+                dotColor: '#E7EBED',
+                lineColor: '#9CBFD9'
+            });
+        });
+
+        layui.use('form', function () {
+            var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
+        });
+
+        function login() {
+            var token = $('[name="__RequestVerificationToken"]').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+
+            var userAccount = $("#userAccount").val();
+            var userPwd = $("#userPwd").val();
+            if (userAccount == "" || userAccount == null || userAccount == "undefined") {
+                layer.msg("请输入账号!");
+                $("#userAccount").focus();
+                return;
+            } else if (userPwd == "" || userPwd == null || userPwd == "undefined") {
+                layer.msg("请输入密码!");
+                $("#userPwd").focus();
+                return;
+            } else {
+                var url = "/Login/userLogin";
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    headers: headers,
+                    cache:false,
+                    data: { userAccount: userAccount, userPwd: userPwd },
+                    dataType: 'json',
+                    async: true,
+                    success: function (data, jqxhr, txtStatus) {
+                        if (data.code == 0) {
+                            window.location.href = "/Home/Index";
+                        } else {
+                            layer.msg(data.msg);
+                        }
+                    }, error: function (xhr, txtStatus) {
+                        console.log(txtStatus);
+                    }
+                })
+            }
+        }
+    </script>
+</head>
+<body>
+    @Html.AntiForgeryToken();
+    <dl class="admin_login">
+        <dt><strong>图维设备管理系统</strong><em>Management System</em></dt>
+        <dd class="user_icon">
+            <input class="login_txtbx" name="userAccount" id="userAccount" type="text" placeholder="账号" value="">
+        </dd>
+        <dd class="pwd_icon">
+            <input class="login_txtbx" name="userPwd" id="userPwd" type="password" placeholder="密码" value="">
+        </dd>
+        <dd><input class="submit_btn" type="submit" id="log_btn" value="立即登陆" onclick="login()" />  </dd>
+        <dd>
+            <P>© 2018-2036 图维 版权所有</P>
+        </dd>
+    </dl>
+</body>
+</html>

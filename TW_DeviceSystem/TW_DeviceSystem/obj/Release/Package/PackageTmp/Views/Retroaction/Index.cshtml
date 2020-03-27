@@ -1,0 +1,129 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/echarts/echarts-liquidfill.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        反馈信息
+    </blockquote>
+
+    <div class="layui-tab layui-tab-brief" lay-filter="demo">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="11">添加反馈</li>
+            <li lay-id="22">反馈列表</li>
+        </ul>
+        <div class="layui-tab-content">
+            <!--1-->
+            <div class="layui-tab-item layui-show">
+                <div class="layui-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">反馈用户:</label>
+                        <div class="layui-input-inline">
+                            <input class="layui-input" autofocus="autofocus" />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">所在供电:</label>
+                        <div class="layui-input-inline">
+                            <input class="layui-input" />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">联系方式:</label>
+                        <div class="layui-input-inline">
+                            <input class="layui-input" />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">反馈内容:</label>
+                        <div class="layui-input-block">
+                            <textarea class="layui-textarea" placeholder="请输入内容"></textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item fk_Submit">
+                        <button class="layui-btn layui-btn-normal">提交</button>
+                    </div>
+                </div>
+            </div>
+            <!--2-->
+            <div class="layui-tab-item">
+                <table class="layui-hide" id="fk" lay-filter="demo"></table>
+            </div>
+        </div>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="check">查看</a>
+    </script>
+    <script>
+			layui.use(['element', 'table'], function() {
+				var element = layui.element;
+				var table = layui.table;
+				element.on('tab(demo)', function(data) {
+					var index = data.index;
+					if(index == 1) {
+						table.render({
+							elem: '#fk',
+							url: '/Scripts/data/fk.json',
+							cellMinWidth: 80,
+							even: 'true',
+							height: 400,
+							page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+								layout: ['count', 'prev', 'page', 'next', 'skip'],
+								groups: 5,
+								first: false,
+								last: false,
+								theme: '#127FD1'
+							},
+							cols: [
+								[{
+										field: 'test1',
+										title: '时间'
+									}
+									, {
+										field: 'test2',
+										title: '反馈内容'
+									}, {
+										field: 'test3',
+										title: '反馈用户'
+									}, {
+										field: 'test4',
+										title: '所在供电'
+									}, {
+										field: 'test5',
+										title: '联系方式'
+									}, {
+										field: 'test6',
+										title: '查看',
+										toolbar: '#barDemo'
+									}
+								]
+							]
+						});
+						//监听工具条
+						table.on('tool(demo)', function(obj) {
+						    var data = obj.data;
+						    var id = data.test1;
+							if(obj.event === 'check') {
+							    var url = "/Retroaction/Details";
+							    window.top.frameUrl(url);
+							}
+						});
+					}
+				});
+			});
+    </script>
+</body>
+</html>

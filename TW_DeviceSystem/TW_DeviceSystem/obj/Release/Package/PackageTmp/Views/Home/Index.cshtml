@@ -1,0 +1,468 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "图维电缆系统";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <style type="text/css">
+        .layui-badge {
+            position: relative;
+            top: -35px;
+            left: -10px;
+            display: block;
+        }
+
+        .treeSearch {
+            width: calc(100% - 10px);
+            height: 25px;
+            margin-left: 5px;
+            background: url(/Images/buttonIcon/btnSearch.png) no-repeat;
+            background-size:20px 20px;
+            background-position:right;
+            border-radius: 3px;
+            border: 1px solid #D4D5D9;
+        }
+
+        input::-webkit-input-placeholder {
+            color: #646262;
+        }
+
+        input::-moz-placeholder { /* Mozilla Firefox 19+ */
+            color: #646262;
+        }
+
+        input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+            color: #646262;
+        }
+
+        input:-ms-input-placeholder { /* Internet Explorer 10-11 */
+            color: #646262;
+        }
+
+        input[type="search"]::-webkit-search-cancel-button {
+            display: none;
+        }
+
+        .phoneCode {
+            max-width: 160px;
+            height: 50px;
+            float: right;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+            .phoneCode img {
+                padding-top: 3px;
+                display: block;
+                margin-right: 10px;
+                float: left;
+            }
+
+            .phoneCode span {
+                font-size: 12px;
+                display: block;
+                line-height: 50px;
+                float: left;
+                margin-right: 10px;
+                color: white;
+            }
+
+        .topPanel {
+            top: 0px;
+            right: 0px;
+            left: 0px;
+            height: 70px;
+            position: absolute;
+            z-index: 200;
+        }
+
+        .topTitle {
+            min-width: 350px;
+            height: 70px;
+            float: left;
+        }
+
+            .topTitle img {
+                line-height: 70px;
+                margin-left: 10px;
+            }
+
+            .topTitle span {
+                color: white;
+                font-size: 18px;
+                font-weight: bold;
+                line-height: 70px;
+            }
+
+        .topRightPanel {
+            min-width: 200px;
+            height: 70px;
+            float: right;
+        }
+
+        .userRight {
+            min-width: 150px;
+            height: 70px;
+            float: left;
+            color: white;
+        }
+
+            .userRight a {
+                width: 20px;
+                height: 50px;
+                color: white;
+                font-size: 18px;
+                margin: 20px 0px 0px 5px;
+                float: left;
+            }
+
+                .userRight a:hover {
+                    text-decoration: underline;
+                }
+
+            .userRight img {
+                margin: 10px 0px 0px 5px;
+                float: left;
+            }
+
+            .userRight span {
+                margin: 20px 0px 0px 5px;
+                float: left;
+            }
+    </style>
+</head>
+<body>
+    <div class="topPanel">
+        <div class="topTitle">
+            <img alt="logo" src="~/Images/logo.png" width="100" height="50" style="vertical-align:middle;">
+            <span>电缆运行状态监测管理平台</span>
+        </div>
+        <div class="topRightPanel">
+            <div class="userRight" style="cursor:pointer; margin-right:5px;" onclick="GetQRCode()">
+                <img src="~/Images/Phone/phone.png" />
+                <span>手机端APP下载</span>
+            </div>
+            <div class="userRight">
+                <img src="~/Images/userPhoto/admin.png" />
+                <span>@ViewData["userName"]</span>
+                <a class="icon-loginout" href="javascript:void(0);" title="注销登录" onclick="logOut()" target="_parent"></a>
+            </div>
+        </div>
+    </div>
+    <div class="top">
+        <div class="top_logo">
+        </div>
+        <div class="top_center"></div>
+        <div class="top_right">
+
+        </div>
+        <div class="top_nav">
+            <div class="time">
+                <i class="icon-time"></i>
+                <i>当前时间:</i>
+                <span id="day_day"></span>
+            </div>
+            <div id="here_area">当前位置：<a href="javascript:void(0)" onclick="goHome()">首页</a>&nbsp;&gt;&nbsp;<span id="navName"></span></div>
+        </div>
+        <div class="foot">Copyright © 2018-2036 版权所有 浙江新图维电子科技有限公司 </div>
+    </div>
+
+    <div class="menuside">
+        <div class="left_menu">
+            <div class="carousel-01">
+                <a href="javascript:void(0);" class="prev" id="prev-06">&nbsp </a>
+                <div class="jCarouselLite-01" id="menuLite">
+                    <ul id="menuLeft"></ul>
+                </div>
+                <a href="javascript:void(0);" class="next" id="next-06">&nbsp </a>
+            </div>
+        </div>
+        <div class="gncd">功能菜单</div>
+        <div class="left_main_nr">
+            <div class="xmgl_tt">
+                <i class="icon-organize"></i>
+                <span>设备架构</span>
+            </div>
+            <div style="width:100%; height:30px;">
+                <div style="width:auto; height:auto; background:#ffffff">
+                    <input type="text" id="treeSearch" class="treeSearch" placeholder="请输入设备名称或终端Id" onkeyup="AutoMatch(this)" />
+                </div>
+        
+            </div>
+            <div class="leftTreeContainer">
+                <ul id="deivceTree" class="ztree"></ul>
+            </div>
+        </div>
+    </div>
+    <div class="main">
+        <iframe id="mainframe" frameborder="0" scrolling="auto" src="/Home/Chart" style="width:100%;height:100%; float:left;"></iframe>
+    </div>
+    <input type="hidden" id="searchText" />
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        setInterval("GetTime()", 1000);
+        //获取本地时间
+        function GetTime() {
+            var date = new Date();
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            var hour = date.getHours();
+            var minute = date.getMinutes();
+            var second = date.getSeconds();
+            var str = year + "年" + month + "月" + day + "日" + hour + "时" + minute + "分" + second + "秒";
+            document.getElementById("day_day").innerText = str;
+        }
+
+        layui.use(['table', 'form'], function () {
+        });
+        var QRCodeJson = {
+            "title": "安卓手机端二维码",
+            "id": 1,
+            "start": 0,
+            "data": [
+                {
+                    "alt": "手机扫一扫二维码下载AndroidAPP",
+                    "pid": 1,
+                    "src": "/Images/Phone/qrcode.png",
+                    "thumb": "/Images/Phone/qrcode.png"
+                }
+            ]
+        }
+
+        //打开二维码
+        function GetQRCode() {
+            layer.photos({
+                photos: QRCodeJson,
+                shift: 5
+            });
+        }
+
+        //frameUrl设置
+        function frameUrl(url) {
+            document.getElementById("mainframe").src = url;
+        }
+
+        //设置导航名称
+        function setNavName(name) {
+            document.getElementById("navName").innerText = name;
+        }
+
+        //获取所有父节点
+        function getFilePath(treeObj) {
+            if (treeObj == null) return "";
+            var filename = treeObj.name;
+            var pNode = treeObj.getParentNode();
+            if (pNode != null) {
+                filename = getFilePath(pNode) + ">" + filename;
+            }
+            return filename;
+        }
+
+        $(document).ready(function () {
+            initMenu();
+            initTree();
+        });
+
+        var zTreeObj;
+        var setting = {
+            callback: {
+                onClick: function (event, treeId, treeNode) {
+                    var fileName = getFilePath(treeNode);
+                    if (treeNode.actionAddress) {
+                        setNavName(fileName);
+                        removeAllClass();
+                        var url = treeNode.actionAddress + "?TerminalId=" + treeNode.TerminalId + "&ElectricId=" + treeNode.ElectricId + "&LineId=" + treeNode.LineId;
+                        frameUrl(url);
+                    } else {
+                        return;
+                    }
+                }
+            }
+        };
+
+        var zNodes;
+        /*初始化zTree*/
+        function initTree() {
+            var url = "/Organize/getNodeList";
+            $.ajax({
+                url: url,
+                async: true,
+                type: 'post',
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    zNodes = convertToTreeData(data, 0);
+                    zTreeObj = $.fn.zTree.init($("#deivceTree"), setting, zNodes);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        function convertToTreeData(data, pid) {
+            const result = [];
+            let temp = [];
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].parentId === pid) {
+                    const obj = { 'name': data[i].name, 'Id': data[i].Id, 'icon': data[i].icon, 'iconOpen': data[i].iconOpen, 'iconClose': data[i].iconClose, 'path': data[i].path, 'actionAddress': data[i].actionAddress, 'parentId': data[i].parentId, 'orderNo': data[i].orderNo, 'isElectric': data[i].isElectric, 'isLine': data[i].isLine, 'isJoint': data[i].isJoint, 'isDevice': data[i].isDevice, 'CreateTime': data[i].CreateTime, 'TerminalId': data[i].TerminalId, 'ElectricId': data[i].ElectricId, 'LineId': data[i].LineId }
+                    temp = this.convertToTreeData(data, data[i].Id)
+                    if (temp.length > 0) {
+                        obj.children = temp
+                    }
+                    result.push(obj);
+                }
+            }
+            return result;
+        }
+
+        ///根据文本框的关键词输入情况自动匹配树内节点 进行模糊查找
+        function AutoMatch(txtObj) {
+            if (txtObj.value.length > 0) {
+                InitialZtree();
+                var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                var nodeList = zTree.getNodesByParamFuzzy("name", txtObj.value);
+                //将找到的nodelist节点更新至Ztree内
+                $.fn.zTree.init($("#deivceTree"), setting, nodeList);
+                showMenu();
+            } else {
+                //隐藏树
+                //hideMenu();
+                InitialZtree();
+            }
+        }
+
+        //还原zTree的初始数据
+        function InitialZtree() {
+            $.fn.zTree.init($("#deivceTree"), setting, zNodes);
+        }
+
+        //显示树
+        function showMenu() {
+            var cityObj = $("#treeSearch");
+            var cityOffset = $("#treeSearch").offset();
+            //$("#menuContent").css({ left: cityOffset.left + "px", top: cityOffset.top + cityObj.outerHeight() + "px" }).slideDown("fast");
+            $("#menuContent").slideDown("fast");
+        }
+
+        /*界面异步添加节点*/
+        function addNodes(isRootNode, nodeData, isSameNode, treeNode) {
+            var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+            var Node = zTree.getNodeByParam("Id", treeNode.Id);
+            if (Node && isRootNode == false && isSameNode == false) {
+                Node = zTree.addNodes(Node, nodeData);
+            } else if (Node && isRootNode == false && isSameNode == true) {
+                var pNode = Node.getParentNode();
+                Node = zTree.addNodes(pNode, nodeData);
+            } else {
+                Node = zTree.addNodes(null, nodeData);
+            }
+        }
+
+        /*判断是否存在父节点*/
+        function isInArray(arr, value) {
+            for (var i = 0; i < arr.length; i++) {
+                if (value === arr[i]) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function menuChange() {
+            var listMenu = document.getElementById("menuLite").getElementsByTagName("li");
+            for (var i = 0; i < listMenu.length; i++) {
+                listMenu[i].onclick = function () {
+                    menuClick(this);
+                }
+            }
+        }
+
+        function menuClick(tab) {
+            if (tab.ClassName == "MenuSelect") {
+                return;
+            }
+            removeAllClass();
+            $(tab).removeClass();
+            $(tab).addClass("MenuSelect");
+            var url = tab.dataset.url;
+            var titleName = tab.innerText;
+            setNavName(titleName);
+            var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+            zTree.cancelSelectedNode();
+            frameUrl(url);
+        }
+
+        function removeAllClass() {
+            var listMenu = document.getElementById("menuLite").getElementsByTagName("li");
+            for (var i = 0; i < listMenu.length; i++) {
+                $(listMenu[i]).removeClass();
+            }
+        }
+
+        function goHome() {
+            var url = "/Home/Chart";
+            frameUrl(url);
+        }
+
+        function logOut() {
+            window.location.href = "/Login/logOut";
+        }
+
+        function initMenu() {
+            var url = "/Function/GetFunctionByUser"
+            $.ajax({
+                url: url,
+                type: 'post',
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    $.each(data, function (idx, obj) {
+                        var html = " <li data-url='" + obj.actionAddress + "'> <i class='" + obj.iconFont + "'></i><div class='title'>" + obj.functionName + "</div></li>";
+                        $("#menuLeft").append(html);
+                    });
+                    //左侧轮训菜单加载
+                    $('#menuLite').jCarouselLite({
+                        btnPrev: '#prev-06',
+                        btnNext: '#next-06',
+                        visible: 6,
+                        vertical: true,
+                        circular: false
+                    });
+                    menuChange();
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        function GetPendAlarmNum(number) {
+            var obj = document.getElementById("menuLeft").children[1];
+            var html = "<span class='layui-badge'>" + number + "</span>";
+            try {
+                $(obj.children[2]).remove();
+                $(obj).append(html);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        function GetDoAlarmNum(number) {
+            var obj = document.getElementById("menuLeft").children[2];
+            var html = "<span class='layui-badge'>" + number + "</span>";
+            try {
+                $(obj.children[2]).remove();
+                $(obj).append(html);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+    </script>
+</body>
+</html>

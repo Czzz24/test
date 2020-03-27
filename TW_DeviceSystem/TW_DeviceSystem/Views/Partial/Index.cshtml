@@ -1,0 +1,2014 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.js"></script>
+</head>
+<body>
+    <input type="hidden" id="TerminalId" value="@ViewBag.TerminalId" />
+    <input type="hidden" id="ElectricId" value="@ViewBag.ElectricId" />
+    <input type="hidden" id="LineId" value="@ViewBag.LineId" />
+
+    <blockquote class="layui-elem-quote layui-text" id="PartialTitle"></blockquote>
+    <div class="jd_detailsColumns">
+        <div class="partial_tableContainer">
+            <table cellspacing="0">
+                <thead>
+                    <tr>
+                        <td>相位</td>
+                        <td>最大放电量</td>
+                        <td>最大放电频次</td>
+                        <td>状态</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>A相</td>
+                        <td id="AElectricMaxValue">--.--</td>
+                        <td id="AFrequencyMaxValue">--.--</td>
+                        <td id="Astatus">--.--</td>
+                    </tr>
+                    <tr>
+                        <td>B相</td>
+                        <td id="BElectricMaxValue">--.--</td>
+                        <td id="BFrequencyMaxValue">--.--</td>
+                        <td id="Bstatus">--.--</td>
+                    </tr>
+                    <tr>
+                        <td>C相</td>
+                        <td id="CElectricMaxValue">--.--</td>
+                        <td id="CFrequencyMaxValue">--.--</td>
+                        <td id="Cstatus">--.--</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="partial_tableContainer">
+            @*<div class="partialAnyContainer">
+                    <div class="partialAnyChart" id="partialAnyChart"></div>
+                    <div class="partialAnyChartTitle">
+                        <div class="partialAnyChartTitleConTainer">
+                            <ul>
+                                <li><span style="color:#86F316;display:block; border:1px solid #86F316" class="box">正常</span></li>
+                                <li><span style="color:#B7B2B2;display:block; border:1px solid #B7B2B2">异常</span></li>
+                                <li><span style="color:#B7B2B2;display:block; border:1px solid #B7B2B2">高危</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <img src="~/Images/guandao.jpg" />*@
+            <img src="~/Images/guandao.jpg" style="width:100%; height:130px" />
+        </div>
+    </div>
+    <div class="tabbar_Container">
+        <div class="layui-tab layui-tab-brief" lay-filter="demo">
+            <ul class="layui-tab-title">
+                <li class="layui-this">A相</li>
+                <li>B相</li>
+                <li>C相</li>
+                <li>历史回放</li>
+                <li>历史分析</li>
+                <li>报警数据<span class="layui-badge" id="alarmCount"></span></li>
+                <li>趋势分析</li>
+                <li>设备状态</li>
+            </ul>
+            <div class="layui-tab-content">
+                <!--1-->
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">Y抽定值：</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" placeholder="请输入Y值" id="YMax" value="500">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn btn-size layui-btn-normal" id="sureYMax">确定</button>
+                    </div>
+                    <div class="form_Area">
+                        <div id="form1" class="form_Container"></div>
+                        <div id="form2" class="form_Container"></div>
+                        <div id="form3" class="form_Container"></div>
+                        <div id="form4" class="form_Container"></div>
+                        <div id="form5" class="form_Container"></div>
+                        <div id="form6" class="form_Container"></div>
+                        <div id="form7" class="form_Container"></div>
+                        <div id="form8" class="form_Container"></div>
+                        <div id="form9" class="form_Container"></div>
+                        <div id="form10" class="form_Container"></div>
+                        <div id="form11" class="form_Container"></div>
+                        <div id="form12" class="form_Container"></div>
+                        <div id="form13" class="form_Container"></div>
+                        <div id="form14" class="form_Container"></div>
+                        <div id="form15" class="form_Container"></div>
+                    </div>
+                </div>
+                <!--2-->
+                <div class="layui-tab-item">
+                    2
+                </div>
+                <!--3-->
+                <div class="layui-tab-item">
+                    3
+                </div>
+                <!--4-->
+                <div class="layui-tab-item">
+                    <div class="layui-form">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">开始时间：</label>
+                            <div class="layui-input-inline">
+                                <input type="tel" id="historystartTime" name="phone" placeholder="请选择开始时间" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">结束时间：</label>
+                            <div class="layui-input-inline">
+                                <input type="tel" id="hitoryendTime" name="phone" placeholder="请选择结束时间" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">Y抽定值：</label>
+                            <div class="layui-input-inline">
+                                <input type="text" class="layui-input" placeholder="请输入Y值" id="HYMax" value="500">
+                            </div>
+                        </div>
+                        <div class="layui-inline" style="margin-left: 10px;">
+                            <label class="layui-form-label">自动播放：</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" id="isAutoPlay" lay-skin="switch" lay-text="开|关" lay-filter="switchPaly" checked>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">单位(秒)：</label>
+                            <div class="layui-input-block">
+                                <input type="text" class="layui-input" placeholder="请输入时间" value="60" id="secondDate" onkeyup="timegapChange()">
+                            </div>
+                        </div>
+                        <div class="layui-inline" style="margin-left: 10px;">
+                            <button class="layui-btn btn-size layui-btn-normal" onclick="searchHistory()">查询</button>
+                            <button class="layui-btn btn-size layui-btn-warm" id="sureHYMax">确定</button>
+                        </div>
+                    </div>
+                    <div class="layui-form">
+                        <div class="layui-inline" style="margin-left:18px">
+                            <img src="~/Images/Icon/left.png" title="上一页" style="cursor:pointer;width:20px; height:20px;" onclick="prePage()" />
+                            <span id="currentPage">1</span>
+                            <span>/</span>
+                            <span id="pageCount"></span>
+                            <img src="~/Images/Icon/right.png" title="下一页" style="cursor:pointer;width:20px; height:20px" onclick="nextPage()" />
+                            <span>时间：</span>
+                            <span style="color:red" id="dataTimes"></span>
+                        </div>
+                    </div>
+                    <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                        <ul class="layui-tab-title">
+                            <li class="layui-this">A相</li>
+                            <li>B相</li>
+                            <li>C相</li>
+                        </ul>
+                        <div class="layui-tab-content">
+                            <div class="layui-tab-item layui-show">
+                                <div class="form_Area">
+                                    <div id="hform1" class="form_Container"></div>
+                                    <div id="hform2" class="form_Container"></div>
+                                    <div id="hform3" class="form_Container"></div>
+                                    <div id="hform4" class="form_Container"></div>
+                                    <div id="hform5" class="form_Container"></div>
+                                    <div id="hform6" class="form_Container"></div>
+                                    <div id="hform7" class="form_Container"></div>
+                                    <div id="hform8" class="form_Container"></div>
+                                    <div id="hform9" class="form_Container"></div>
+                                    <div id="hform10" class="form_Container"></div>
+                                    <div id="hform11" class="form_Container"></div>
+                                    <div id="hform12" class="form_Container"></div>
+                                    <div id="hform13" class="form_Container"></div>
+                                    <div id="hform14" class="form_Container"></div>
+                                    <div id="hform15" class="form_Container"></div>
+                                </div>
+                            </div>
+                            <div class="layui-tab-item"></div>
+                            <div class="layui-tab-item"></div>
+                        </div>
+                    </div>
+                </div>
+                <!--5-->
+                <div class="layui-tab-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" placeholder="请选择开始时间" id="startDate">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" placeholder="请选择结束时间" id="endDate">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn btn-size layui-btn-normal" id="searchHistoryAny">查询</button>
+                    </div>
+                    <div class="form_Area">
+                        <div class="partial_ChartArea" id="aPhase"></div>
+                        <div class="partial_ChartArea" id="bPhase"></div>
+                        <div class="partial_ChartArea" id="cPhase"></div>
+                    </div>
+                </div>
+                <!--6-->
+                <div class="layui-tab-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="alarmStartTime" name="phone" placeholder="请选择开始时间" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="alarmEndTime" name="phone" placeholder="请选择结束时间" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn layui-btn-normal" data-type="reloadAlarm" id="btnAlarmSearch">查询</button>
+                        <button class="layui-btn layui-btn-danger" lay-event="getCheckLength" id="confirmAlarm">确认告警</button>
+                    </div>
+                    <table class="layui-hide" id="alarmdata" lay-filter="alarm"></table>
+                </div>
+                <!--7-->
+                <div class="layui-tab-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="trendStartTime" placeholder="请选择开始时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="trendEndTime" placeholder="请选择结束时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn layui-btn-normal" id="btnTrend">查询</button>
+                    </div>
+                    <div class="form_Area">
+                        <div class="partial_ChartArea" id="aTrend"></div>
+                        <div class="partial_ChartArea" id="bTrend"></div>
+                        <div class="partial_ChartArea" id="cTrend"></div>
+                    </div>
+                </div>
+                <!--8-->
+                <div class="layui-tab-item">
+                    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                        <legend>设备通讯状态曲线</legend>
+                    </fieldset>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="netStartTime" name="phone" placeholder="请选择开始时间" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="netEndTime" name="phone" placeholder="请选择结束时间" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn layui-btn-normal" id="btnNetWork">查询</button>
+                    </div>
+                    <div class="legendRow">
+                        <div class="legend green"></div>
+                        <p class="legendTitle">校验通过</p>
+                        <div class="legend red"></div>
+                        <p class="legendTitle">校验不通过</p>
+                        <div class="legend blue"></div>
+                        <p class="legendTitle">没回复模块正常</p>
+                        <div class="legend yellow"></div>
+                        <p class="legendTitle">网络无连接</p>
+                        <div class="legend Violet"></div>
+                        <p class="legendTitle">网络已连接</p>
+                    </div>
+                    <div class="form_Area">
+                        <div class="partial_ChartArea" style="width:calc(100% - 10px)" id="networkTrend"></div>
+                    </div>
+                    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                        <legend>设备电源信息</legend>
+                    </fieldset>
+                    <table lay-filter="parse-table-version">
+                        <thead>
+                            <tr>
+                                <th lay-data="{field:'A1Voltage1', width:230}">设备A1电源5v电压单位(mV)</th>
+                                <th lay-data="{field:'A1Voltage2', width:200}">设备A1电源3.3V电压(mV)</th>
+                                <th lay-data="{field:'A1Voltage3', width:200}">设备A1电源2.5V电压(mV)</th>
+                                <th lay-data="{field:'A2Voltage1', width:200}">设备A2电源12V电压(mV)</th>
+                                <th lay-data="{field:'A2Voltage2', width:200}">设备A2电源5V电压(mV)</th>
+                                <th lay-data="{field:'A2Voltage3', width:200}">设备A2电源3.3V电压(mV)</th>
+                                <th lay-data="{field:'B1Voltage1', width:200}">设备B1电源5V电压(mV)</th>
+                                <th lay-data="{field:'B1Voltage2', width:200}">设备B1电源3.3V电压(mV)</th>
+                                <th lay-data="{field:'B1Voltage3', width:200}">设备B1电源2.5V电压(mV)</th>
+                                <th lay-data="{field:'B2Voltage1', width:200}">设备B2电源12V电压(mV)</th>
+                                <th lay-data="{field:'B2Voltage2', width:200}">设备B2电源5V电压(mV)</th>
+                                <th lay-data="{field:'B2Voltage3', width:200}">设备B2电源3.3V电压(mV)</th>
+                                <th lay-data="{field:'C1Voltage1', width:200}">设备C1电源5V电压(mV)</th>
+                                <th lay-data="{field:'C1Voltage2', width:200}">设备C1电源3.3V电压(mV)</th>
+                                <th lay-data="{field:'C1Voltage3', width:200}">设备C1电源2.5V电压(mV)</th>
+                                <th lay-data="{field:'C2Voltage1', width:200}">设备C2电源12V电压(mV)</th>
+                                <th lay-data="{field:'C2Voltage2', width:200}">设备C2电源5V电压(mV)</th>
+                                <th lay-data="{field:'C2Voltage3', width:200}">设备C2电源3.3V电压(mV)</th>
+                                <th lay-data="{field:'d3Voltage1', width:200}">设备3电源12V电压(mV)</th>
+                                <th lay-data="{field:'d3Voltage2', width:200}">设备3电源5V电压(mV)</th>
+                                <th lay-data="{field:'d3Voltage3', width:200}">设备3电源3.3V电压(mV)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="powerSupplyRow"></tr>
+                        </tbody>
+                    </table>
+                    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                        <legend>设备版本号</legend>
+                    </fieldset>
+                    <table lay-filter="parse-table-version">
+                        <thead>
+                            <tr>
+                                <th lay-data="{field:'A1hardversion', width:150}">设备A1硬件版本号</th>
+                                <th lay-data="{field:'A1softversion', width:150}">设备A1软件版本号</th>
+                                <th lay-data="{field:'A2hardversion', width:150}">设备A2硬件版本号</th>
+                                <th lay-data="{field:'A2softversion', width:150}">设备A2软件版本号</th>
+                                <th lay-data="{field:'B1hardversion', width:150}">设备B1硬件版本号</th>
+                                <th lay-data="{field:'B1softversion', width:150}">设备B1软件版本号</th>
+                                <th lay-data="{field:'B2hardversion', width:150}">设备B2硬件版本号</th>
+                                <th lay-data="{field:'B2softversion', width:150}">设备B2软件版本号</th>
+                                <th lay-data="{field:'C1hardversion', width:150}">设备C1硬件版本号</th>
+                                <th lay-data="{field:'C1softversion', width:150}">设备C1软件版本号</th>
+                                <th lay-data="{field:'C2hardversion', width:150}">设备C2硬件版本号</th>
+                                <th lay-data="{field:'C2softversion', width:150}">设备C2软件版本号</th>
+                                <th lay-data="{field:'d3hardversion', width:150}">设备3硬件版本号</th>
+                                <th lay-data="{field:'d3softversion', width:150}">设备3软件版本号</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="versionRow"></tr>
+                        </tbody>
+                    </table>
+                    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                        <legend>状态字1</legend>
+                    </fieldset>
+                    <table lay-filter="parse-table-version">
+                        <thead>
+                            <tr>
+                                <th lay-data="{field:'BIT7', width:160}">BIT7</th>
+                                <th lay-data="{field:'BIT6', width:160}">BIT6</th>
+                                <th lay-data="{field:'BIT5', width:160}">BIT5</th>
+                                <th lay-data="{field:'BIT4', width:160}">BIT4</th>
+                                <th lay-data="{field:'BIT3', width:160}">BIT3</th>
+                                <th lay-data="{field:'BIT2', width:160}">BIT2</th>
+                                <th lay-data="{field:'BIT1', width:160}">BIT1</th>
+                                <th lay-data="{field:'BIT0', width:160}">BIT0</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>B相</td>
+                                <td>B相</td>
+                                <td>B相</td>
+                                <td>A相</td>
+                                <td>A相</td>
+                                <td>A相</td>
+                                <td>A相</td>
+                                <td>A相</td>
+                            </tr>
+                            <tr>
+                                <td>3通道</td>
+                                <td>2通道</td>
+                                <td>1通道</td>
+                                <td>5通道</td>
+                                <td>4通道</td>
+                                <td>3通道</td>
+                                <td>2通道</td>
+                                <td>1通道</td>
+                            </tr>
+                            <tr>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                            </tr>
+                            <tr id="statusRowOne"></tr>
+                        </tbody>
+                    </table>
+                    <table lay-filter="parse-table-version">
+                        <thead>
+                            <tr>
+                                <th lay-data="{field:'BIT15', width:160}">BIT15</th>
+                                <th lay-data="{field:'BIT14', width:160}">BIT14</th>
+                                <th lay-data="{field:'BIT13', width:160}">BIT13</th>
+                                <th lay-data="{field:'BIT12', width:160}">BIT12</th>
+                                <th lay-data="{field:'BIT11', width:160}">BIT11</th>
+                                <th lay-data="{field:'BIT10', width:160}">BIT10</th>
+                                <th lay-data="{field:'BIT9', width:160}">BIT9</th>
+                                <th lay-data="{field:'BIT8', width:160}">BIT8</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>备用</td>
+                                <td>C相</td>
+                                <td>C相</td>
+                                <td>C相</td>
+                                <td>C相</td>
+                                <td>C相</td>
+                                <td>B相</td>
+                                <td>B相</td>
+                            </tr>
+                            <tr>
+                                <td>备用</td>
+                                <td>5通道</td>
+                                <td>4通道</td>
+                                <td>3通道</td>
+                                <td>2通道</td>
+                                <td>1通道</td>
+                                <td>5通道</td>
+                                <td>4通道</td>
+                            </tr>
+                            <tr>
+                                <td>备用</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                            </tr>
+                            <tr id="statusRowTwo"></tr>
+                        </tbody>
+                    </table>
+                    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                        <legend>状态字2</legend>
+                    </fieldset>
+                    <table lay-filter="parse-table-version">
+                        <thead>
+                            <tr>
+                                <th lay-data="{field:'BIT7', width:160}">BIT7</th>
+                                <th lay-data="{field:'BIT6', width:160}">BIT6</th>
+                                <th lay-data="{field:'BIT5', width:160}">BIT5</th>
+                                <th lay-data="{field:'BIT4', width:160}">BIT4</th>
+                                <th lay-data="{field:'BIT3', width:160}">BIT3</th>
+                                <th lay-data="{field:'BIT2', width:160}">BIT2</th>
+                                <th lay-data="{field:'BIT1', width:160}">BIT1</th>
+                                <th lay-data="{field:'BIT0', width:160}">BIT0</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>备用</td>
+                                <td>备用</td>
+                                <td>C相</td>
+                                <td>B相</td>
+                                <td>A相</td>
+                                <td>C相</td>
+                                <td>B相</td>
+                                <td>A相</td>
+                            </tr>
+                            <tr>
+                                <td>备用</td>
+                                <td>备用</td>
+                                <td>485通信</td>
+                                <td>485通信</td>
+                                <td>485通信</td>
+                                <td>射频通信</td>
+                                <td>射频通信</td>
+                                <td>射频通信</td>
+                            </tr>
+                            <tr>
+                                <td>备用</td>
+                                <td>备用</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                                <td>工作状态</td>
+                            </tr>
+                            <tr id="statusRowThree"></tr>
+                        </tbody>
+                    </table>
+                    <table lay-filter="parse-table-version">
+                        <thead>
+                            <tr>
+                                <th lay-data="{field:'BIT15', width:160}">BIT15</th>
+                                <th lay-data="{field:'BIT14', width:160}">BIT14</th>
+                                <th lay-data="{field:'BIT13', width:160}">BIT13</th>
+                                <th lay-data="{field:'BIT12', width:160}">BIT12</th>
+                                <th lay-data="{field:'BIT11', width:160}">BIT11</th>
+                                <th lay-data="{field:'BIT10', width:160}">BIT10</th>
+                                <th lay-data="{field:'BIT9', width:160}">BIT9</th>
+                                <th lay-data="{field:'BIT8', width:160}">BIT8</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>备用</td>
+                                <td>备用</td>
+                                <td>备用</td>
+                                <td>备用</td>
+                                <td>备用</td>
+                                <td>备用</td>
+                                <td>备用</td>
+                                <td>备用</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                        <legend>状态字3</legend>
+                    </fieldset>
+                    <table lay-filter="parse-table-version">
+                        <thead>
+                            <tr>
+                                <th lay-data="{field:'BIT7', width:160}">BIT7</th>
+                                <th lay-data="{field:'BIT6', width:160}">BIT6</th>
+                                <th lay-data="{field:'BIT5', width:160}">BIT5</th>
+                                <th lay-data="{field:'BIT4', width:160}">BIT4</th>
+                                <th lay-data="{field:'BIT3', width:160}">BIT3</th>
+                                <th lay-data="{field:'BIT2', width:160}">BIT2</th>
+                                <th lay-data="{field:'BIT1', width:160}">BIT1</th>
+                                <th lay-data="{field:'BIT0', width:160}">BIT0</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>B相</td>
+                                <td>B相</td>
+                                <td>B相</td>
+                                <td>A相</td>
+                                <td>A相</td>
+                                <td>A相</td>
+                                <td>A相</td>
+                                <td>A相</td>
+                            </tr>
+                            <tr>
+                                <td>3通道</td>
+                                <td>2通道</td>
+                                <td>1通道</td>
+                                <td>5通道</td>
+                                <td>4通道</td>
+                                <td>3通道</td>
+                                <td>2通道</td>
+                                <td>1通道</td>
+                            </tr>
+                            <tr>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                            </tr>
+                            <tr id="statusRowFour"></tr>
+                        </tbody>
+                    </table>
+                    <table lay-filter="parse-table-version">
+                        <thead>
+                            <tr>
+                                <th lay-data="{field:'BIT15', width:160}">BIT15</th>
+                                <th lay-data="{field:'BIT14', width:160}">BIT14</th>
+                                <th lay-data="{field:'BIT13', width:160}">BIT13</th>
+                                <th lay-data="{field:'BIT12', width:160}">BIT12</th>
+                                <th lay-data="{field:'BIT11', width:160}">BIT11</th>
+                                <th lay-data="{field:'BIT10', width:160}">BIT10</th>
+                                <th lay-data="{field:'BIT9', width:160}">BIT9</th>
+                                <th lay-data="{field:'BIT8', width:160}">BIT8</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>备用</td>
+                                <td>C相</td>
+                                <td>C相</td>
+                                <td>C相</td>
+                                <td>C相</td>
+                                <td>C相</td>
+                                <td>B相</td>
+                                <td>B相</td>
+                            </tr>
+                            <tr>
+                                <td>备用</td>
+                                <td>5通道</td>
+                                <td>4通道</td>
+                                <td>3通道</td>
+                                <td>2通道</td>
+                                <td>1通道</td>
+                                <td>5通道</td>
+                                <td>4通道</td>
+                            </tr>
+                            <tr>
+                                <td>备用</td>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                                <td>局放告警</td>
+                            </tr>
+                            <tr id="statusRowFive"></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--实时分析网络状态-->
+    <div class="netWordStatePanelIcon shrink" id="networkBtn"></div>
+    <div class="netWordStatePanel" id="netWordState">
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    @*局放分析图表*@
+    @*<script src="~/Scripts/Views/Partial/PartialAnyChart/PartialAnyChart.js"></script>*@
+    @*即时图表*@
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart1.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart2.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart3.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart4.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart5.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart6.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart7.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart8.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart9.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart10.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart11.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart12.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart13.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart14.js"></script>
+    <script src="~/Scripts/Views/Partial/Immediate/PartialChart15.js"></script>
+    @*历史图表*@
+    <script src="~/Scripts/Views/Partial/History/hPartialChart1.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart2.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart3.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart4.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart5.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart6.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart7.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart8.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart9.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart10.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart11.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart12.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart13.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart14.js"></script>
+    <script src="~/Scripts/Views/Partial/History/hPartialChart15.js"></script>
+    @*历史分析图表*@
+    <script src="~/Scripts/Views/Partial/Analysis/aPhase.js"></script>
+    <script src="~/Scripts/Views/Partial/Analysis/bPhase.js"></script>
+    <script src="~/Scripts/Views/Partial/Analysis/cPhase.js"></script>
+    @*历史趋势图表*@
+    <script src="~/Scripts/Views/Partial/Trend/aTrend.js"></script>
+    <script src="~/Scripts/Views/Partial/Trend/bTrend.js"></script>
+    <script src="~/Scripts/Views/Partial/Trend/cTrend.js"></script>
+    @*通讯状态曲线*@
+    <script src="~/Scripts/Views/NetWord/networkTrend.js"></script>
+    @*滚动条插件*@
+    <script src="~/Scripts/scroll/jquery.nicescroll.js"></script>
+
+    <script type="text/html" id="StatusName">
+        {{#  if(d.Status === 1){ }}
+        <span style="color: red;">{{ d.StatusName }}</span>
+        {{# } }}
+        {{#  if(d.Status === 2){ }}
+        <span style="color: #FFB700;">{{ d.StatusName }}</span>
+        {{# } }}
+        {{#  if(d.Status === 3){ }}
+        <span style="color: #417505;">{{ d.StatusName }}</span>
+        {{# } }}
+    </script>
+
+    <script type="text/html" id="FlagStatus">
+        {{#  if(d.Flag === -1){ }}
+        <span style="color: red;">告警中</span>
+        {{#  } else { }}
+        <span style="color: #417505;">已恢复</span>
+        {{#  } }}
+    </script>
+
+    <script type="text/html" id="handle">
+        @*箱柜门打开可查看照片/其他变处理*@
+        <a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="showPicture">查看处理照片</a>
+        {{#  if(d.AlarmCode === 257 && d.Status===1){ }}
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看照片</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">处理</a>
+        {{#  } else if(d.Status===2 && d.AlarmCode===257) { }}
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看照片</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">处理</a>
+        {{#  } else if(d.Status===3 && d.AlarmCode===257) { }}
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看照片</a>
+        {{#  } else if(d.Status===3) { }}
+
+        {{#  } else { }}
+        <a class="layui-btn layui-btn-xs" lay-event="edit">处理</a>
+        {{#  } }}
+    </script>
+
+    <script type="text/javascript">
+        var IntervalImmediate;
+        var intervalHistory;
+        var counter = 60 * 1000;
+        var rIndex = 1;
+        var yMax = 500;
+        var HYMax = 500;
+
+        $('#netWordState').niceScroll({
+            cursorcolor: "#4A4E51",//#CC0071 光标颜色
+            cursoropacitymax: 1, //改变不透明度非常光标处于活动状态（scrollabar“可见”状态），范围从1到0
+            touchbehavior: false, //使光标拖动滚动像在台式电脑触摸设备
+            cursorwidth: "5px", //像素光标的宽度
+            cursorborder: "0", // 游标边框css定义
+            cursorborderradius: "5px",//以像素为光标边界半径
+            autohidemode: false //是否隐藏滚动条
+        });
+
+        layui.use(['element', 'form', 'table', 'laydate'], function () {
+            var form = layui.form;
+            var element = layui.element;
+            var versiontable = layui.table;
+            var alarmTable = layui.table;
+
+            alarmTable.render({
+                elem: '#alarmdata',
+                url: '/Alarm/GetAlarmPageList',
+                cellMinWidth: 80,
+                even: 'true',
+                height: 400,
+                id: 'reloadAlarm',
+                page: true,
+                cols: [
+                          [
+                              {
+                                  field: 'test1',
+                                  title: '全选',
+                                  type: 'checkbox'
+                              },
+                              {
+                                  field: 'DeviceName',
+                                  title: '终端名称',
+                                  width: 170,
+                              },
+                              {
+                                  field: 'TerminalId',
+                                  title: '终端ID',
+                                  width: 130,
+                              },
+                              {
+                                  field: 'ElectricName',
+                                  title: '供电或公司',
+                                  width: 170,
+                              },
+                              {
+                                  field: 'LineName',
+                                  title: '线路名称',
+                                  width: 170,
+                              },
+                              {
+                                  field: 'JointName',
+                                  title: '接头名称',
+                                  width: 170,
+                              },
+                              {
+                                  field: 'Flag',
+                                  title: '报警状态',
+                                  templet: '#FlagStatus',
+                                  width: 130,
+                              },
+                               {
+                                   field: 'StatusName',
+                                   title: '处理状态',
+                                   templet: '#StatusName',
+                                   width: 130,
+                               },
+                              {
+                                  field: 'Value',
+                                  title: '告警值'
+                              },
+                              {
+                                  field: 'StartTime',
+                                  title: '告警时间',
+                                  templet: function (row) { return dateFormat(row.StartTime); },
+                                  width: 170,
+                              },
+                              {
+                                  field: 'EndTime',
+                                  title: '结束时间',
+                                  templet: function (row) { return dateFormat(row.EndTime); },
+                                  width: 170,
+                              },
+                              {
+                                  field: 'Content',
+                                  title: '告警详情',
+                                  width: 170,
+                              },
+                              {
+                                  field: 'handEndTime',
+                                  title: '处理时间',
+                                  templet: function (row) { return dateFormat(row.handEndTime); },
+                                  width: 170,
+                              },
+                            {
+                                field: 'handUser',
+                                title: '处理人',
+                                width: 130,
+                            },
+                            {
+                                field: 'Cause',
+                                title: '处理原因',
+                                width: 130,
+                            },
+                            {
+                                field: 'handContent',
+                                title: '处理内容',
+                                width: 130,
+                            },
+                              {
+                                  fixed: 'right',
+                                  field: 'handle',
+                                  title: '操作',
+                                  templet: '#handle',
+                                  width: 240,
+                              }
+                          ]
+                ], where: {
+                    TerminalId: document.getElementById("TerminalId").value,
+                    ElectricId: document.getElementById("ElectricId").value,
+                    LineId: document.getElementById("LineId").value
+                }
+            });
+
+            //监听工具条
+            alarmTable.on('tool(alarm)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'edit') {
+                    var Id = data.Id;
+                    var ElectricId = data.ElectricId;
+                    var LineId = data.LineId;
+                    var TerminalId = data.TerminalId;
+                    var url = "/Alarm/HandleAlarm?Id=" + Id + "&ElectricId=" + ElectricId + "&LineId=" + LineId + "&TerminalId=" + TerminalId;
+                    window.top.frameUrl(url);
+                }
+                if (obj.event === 'showPicture') {
+                    var Id = data.Id;
+                    var ElectricId = data.ElectricId;
+                    var LineId = data.LineId;
+                    $.getJSON('/Alarm/GetPicture?AlarmId=' + Id + "&ElectricId=" + ElectricId + "&LineId=" + LineId, function (json) {
+                        layer.photos({
+                            photos: json,
+                            shift: 5
+                        });
+                    });
+                }
+            });
+
+            var $ = layui.$, active = {
+                reloadAlarm: function () {
+                    var TerminalId = $("#TerminalId").val();
+                    var ElectricId = $("#ElectricId").val();
+                    var LineId = $("#LineId").val();
+                    var alarmStartTime = $("#alarmStartTime").val();
+                    var alarmEndTime = $("#alarmEndTime").val();
+                    alarmTable.reload('reloadAlarm', {
+                        page: { curr: 1 },
+                        where: {
+                            TerminalId: TerminalId,
+                            ElectricId: ElectricId,
+                            LineId: LineId,
+                            startTime: alarmStartTime,
+                            endTime: alarmEndTime
+                        }
+                    });
+                },
+            };
+
+            $('#btnAlarmSearch').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            $('#confirmAlarm').on('click', function () {
+                var checkStatus = alarmTable.checkStatus("reloadAlarm");
+                var data = checkStatus.data;
+                var arrayAlarmId = new Array();
+                $.each(data, function (idx, obj) {
+                    arrayAlarmId.push(obj.Id);
+                });
+                if (arrayAlarmId.length > 0) {
+                    layer.confirm('是否确认报警', { title: "提示" }, function () {
+                        var TerminalId = $("#TerminalId").val();
+                        var ElectricId = $("#ElectricId").val();
+                        var LineId = $("#LineId").val();
+                        var url = '/Alarm/confirmAlarm';
+                        $.ajax({
+                            url: url,
+                            type: 'post',
+                            data: { listId: arrayAlarmId, TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId },
+                            async: true,
+                            dataType: 'json',
+                            success: function (data, jqxhr, txtStatus) {
+                                if (data.code == 0) {
+                                    layer.msg(data.msg);
+                                    var type = "reloadAlarm";
+                                    active[type] ? active[type].call(this) : '';
+                                }
+                            }, error: function (xhr, txtStatus) {
+                                console.log(txtStatus);
+                            }
+                        })
+                    });
+                } else {
+                    layer.alert('请选择需要处理的告警!', { title: "提示" });
+                }
+            });
+
+            element.on('tab(demo)', function (data) {
+                hideAllTab();
+                var layItemList = $(".layui-tab-content")[0].children;
+                var index = data.index;
+                oldDataA = null;
+                oldDataB = null;
+                oldDataC = null;
+                switch (index) {
+                    case 0:
+                        layItemList[0].className = "layui-tab-item layui-show";
+                        initChartA();
+                        stopInterval(IntervalImmediate);
+                        IntervalImmediate = setInterval("initChartA()", 1000);
+                        stopInterval(intervalHistory);
+                        break;
+                    case 1:
+                        layItemList[0].className = "layui-tab-item layui-show";
+                        initChartB();
+                        stopInterval(IntervalImmediate);
+                        IntervalImmediate = setInterval("initChartB()", 1000);
+                        stopInterval(intervalHistory);
+                        break;
+                    case 2:
+                        layItemList[0].className = "layui-tab-item layui-show";
+                        initChartC();
+                        stopInterval(IntervalImmediate);
+                        IntervalImmediate = setInterval("initChartC()", 1000);
+                        stopInterval(intervalHistory);
+                        break;
+                    case 3:
+                        layItemList[index].className = "layui-tab-item layui-show";
+                        stopInterval(IntervalImmediate);
+                        if (rIndex == 1) {
+                            initHChartA();
+                        }
+                        intervalHistory = setInterval("myFunction(rIndex)", counter);
+                        break;
+                    case 4:
+                        layItemList[index].className = "layui-tab-item layui-show";
+                        stopInterval(IntervalImmediate);
+                        stopInterval(intervalHistory);
+                        initHistoryAny(null, null);
+                        break;
+                    case 5:
+                        layItemList[index].className = "layui-tab-item layui-show";
+                        stopInterval(IntervalImmediate);
+                        stopInterval(intervalHistory);
+                        var type = "reloadAlarm";
+                        active[type] ? active[type].call(this) : '';
+                        break;
+                    case 6:
+                        layItemList[index].className = "layui-tab-item layui-show";
+                        stopInterval(IntervalImmediate);
+                        stopInterval(intervalHistory);
+                        historyTrend(null, null);
+                        break;
+                    case 7:
+                        layItemList[index].className = "layui-tab-item layui-show";
+                        stopInterval(IntervalImmediate);
+                        stopInterval(intervalHistory);
+                        historyNetWorkTrend(null, null);
+                        parseVersionTable();
+                    default:
+                        break;
+                }
+            });
+
+            element.on('tab(docDemoTabBrief)', function (data) {
+                hideHAllTab();
+                var index = data.index;
+                var layItemList = $(".layui-tab-content")[1].children;
+                switch (index) {
+                    case 0:
+                        layItemList[0].className = "layui-tab-item layui-show";
+                        initHChartA();
+                        rIndex = 1;
+                        stopInterval(intervalHistory);
+                        intervalHistory = setInterval("myFunction(1)", counter);
+                        break;
+                    case 1:
+                        layItemList[0].className = "layui-tab-item layui-show";
+                        initHChartB();
+                        rIndex = 2;
+                        stopInterval(intervalHistory);
+                        intervalHistory = setInterval("myFunction(2)", counter);
+                        break;
+                    case 2:
+                        layItemList[0].className = "layui-tab-item layui-show";
+                        initHChartC();
+                        rIndex = 3;
+                        stopInterval(intervalHistory);
+                        intervalHistory = setInterval("myFunction(3)", counter);
+                        break;
+                }
+            });
+
+            var laydate = layui.laydate;
+            //1
+            laydate.render({
+                elem: '#historystartTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#hitoryendTime',
+                type: 'datetime'
+            });
+
+            laydate.render({
+                elem: '#startDate',
+                type: 'datetime'
+            });
+
+            laydate.render({
+                elem: '#endDate',
+                type: 'datetime'
+            });
+
+            laydate.render({
+                elem: '#alarmStartTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#alarmEndTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#trendStartTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#trendEndTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#netStartTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#netEndTime',
+                type: 'datetime'
+            });
+
+            window.parseVersionTable = function () {
+                versiontable.init('parse-table-version', { //转化静态表格
+                });
+            }
+        });
+
+        var oldNetData = null;
+        function GetBestNewNetWork() {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var url = "/Partial/GetBestNewNetWork";
+            $.ajax({
+                url: url,
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId },
+                type: 'post',
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    if (JSON.stringify(data) != JSON.stringify(oldNetData)) {
+                        if ($("#netWordState")[0].children.length == 20) {
+                            $("#netWordState")[0].children[0].remove();
+                        }
+                        var time = dateFormat(data.CreateTime);
+                        var msg = "";
+                        var status = data.Status;
+                        if (status == 1) {
+                            msg = "校验通过";
+                        } else if (status == 2) {
+                            msg = "校验不通过";
+                        } else if (status == 3) {
+                            msg = "没回复模块正常";
+                        } else if (status == 4) {
+                            msg = "网络无连接";
+                        } else {
+                            msg = "网络已连接";
+                        }
+                        var html = "<p>" + time + "&nbsp;" + msg + "</p>";
+                        $("#netWordState").append(html);
+                        var scrollDom = document.getElementById('netWordState');
+                        scrollDom.scrollTop = scrollDom.scrollHeight
+                        oldNetData = data;
+                    }
+
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*隐藏历史tabContent*/
+        function hideHAllTab() {
+            var layItemList = $(".layui-tab-content")[1].children;
+            for (var i = 0; i < layItemList.length; i++) {
+                layItemList[i].className = "layui-tab-item";
+            }
+        }
+
+        /*隐藏所有tabContent*/
+        function hideAllTab() {
+            var layItemList = $(".layui-tab-content")[0].children;
+            for (var i = 0; i < layItemList.length; i++) {
+                layItemList[i].className = "layui-tab-item";
+            }
+        }
+
+        /*停止定时器*/
+        function stopInterval(time) {
+            clearInterval(time);
+        }
+
+        $(document).ready(function () {
+            initChartA();
+            bindTable();
+            IntervalImmediate = setInterval("initChartA()", 1000);
+            setInterval("bindTable()", 1000);
+            setInterval("GetBestNewNetWork()", 1000);
+            GetAlarmCount();
+        });
+
+        function GetAlarmCount() {
+            var url = "/Alarm/GetAlarmCount";
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var data = { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId };
+            $.ajax({
+                url: url,
+                type: 'post',
+                async: true,
+                dataType: 'json',
+                data: data,
+                success: function (data, jqxhr, txtStatus) {
+                    $("#alarmCount").text(data.count);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        var oldDataA, oldDataB, oldDataC;
+
+        /*加载A相局放*/
+        function initChartA() {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var color = "#EFEF3F";
+            var xAxisData = [];
+            for (var i = 0; i <= 40; i++) {
+                if (i == 0) {
+                    xAxisData.push("相位");
+                } else {
+                    xAxisData.push(i * 9);
+                }
+            }
+            var wXAxisData = [];
+            for (var i = 0; i <= 30; i++) {
+                if (i == 0) {
+                    wXAxisData.push("采样点");
+                } else {
+                    wXAxisData.push(i);
+                }
+            }
+            var url = "/Partial/GetAPassaGeWay";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    if (JSON.stringify(data) != JSON.stringify(oldDataA)) {
+                        oldDataA = data;
+                        resetEchart1(xAxisData, data.A1ElectricSeriesData, "A相1通道放电量(单位PC)", yMax, color);
+                        resetEchart2(xAxisData, data.A2ElectricSeriesData, "A相2通道放电量(单位PC)", yMax, color);
+                        resetEchart3(xAxisData, data.A3ElectricSeriesData, "A相3通道放电量(单位PC)", yMax, color);
+                        resetEchart4(xAxisData, data.A4ElectricSeriesData, "A相4通道放电量(单位PC)", yMax, color);
+                        resetEchart5(xAxisData, data.A5ElectricSeriesData, "A相5通道放电量(单位PC)", yMax, color);
+                        resetEchart6(xAxisData, data.A1frequencySeriesData, "A相1通道放电频次(单位HZ)", yMax, color);
+                        resetEchart7(xAxisData, data.A2frequencySeriesData, "A相2通道放电频次(单位HZ)", yMax, color);
+                        resetEchart8(xAxisData, data.A3frequencySeriesData, "A相3通道放电频次(单位HZ)", yMax, color);
+                        resetEchart9(xAxisData, data.A4frequencySeriesData, "A相4通道放电频次(单位HZ)", yMax, color);
+                        resetEchart10(xAxisData, data.A5frequencySeriesData, "A相5通道放电频次(单位HZ)", yMax, color);
+                        resetEchart11(wXAxisData, data.A1WaveformSeriesData, "A相1通道放电波形(单位mV)", color, yMax);
+                        resetEchart12(wXAxisData, data.A2WaveformSeriesData, "A相2通道放电波形(单位mV)", color, yMax);
+                        resetEchart13(wXAxisData, data.A3WaveformSeriesData, "A相3通道放电波形(单位mV)", color, yMax);
+                        resetEchart14(wXAxisData, data.A4WaveformSeriesData, "A相4通道放电波形(单位mV)", color, yMax);
+                        resetEchart15(wXAxisData, data.A5WaveformSeriesData, "A相5通道放电波形(单位mV)", color, yMax);
+                        oldDataA = data;
+                    }
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*加载B相局放*/
+        function initChartB() {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var color = "#008000";
+            var xAxisData = [];
+            for (var i = 0; i <= 40; i++) {
+                if (i == 0) {
+                    xAxisData.push("相位");
+                } else {
+                    xAxisData.push(i * 9);
+                }
+            }
+            var wXAxisData = [];
+            for (var i = 0; i <= 30; i++) {
+                if (i == 0) {
+                    wXAxisData.push("采样点");
+                } else {
+                    wXAxisData.push(i);
+                }
+            }
+            var url = "/Partial/GetBPassaGeWay";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    if (JSON.stringify(data) != JSON.stringify(oldDataB)) {
+                        oldDataB = data;
+                        resetEchart1(xAxisData, data.B1ElectricSeriesData, "B相1通道放电量(单位PC)", yMax, color);
+                        resetEchart2(xAxisData, data.B2ElectricSeriesData, "B相2通道放电量(单位PC)", yMax, color);
+                        resetEchart3(xAxisData, data.B3ElectricSeriesData, "B相3通道放电量(单位PC)", yMax, color);
+                        resetEchart4(xAxisData, data.B4ElectricSeriesData, "B相4通道放电量(单位PC)", yMax, color);
+                        resetEchart5(xAxisData, data.B5ElectricSeriesData, "B相5通道放电量(单位PC)", yMax, color);
+                        resetEchart6(xAxisData, data.B1frequencySeriesData, "B相1通道放电频次(单位HZ)", yMax, color);
+                        resetEchart7(xAxisData, data.B2frequencySeriesData, "B相2通道放电频次(单位HZ)", yMax, color);
+                        resetEchart8(xAxisData, data.B3frequencySeriesData, "B相3通道放电频次(单位HZ)", yMax, color);
+                        resetEchart9(xAxisData, data.B4frequencySeriesData, "B相4通道放电频次(单位HZ)", yMax, color);
+                        resetEchart10(xAxisData, data.B5frequencySeriesData, "B相5通道放电频次(单位HZ)", yMax, color);
+                        resetEchart11(wXAxisData, data.B1WaveformSeriesData, "B相1通道放电波形(单位mV)", color, yMax);
+                        resetEchart12(wXAxisData, data.B2WaveformSeriesData, "B相2通道放电波形(单位mV)", color, yMax);
+                        resetEchart13(wXAxisData, data.B3WaveformSeriesData, "B相3通道放电波形(单位mV)", color, yMax);
+                        resetEchart14(wXAxisData, data.B4WaveformSeriesData, "B相4通道放电波形(单位mV)", color, yMax);
+                        resetEchart15(wXAxisData, data.B5WaveformSeriesData, "B相5通道放电波形(单位mV)", color, yMax);
+                        oldDataB = data;
+                    }
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*加载C相局放*/
+        function initChartC() {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var color = "#FF0000";
+            var xAxisData = [];
+            for (var i = 0; i <= 40; i++) {
+                if (i == 0) {
+                    xAxisData.push("相位");
+                } else {
+                    xAxisData.push(i * 9);
+                }
+            }
+            var wXAxisData = [];
+            for (var i = 0; i <= 30; i++) {
+                if (i == 0) {
+                    wXAxisData.push("采样点");
+                } else {
+                    wXAxisData.push(i);
+                }
+            }
+            var url = "/Partial/GetCPassaGeWay";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    if (JSON.stringify(data) != JSON.stringify(oldDataC)) {
+                        oldDataC = data;
+                        resetEchart1(xAxisData, data.C1ElectricSeriesData, "C相1通道放电量(单位PC)", yMax, color);
+                        resetEchart2(xAxisData, data.C2ElectricSeriesData, "C相2通道放电量(单位PC)", yMax, color);
+                        resetEchart3(xAxisData, data.C3ElectricSeriesData, "C相3通道放电量(单位PC)", yMax, color);
+                        resetEchart4(xAxisData, data.C4ElectricSeriesData, "C相4通道放电量(单位PC)", yMax, color);
+                        resetEchart5(xAxisData, data.C5ElectricSeriesData, "C相5通道放电量(单位PC)", yMax, color);
+                        resetEchart6(xAxisData, data.C1frequencySeriesData, "C相1通道放电频次(单位HZ)", yMax, color);
+                        resetEchart7(xAxisData, data.C2frequencySeriesData, "C相2通道放电频次(单位HZ)", yMax, color);
+                        resetEchart8(xAxisData, data.C3frequencySeriesData, "C相3通道放电频次(单位HZ)", yMax, color);
+                        resetEchart9(xAxisData, data.C4frequencySeriesData, "C相4通道放电频次(单位HZ)", yMax, color);
+                        resetEchart10(xAxisData, data.C5frequencySeriesData, "C相5通道放电频次(单位HZ)", yMax, color);
+                        resetEchart11(wXAxisData, data.C1WaveformSeriesData, "C相1通道放电波形(单位mV)", color, yMax);
+                        resetEchart12(wXAxisData, data.C2WaveformSeriesData, "C相2通道放电波形(单位mV)", color, yMax);
+                        resetEchart13(wXAxisData, data.C3WaveformSeriesData, "C相3通道放电波形(单位mV)", color, yMax);
+                        resetEchart14(wXAxisData, data.C4WaveformSeriesData, "C相4通道放电波形(单位mV)", color, yMax);
+                        resetEchart15(wXAxisData, data.C5WaveformSeriesData, "C相5通道放电波形(单位mV)", color, yMax);
+                        oldDataC = data;
+                    }
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*加载历史A相局放*/
+        function initHChartA() {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var currentPages = $("#currentPage").text();
+            if (currentPages == 0) {
+                currentPages = 1;
+                $("#currentPage").text(currentPages);
+            }
+            var color = "#EFEF3F";
+            var xAxisData = [];
+            for (var i = 0; i <= 40; i++) {
+                if (i == 0) {
+                    xAxisData.push("相位");
+                } else {
+                    xAxisData.push(i * 9);
+                }
+            }
+            var wXAxisData = [];
+            for (var i = 0; i <= 30; i++) {
+                if (i == 0) {
+                    wXAxisData.push("采样点");
+                } else {
+                    wXAxisData.push(i);
+                }
+            }
+            var url = "/Partial/GetAHPassaGeWay";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId, currentPage: currentPages, startTime: rstartTime, endTime: rendTime },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    hresetEchart1(xAxisData, data.A1ElectricSeriesData, "A相1通道放电量(单位PC)", HYMax, color);
+                    hresetEchart2(xAxisData, data.A2ElectricSeriesData, "A相2通道放电量(单位PC)", HYMax, color);
+                    hresetEchart3(xAxisData, data.A3ElectricSeriesData, "A相3通道放电量(单位PC)", HYMax, color);
+                    hresetEchart4(xAxisData, data.A4ElectricSeriesData, "A相4通道放电量(单位PC)", HYMax, color);
+                    hresetEchart5(xAxisData, data.A5ElectricSeriesData, "A相5通道放电量(单位PC)", HYMax, color);
+                    hresetEchart6(xAxisData, data.A1frequencySeriesData, "A相1通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart7(xAxisData, data.A2frequencySeriesData, "A相2通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart8(xAxisData, data.A3frequencySeriesData, "A相3通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart9(xAxisData, data.A4frequencySeriesData, "A相4通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart10(xAxisData, data.A5frequencySeriesData, "A相5通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart11(wXAxisData, data.A1WaveformSeriesData, "A相1通道放电波形(单位mV)", color, HYMax);
+                    hresetEchart12(wXAxisData, data.A2WaveformSeriesData, "A相2通道放电波形(单位mV)", color, HYMax);
+                    hresetEchart13(wXAxisData, data.A3WaveformSeriesData, "A相3通道放电波形(单位mV)", color, HYMax);
+                    hresetEchart14(wXAxisData, data.A4WaveformSeriesData, "A相4通道放电波形(单位mV)", color, HYMax);
+                    hresetEchart15(wXAxisData, data.A5WaveformSeriesData, "A相5通道放电波形(单位mV)", color, HYMax);
+                    $("#dataTimes").html(dateFormat(data.CreateTime));
+                    $("#pageCount").text(data.totalcount);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*加载历史局放B*/
+        function initHChartB() {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var currentPages = $("#currentPage").text();
+            if (currentPages == 0) {
+                currentPages = 1;
+                $("#currentPage").text(currentPages);
+            }
+            var color = "#008000";
+            var xAxisData = [];
+            for (var i = 0; i <= 40; i++) {
+                if (i == 0) {
+                    xAxisData.push("相位");
+                } else {
+                    xAxisData.push(i * 9);
+                }
+            }
+            var wXAxisData = [];
+            for (var i = 0; i <= 30; i++) {
+                if (i == 0) {
+                    wXAxisData.push("采样点");
+                } else {
+                    wXAxisData.push(i);
+                }
+            }
+            var url = "/Partial/GetBHPassaGeWay";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId, currentPage: currentPages, startTime: rstartTime, endTime: rendTime },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    hresetEchart1(xAxisData, data.B1ElectricSeriesData, "B相1通道放电量(单位PC)", HYMax, color);
+                    hresetEchart2(xAxisData, data.B2ElectricSeriesData, "B相2通道放电量(单位PC)", HYMax, color);
+                    hresetEchart3(xAxisData, data.B3ElectricSeriesData, "B相3通道放电量(单位PC)", HYMax, color);
+                    hresetEchart4(xAxisData, data.B4ElectricSeriesData, "B相4通道放电量(单位PC)", HYMax, color);
+                    hresetEchart5(xAxisData, data.B5ElectricSeriesData, "B相5通道放电量(单位PC)", HYMax, color);
+                    hresetEchart6(xAxisData, data.B1frequencySeriesData, "B相1通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart7(xAxisData, data.B2frequencySeriesData, "B相2通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart8(xAxisData, data.B3frequencySeriesData, "B相3通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart9(xAxisData, data.B4frequencySeriesData, "B相4通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart10(xAxisData, data.B5frequencySeriesData, "B相5通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart11(wXAxisData, data.B1WaveformSeriesData, "B相1通道放电波形(单位mV)", color, HYMax);
+                    hresetEchart12(wXAxisData, data.B2WaveformSeriesData, "B相2通道放电波形(单位mV)", color, HYMax);
+                    hresetEchart13(wXAxisData, data.B3WaveformSeriesData, "B相3通道放电波形(单位mV)", color, HYMax);
+                    hresetEchart14(wXAxisData, data.B4WaveformSeriesData, "B相4通道放电波形(单位mV)", color, HYMax);
+                    hresetEchart15(wXAxisData, data.B5WaveformSeriesData, "B相5通道放电波形(单位mV)", color, HYMax);
+                    $("#dataTimes").html(dateFormat(data.CreateTime));
+                    $("#pageCount").text(data.totalcount);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*加载历史局放C*/
+        function initHChartC() {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var currentPages = $("#currentPage").text();
+            if (currentPages == 0) {
+                currentPages = 1;
+                $("#currentPage").text(currentPages);
+            }
+            var color = "#FF0000";
+            var xAxisData = [];
+            for (var i = 0; i <= 40; i++) {
+                if (i == 0) {
+                    xAxisData.push("相位");
+                } else {
+                    xAxisData.push(i * 9);
+                }
+            }
+            var wXAxisData = [];
+            for (var i = 0; i <= 30; i++) {
+                if (i == 0) {
+                    wXAxisData.push("采样点");
+                } else {
+                    wXAxisData.push(i);
+                }
+            }
+            var url = "/Partial/GetCHPassaGeWay";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId, currentPage: currentPages, startTime: rstartTime, endTime: rendTime },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    hresetEchart1(xAxisData, data.C1ElectricSeriesData, "C相1通道放电量(单位PC)", HYMax, color);
+                    hresetEchart2(xAxisData, data.C2ElectricSeriesData, "C相2通道放电量(单位PC)", HYMax, color);
+                    hresetEchart3(xAxisData, data.C3ElectricSeriesData, "C相3通道放电量(单位PC)", HYMax, color);
+                    hresetEchart4(xAxisData, data.C4ElectricSeriesData, "C相4通道放电量(单位PC)", HYMax, color);
+                    hresetEchart5(xAxisData, data.C5ElectricSeriesData, "C相5通道放电量(单位PC)", HYMax, color);
+                    hresetEchart6(xAxisData, data.C1frequencySeriesData, "C相1通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart7(xAxisData, data.C2frequencySeriesData, "C相2通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart8(xAxisData, data.C3frequencySeriesData, "C相3通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart9(xAxisData, data.C4frequencySeriesData, "C相4通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart10(xAxisData, data.C5frequencySeriesData, "C相5通道放电频次(单位HZ)", HYMax, color);
+                    hresetEchart11(wXAxisData, data.C1WaveformSeriesData, "C相1通道放电波形(单位mV)", color, HYMax);
+                    hresetEchart12(wXAxisData, data.C2WaveformSeriesData, "C相2通道放电波形(单位mV)", color, HYMax);
+                    hresetEchart13(wXAxisData, data.C3WaveformSeriesData, "C相3通道放电波形(单位mV)", color, HYMax);
+                    hresetEchart14(wXAxisData, data.C4WaveformSeriesData, "C相4通道放电波形(单位mV)", color, HYMax);
+                    hresetEchart15(wXAxisData, data.C5WaveformSeriesData, "C相5通道放电波形(单位mV)", color, HYMax);
+                    $("#dataTimes").html(dateFormat(data.CreateTime));
+                    $("#pageCount").text(data.totalcount);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        var rstartTime = null;
+        var rendTime = null;
+
+        /*下一页*/
+        function nextPage() {
+            var currentPages = $("#currentPage").text();
+            var pageCount = $("#pageCount").text();
+            if (currentPages != pageCount) {
+                var number = parseFloat(currentPages) + 1;
+                $("#currentPage").text(number);
+                if (rIndex == 1) {
+                    initHChartA();
+                }
+                if (rIndex == 2) {
+                    initHChartB();
+                }
+                if (rIndex == 3) {
+                    initHChartC();
+                }
+            }
+        }
+
+        /*上一页*/
+        function prePage() {
+            var currentPages = $("#currentPage").text();
+            if (currentPages != 1) {
+                var number = parseFloat(currentPages) - 1;
+                $("#currentPage").text(number);
+                if (rIndex == 1) {
+                    initHChartA();
+                }
+                if (rIndex == 2) {
+                    initHChartB();
+                }
+                if (rIndex == 3) {
+                    initHChartC();
+                }
+            } else {
+                return;
+            }
+        }
+
+        /*历史查询*/
+        function searchHistory() {
+            var startDate = $("#historystartTime").val();
+            var endDate = $("#hitoryendTime").val();
+            rstartTime = startDate;
+            rendTime = endDate;
+            switch (rIndex) {
+                case 1:
+                    initHChartA();
+                    break;
+                case 2:
+                    initHChartB();
+                    break;
+                case 3:
+                    initHChartC();
+                    break;
+                default:
+                    break;
+            }
+            $("#currentPage").text(0);
+            myFunction(rIndex)
+            stopInterval(intervalHistory);
+            intervalHistory = setInterval("myFunction(rIndex)", counter);
+        }
+
+        /*自动播放*/
+        var myFunction = function (idx) {
+            var isChecked = document.getElementById("isAutoPlay").checked;
+            if (isChecked == true) {
+                var currentPages = document.getElementById("currentPage").innerHTML;
+                var pageCount = document.getElementById("pageCount").innerHTML;
+                if (parseFloat(currentPages) < parseFloat(pageCount)) {
+                    var number = parseFloat(currentPages) + 1;
+                    document.getElementById("currentPage").innerHTML = number;
+                    switch (idx) {
+                        case 1:
+                            initHChartA();
+                            break;
+                        case 2:
+                            initHChartB();
+                            break;
+                        case 3:
+                            initHChartC();
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    $("#currentPage").text(1);
+                }
+            }
+        }
+
+        /*时间更改*/
+        function timegapChange() {
+            var times = document.getElementById("secondDate").value;
+            var re = /^[0-9]+.?[0-9]*$/; //判断字符串是否为数字 //判断正整数 /^[1-9]+[0-9]*]*$/
+            if (!re.test(times)) {
+                layer.msg("请输入整数时间!");
+            } else {
+                times = parseFloat(times);
+                var number = times * 1000;
+                counter = number;
+                stopInterval(intervalHistory);
+                intervalHistory = setInterval("myFunction(rIndex)", number);
+            }
+        }
+
+        function dateFormat(item) {
+            if (item == null || item == "" || item == "undefined") {
+                return "";
+            } else {
+                var time = new Date(parseInt(item.substr(6))).Format("yyyy-MM-dd hh:mm:ss");
+                return time;
+            }
+        }
+
+        Date.prototype.Format = function (fmt) {
+            var o = {
+                "M+": this.getMonth() + 1, //月份
+                "d+": this.getDate(), //日
+                "h+": this.getHours(), //小时
+                "m+": this.getMinutes(), //分
+                "s+": this.getSeconds() //秒
+            };
+            if (/(y+)/.test(fmt)) { //根据y的长度来截取年
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            }
+            for (var k in o) {
+                if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            }
+            return fmt;
+        }
+
+        /*加载历史分析*/
+        function initHistoryAny(startTime, endTime) {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var url = "/Partial/GetPartialAnalysis";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId, startTime: startTime, endTime: endTime },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    aPhaseEchart(data.xAxisData, data.AElectricData, data.AFrequencyData);
+                    bPhaseEchart(data.xAxisData, data.BElectricData, data.BFrequencyData);
+                    cPhaseEchart(data.xAxisData, data.CElectricData, data.CFrequencyData);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*历史查询*/
+        $("#searchHistoryAny").on('click', function () {
+            var startTime = $("#startDate").val();
+            var endTime = $("#endDate").val();
+            initHistoryAny(startTime, endTime);
+        });
+
+        var oldTableJson;
+        /*绑定最新表格*/
+        function bindTable() {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var url = "/Partial/GetBestNewTable";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    if (JSON.stringify(oldTableJson) != JSON.stringify(data)) {
+                        $("#AElectricMaxValue").text(data.AElectricMaxValue);
+                        $("#AFrequencyMaxValue").text(data.AFrequencyMaxValue);
+                        $("#Astatus").text(data.Astatus == 0 ? "正常" : "异常");
+                        if (data.Astatus != 0) {
+                            document.getElementById("Astatus").style.color = "red";
+                        } else {
+                            document.getElementById("Astatus").style.color = "yellow";
+                        }
+                        $("#BElectricMaxValue").text(data.BElectricMaxValue);
+                        $("#BFrequencyMaxValue").text(data.BFrequencyMaxValue);
+                        $("#Bstatus").text(data.Bstatus == 0 ? "正常" : "异常");
+                        if (data.Bstatus != 0) {
+                            document.getElementById("Bstatus").style.color = "red";
+                        } else {
+                            document.getElementById("Bstatus").style.color = "yellow";
+                        }
+                        $("#CElectricMaxValue").text(data.CElectricMaxValue);
+                        $("#CFrequencyMaxValue").text(data.CFrequencyMaxValue);
+                        $("#Cstatus").text(data.Cstatus == 0 ? "正常" : "异常");
+                        if (data.Cstatus != 0) {
+                            document.getElementById("Cstatus").style.color = "red";
+                        } else {
+                            document.getElementById("Cstatus").style.color = "yellow";
+                        }
+                        $("#PartialTitle").html("数据接入时间:" + "<span style='color:red'>" + dateFormat(data.CreateTime) + "</span>");
+                        var powerSupplyRowHtm = "<td>" + data.A1Voltage1 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.A1Voltage2 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.A1Voltage3 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.A2Voltage1 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.A2Voltage2 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.A2Voltage3 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.B1Voltage1 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.B1Voltage2 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.B1Voltage3 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.B2Voltage1 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.B2Voltage2 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.B2Voltage3 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.C1Voltage1 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.C1Voltage2 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.C1Voltage3 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.C2Voltage1 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.C2Voltage2 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.C2Voltage3 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.d3Voltage1 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.d3Voltage2 + "</td>";
+                        powerSupplyRowHtm += "<td>" + data.d3Voltage3 + "</td>";
+                        $("#powerSupplyRow").html(powerSupplyRowHtm);
+                        var html = "<td>" + data.A1hardversion + "</td>";
+                        html += "<td>" + data.A1softversion + "</td>";
+                        html += "<td>" + data.A2hardversion + "</td>";
+                        html += "<td>" + data.A2softversion + "</td>";
+                        html += "<td>" + data.B1hardversion + "</td>";
+                        html += "<td>" + data.B1softversion + "</td>";
+                        html += "<td>" + data.B2hardversion + "</td>";
+                        html += "<td>" + data.B2softversion + "</td>";
+                        html += "<td>" + data.C1hardversion + "</td>";
+                        html += "<td>" + data.C1softversion + "</td>";
+                        html += "<td>" + data.C2hardversion + "</td>";
+                        html += "<td>" + data.C2softversion + "</td>";
+                        html += "<td>" + data.d3hardversion + "</td>";
+                        html += "<td>" + data.d3softversion + "</td>";
+                        $("#versionRow").html(html);
+                        var statusRowOne = "";
+                        var statusRowTwo = "";
+                        var statusRowThree = "";
+                        var statusRowFour = "";
+                        var statusRowFive = "";
+                        var status1 = data.status1;
+                        var status2 = data.status2;
+                        var status3 = data.status3;
+                        var bitStatus0, bitStatus1, bitStatus2, bitStatus3, bitStatus4, bitStatus5, bitStatus6, bitStatus7, bitStatus8, bitStatus9, bitStatus10, bitStatus11, bitStatus12, bitStatus13, bitStatus14, bitStatus15;
+                        bitStatus0 = status1[15];
+                        bitStatus1 = status1[14];
+                        bitStatus2 = status1[13];
+                        bitStatus3 = status1[12];
+                        bitStatus4 = status1[11];
+                        bitStatus5 = status1[10];
+                        bitStatus6 = status1[9];
+                        bitStatus7 = status1[8];
+                        bitStatus8 = status1[7];
+                        bitStatus9 = status1[6];
+                        bitStatus10 = status1[5];
+                        bitStatus11 = status1[4];
+                        bitStatus12 = status1[3];
+                        bitStatus13 = status1[2];
+                        bitStatus14 = status1[1];
+                        bitStatus15 = status1[0];
+                        statusRowOne += setTableTdColor(bitStatus7);
+                        statusRowOne += setTableTdColor(bitStatus6);
+                        statusRowOne += setTableTdColor(bitStatus5);
+                        statusRowOne += setTableTdColor(bitStatus4);
+                        statusRowOne += setTableTdColor(bitStatus3);
+                        statusRowOne += setTableTdColor(bitStatus2);
+                        statusRowOne += setTableTdColor(bitStatus1);
+                        statusRowOne += setTableTdColor(bitStatus0);
+                        $("#statusRowOne").html(statusRowOne);
+                        statusRowTwo += setTableTdColor(3);
+                        statusRowTwo += setTableTdColor(bitStatus14);
+                        statusRowTwo += setTableTdColor(bitStatus13);
+                        statusRowTwo += setTableTdColor(bitStatus12);
+                        statusRowTwo += setTableTdColor(bitStatus11);
+                        statusRowTwo += setTableTdColor(bitStatus10);
+                        statusRowTwo += setTableTdColor(bitStatus9);
+                        statusRowTwo += setTableTdColor(bitStatus8);
+                        $("#statusRowTwo").html(statusRowTwo);
+                        bitStatus0 = status2[15];
+                        bitStatus1 = status2[14];
+                        bitStatus2 = status2[13];
+                        bitStatus3 = status2[12];
+                        bitStatus4 = status2[11];
+                        bitStatus5 = status2[10];
+                        statusRowThree += setTableTdColor(3);
+                        statusRowThree += setTableTdColor(3);
+                        statusRowThree += setTableTdColor(bitStatus5);
+                        statusRowThree += setTableTdColor(bitStatus4);
+                        statusRowThree += setTableTdColor(bitStatus3);
+                        statusRowThree += setTableTdColor(bitStatus2);
+                        statusRowThree += setTableTdColor(bitStatus1);
+                        statusRowThree += setTableTdColor(bitStatus0);
+                        $("#statusRowThree").html(statusRowThree);
+                        bitStatus0 = status3[15];
+                        bitStatus1 = status3[14];
+                        bitStatus2 = status3[13];
+                        bitStatus3 = status3[12];
+                        bitStatus4 = status3[11];
+                        bitStatus5 = status3[10];
+                        bitStatus6 = status3[9];
+                        bitStatus7 = status3[8];
+                        bitStatus8 = status3[7];
+                        bitStatus9 = status3[6];
+                        bitStatus10 = status3[5];
+                        bitStatus11 = status3[4];
+                        bitStatus12 = status3[3];
+                        bitStatus13 = status3[2];
+                        bitStatus14 = status3[1];
+                        bitStatus15 = status3[0];
+                        statusRowFour += setTableTdColor(bitStatus7);
+                        statusRowFour += setTableTdColor(bitStatus6);
+                        statusRowFour += setTableTdColor(bitStatus5);
+                        statusRowFour += setTableTdColor(bitStatus4);
+                        statusRowFour += setTableTdColor(bitStatus3);
+                        statusRowFour += setTableTdColor(bitStatus2);
+                        statusRowFour += setTableTdColor(bitStatus1);
+                        statusRowFour += setTableTdColor(bitStatus0);
+                        $("#statusRowFour").html(statusRowFour);
+                        statusRowFive += setTableTdColor(3);
+                        statusRowFive += setTableTdColor(bitStatus14);
+                        statusRowFive += setTableTdColor(bitStatus13);
+                        statusRowFive += setTableTdColor(bitStatus12);
+                        statusRowFive += setTableTdColor(bitStatus11);
+                        statusRowFive += setTableTdColor(bitStatus10);
+                        statusRowFive += setTableTdColor(bitStatus9);
+                        statusRowFive += setTableTdColor(bitStatus8);
+                        $("#statusRowFive").html(statusRowFive);
+                        parseVersionTable();
+                        oldTableJson = data;
+                    }
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        function setTableTdColor(value) {
+            var html = "";
+            if (value == "0") {
+                html = "<td style='color:yellow'>正常</td>";
+            } else if (value == "1") {
+                html = "<td style='color:red'>异常</td>";
+            } else {
+                html = "<td>备用</td>";
+            }
+            return html;
+        }
+
+        /*历史查询*/
+        $("#btnTrend").on('click', function () {
+            var startTime = $("#trendStartTime").val();
+            var endTime = $("#trendEndTime").val();
+            historyTrend(startTime, endTime);
+        });
+
+        /*加载历史趋势分析*/
+        function historyTrend(startTime, endTime) {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var url = "/Partial/GetPartialTrend"
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId, startTime: startTime, endTime: endTime },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    resettmyChart1(data);
+                    resettmyChart2(data);
+                    resettmyChart3(data);
+                }, error: function (jaxhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*历史查询*/
+        $("#btnNetWork").on('click', function () {
+            var startTime = $("#netStartTime").val();
+            var endTime = $("#netEndTime").val();
+            historyNetWorkTrend(startTime, endTime);
+        });
+
+        /*加载网络曲线*/
+        function historyNetWorkTrend(startTime, endTime) {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var url = "/Partial/GetNetWorkTrend"
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId, startTime: startTime, endTime: endTime },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    resetnetworkChart(data);
+                }, error: function (jaxhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*面板伸缩*/
+        var isAnimate = true;
+        $("#networkBtn").click(function () {
+            if (isAnimate) {
+                $("#networkBtn").removeClass();
+                $("#networkBtn").addClass("netWordStatePanelIcon collect");
+                $("#networkBtn").animate({ right: "250px" })
+                $("#netWordState").animate({ right: "0px" });
+                isAnimate = false;
+            } else {
+                $("#networkBtn").removeClass();
+                $("#networkBtn").addClass("netWordStatePanelIcon shrink");
+                $("#networkBtn").animate({ right: "0px" })
+                $("#netWordState").animate({ right: "-250px" });
+                isAnimate = true;
+            }
+
+        })
+
+        /*确认Y值*/
+        $("#sureYMax").on("click", function () {
+            loadreport();
+        });
+
+        /*历史确认Y值*/
+        $("#sureHYMax").on("click", function () {
+            loadHreport();
+        });
+
+        //确认实时Y值
+        function loadreport() {
+            oldDataA = null;
+            oldDataB = null;
+            oldDataC = null;
+            try {
+                yMax = parseFloat($("#YMax").val());
+            } catch (e) {
+                yMax = 500;
+                layer.msg("请输入数字");
+            }
+            if (rIndex == 1) {
+                initChartA();
+            }
+            if (rIndex == 2) {
+                initChartB();
+            }
+            if (rIndex == 3) {
+                initChartC();
+            }
+        }
+
+        //确认历史Y值
+        function loadHreport() {
+            try {
+                HYMax = parseFloat($("#HYMax").val());
+            } catch (e) {
+                HYMax = 500;
+                layer.msg("请输入数字");
+            }
+            switch (rIndex) {
+                case 1:
+                    initHChartA();
+                    break;
+                case 2:
+                    initHChartB();
+                    break;
+                case 3:
+                    initHChartC();
+                    break;
+                default:
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

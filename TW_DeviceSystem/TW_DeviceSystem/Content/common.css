@@ -1,0 +1,365 @@
+html, body {
+    min-width: 1020px;
+}
+
+.layui-text {
+    margin-bottom: 0px;
+}
+
+.jd_detailsColumns {
+    width: 100%;
+    height: 220px;
+    float: left;
+}
+
+.product_Container {
+    width: calc(100% / 5);
+    height: 100%;
+    float: left;
+}
+
+    .product_Container table {
+        margin: 30px 0px 0px 0px;
+        width: 100%;
+    }
+
+        .product_Container table tr {
+            height: 28px;
+        }
+
+        .product_Container table img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .product_Container table tr td:nth-child(2n) {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .product_Container table tr td:nth-child(2n+1) {
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .product_Container table tr td span {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+.tabbar_Container,
+.monitor_Box {
+    width: 100%;
+    height: auto;
+    float: left;
+}
+
+.layui-inline {
+    margin-top: 10px;
+}
+
+.chart_Container {
+    width: 100%;
+    height: 400px;
+    margin-top: 10px;
+    float: left;
+}
+
+.monitor_Container {
+    float: left;
+    margin: 5px 0px 0px 5px;
+}
+
+    .monitor_Container div {
+        margin-top: 5px;
+        text-align: center;
+    }
+
+.layui-elem-quote {
+    padding: 8px !important;
+    border-left-color: #127FD1 !important;
+}
+
+.layui-tab-brief > .layui-tab-title .layui-this {
+    color: #127FD1 !important;
+}
+
+    .layui-tab-brief > .layui-tab-more li.layui-this:after, .layui-tab-brief > .layui-tab-title .layui-this:after {
+        border-bottom-color: #127FD1 !important;
+    }
+
+.layui-tab-content {
+    min-height: 400px;
+}
+
+.dashboard_Container {
+    width: 230px;
+    height: auto;
+    float: left;
+}
+
+    .dashboard_Container div:nth-child(1) {
+        text-align: center;
+        font-size: 15px;
+        margin-top: 5px;
+    }
+
+.boardTemp_Container {
+    width: 100%;
+    height: 300px;
+}
+
+.product_Check {
+    text-align: center;
+}
+
+.partial_tableContainer {
+    width: calc(100% / 2 - 55px);
+    border: 20px solid #CCCCCC;
+    margin: 25px 0px 0px 10px;
+    float: left;
+}
+
+    .partial_tableContainer table {
+        width: 100%;
+        text-align: center;
+        padding: 0px;
+        margin: 0px;
+    }
+
+        .partial_tableContainer table thead tr {
+            height: 40px;
+            color: white;
+            background: #8F3A2F;
+        }
+
+        .partial_tableContainer table tbody tr {
+            height: 30px;
+        }
+
+            .partial_tableContainer table tbody tr td:nth-child(1) {
+                background: #8F3A2F;
+                color: white;
+            }
+
+            .partial_tableContainer table tbody tr td {
+                color: yellow;
+                background: #020202;
+            }
+
+    .partial_tableContainer img {
+        width: 40%;
+        height: 130px;
+        float: left;
+    }
+
+.partialAnyContainer {
+    width: 60%;
+    height: 130px;
+    float: left;
+}
+
+.partialAnyChart {
+    width: 100%;
+    height: 110px;
+    float: left;
+}
+
+.partialAnyChartTitle {
+    width: 100%;
+    height: 20px;
+    float: left;
+}
+
+.partialAnyChartTitleConTainer {
+    width: calc(100% - 66px);
+    height: 20px;
+    float: right;
+}
+
+    .partialAnyChartTitleConTainer ul {
+        list-style: none;
+        margin: 0px;
+        padding: 0px;
+    }
+
+        .partialAnyChartTitleConTainer ul li {
+            text-align: center;
+            width: calc(100% / 3);
+            float: left;
+        }
+
+.box {
+    animation: change 1s ease-in infinite;
+    font-size: 14px;
+    color: #f00;
+}
+
+@keyframes change {
+    0% {
+        border: 1px solid #5DD05D;
+    }
+
+    50% {
+        border: 3px solid #5DD05D;
+    }
+
+    100% {
+        border: 1px solid #5DD05D;
+    }
+}
+
+.form_Area {
+    width: 100%;
+    height: auto;
+    background: #CCCCCC;
+    padding: 5px 5px;
+    margin: 10px 0px 0px 0px;
+    box-sizing: border-box;
+    float: left;
+}
+
+.form_Container {
+    width: calc((100% / 5) - 10px);
+    height: 200px;
+    background: #B7B2B2;
+    float: left;
+    margin: 5px 5px;
+}
+
+.layui-form-onswitch {
+    border-color: #1E9FFF !important;
+    background-color: #1E9FFF !important;
+}
+
+.partial_ChartArea {
+    width: calc((100% / 3) - 10px);
+    height: 300px;
+    background: #B7B2B2;
+    float: left;
+    margin: 5px 5px;
+}
+
+.layui-form-checked[lay-skin=primary] i {
+    border-color: #1E9FFF !important;
+    background-color: #1E9FFF !important;
+}
+
+.gaojing_Title {
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    line-height: 30px;
+}
+
+.content_Area {
+    padding: 0 10px;
+}
+
+.jsgl_Submit, .wh_Submit, .sb_Submit {
+    margin-left: 110px;
+}
+
+.layui-form-select dl dd.layui-this {
+    background-color: #127FD1 !important;
+}
+
+.wh_Required, .sb_Required {
+    color: red;
+    line-height: 38px;
+}
+
+.wh_pic {
+    float: left;
+}
+
+.addPic {
+    display: block;
+    width: 92px;
+    height: 92px;
+    background: url(../img/addPic.png) no-repeat;
+    background-size: 100% 100%;
+    margin-bottom: 7px;
+}
+
+.netWordStatePanel {
+    width: 250px;
+    height: 200px;
+    background: #4A4E51;
+    opacity: 0.7;
+    position: fixed;
+    top: 20px;
+    border-radius: 5px;
+    right: -250px;
+    float: left;
+    overflow-y: auto;
+}
+
+    .netWordStatePanel p {
+        font-size: 12px;
+        color: yellow;
+    }
+
+.netWordStatePanelIcon {
+    width: 32px;
+    height: 32px;
+    float: left;
+    position: fixed;
+    top: 20px;
+    right: 0px;
+    cursor: pointer;
+}
+
+    .netWordStatePanelIcon.collect {
+        background-image: url(/Images/Panel/collect.png);
+        background-repeat: no-repeat;
+        background-size: 32px 32px;
+    }
+
+    .netWordStatePanelIcon.shrink {
+        background-image: url(/Images/Panel/shrink.png);
+        background-repeat: no-repeat;
+        background-size: 32px 32px;
+    }
+
+.legendRow {
+    width: 100%;
+    height: 30px;
+    float: left;
+}
+
+.legend {
+    width: 20px;
+    height: 15px;
+    border-radius: 3px;
+    margin: 10px 0px 0px 5px;
+    float: left;
+}
+
+    .legend.green {
+        background-color: #4CF129;
+    }
+
+    .legend.red {
+        background-color: #F7511E;
+    }
+
+    .legend.blue {
+        background-color: #1AD5F0;
+    }
+
+    .legend.yellow {
+        background-color: #EBF214;
+    }
+
+    .legend.Violet {
+        background-color: #6214F2;
+    }
+
+.legendTitle {
+    width: auto;
+    height: 15px;
+    font-size: 14px;
+    margin: 7px 0px 0px 5px;
+    float: left;
+}

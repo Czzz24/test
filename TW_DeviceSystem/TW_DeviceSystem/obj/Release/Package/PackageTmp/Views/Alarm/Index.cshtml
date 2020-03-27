@@ -1,0 +1,480 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        历史告警
+    </blockquote>
+    <div class="content_Area">
+        <div class="layui-form">
+            <div class="layui-form-item" style="margin-bottom: 0px !important;">
+                <div class="layui-inline">
+                    <label class="layui-form-label">开始时间:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" placeholder="选择开始日期" id="startTime">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">结束时间:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" placeholder="选择结束日期" id="endTime">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-size layui-btn-normal" id="btnSearch">查询</button>
+                    <button class="layui-btn btn-size" id="excelExport"><i class="layui-icon layui-icon-upload" style="font-size: 14px;line-height: 38px;"></i>数据导出</button>
+                </div>
+            </div>
+            <div class="layui-form-item" style="margin-bottom: 0px !important;">
+                <div class="layui-inline">
+                    <label class="layui-form-label">供电或公司:</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="ElectricId" lay-filter="ElectricId" lay-search=""></select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">线路名称:</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="LineId" lay-filter="LineId" lay-search=""></select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">所在接头:</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="JointId" lay-filter="JointId" lay-search=""></select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">设备大类:</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="deviceBigType" lay-filter="deviceBigType" lay-search=""></select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">设备小类:</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="deviceSmallType" lay-search=""></select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">设备名称:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" placeholder="请输入设备名称|终端ID" class="layui-input" id="searchText" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="layui-hide" id="alarmdata" lay-filter="alarm"></table>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/html" id="StatusName">
+        {{#  if(d.Status === 1){ }}
+        <span style="color: red;">{{ d.StatusName }}</span>
+        {{# } }}
+        {{#  if(d.Status === 2){ }}
+        <span style="color: #FFB700;">{{ d.StatusName }}</span>
+        {{# } }}
+        {{#  if(d.Status === 3){ }}
+        <span style="color: #417505;">{{ d.StatusName }}</span>
+        {{# } }}
+    </script>
+
+    <script type="text/html" id="FlagStatus">
+        {{#  if(d.Flag === -1){ }}
+        <span style="color: red;">告警中</span>
+        {{#  } else { }}
+        <span style="color: #417505;">已恢复</span>
+        {{#  } }}
+    </script>
+
+    <script type="text/html" id="handle">
+        @*箱柜门打开可查看照片/其他变处理*@
+        {{#  if(d.AlarmCode === 257 && d.Status===1){ }}
+            <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看照片</a>
+            <a class="layui-btn layui-btn-xs" lay-event="edit">处理</a>
+        {{#  } else if(d.Status===2 && d.AlarmCode===257) { }}
+            <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看照片</a>
+            <a class="layui-btn layui-btn-xs" lay-event="edit">处理</a>
+        {{#  } else if(d.Status===3 && d.AlarmCode===257) { }}
+            <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看照片</a>
+        {{#  } else if(d.Status===3) { }}
+
+        {{#  } else { }}
+            <a class="layui-btn layui-btn-xs" lay-event="edit">处理</a>
+        {{#  } }}
+    </script>
+    <script type="text/javascript">
+        layui.use(['table', 'form', 'laydate'], function () {
+            var form = layui.form;
+            var laydate = layui.laydate;
+            var alarmTable = layui.table;
+
+            laydate.render({
+                elem: '#startTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#endTime',
+                type: 'datetime'
+            });
+
+            form.on('select(ElectricId)', function (data) {
+                var Id = data.value;
+                getLine(Id);
+                getJoint(null);
+            });
+
+            form.on('select(LineId)', function (data) {
+                var Id = data.value;
+                getJoint(Id);
+            });
+
+            form.on('select(deviceBigType)', function (data) {
+                var Id = data.value;
+                binSmallType(Id);
+            });
+
+            $('#btnSearch').on('click', function () {
+                var typeValue = $("#deviceBigType").val();
+                var ElectricIdval = $("#ElectricId").val();
+                var LineIdval = $("#LineId").val();
+                if (ElectricIdval == null || ElectricIdval == "" || ElectricIdval == "undefined") {
+                    layer.alert('请选择供电或公司!', { title: "提示" });
+                    return;
+                }
+                if (LineIdval == null || LineIdval == "" || LineIdval == "undefined") {
+                    layer.alert('请选择线路名称!', { title: "提示" });
+                    return;
+                }
+                alarmTable.render({
+                    elem: '#alarmdata',
+                    url: '/Alarm/GetAlarmHistory',
+                    cellMinWidth: 80,
+                    even: 'true',
+                    height: 400,
+                    id: 'reloadAlarm',
+                    page: true,
+                    cols: [
+                         [
+                             {
+                                 field: 'test1',
+                                 title: '全选',
+                                 type: 'checkbox'
+                             },
+                             {
+                                 field: 'DeviceName',
+                                 title: '终端名称',
+                                 width: 170,
+                             },
+                             {
+                                 field: 'TerminalId',
+                                 title: '终端ID',
+                                 width: 130,
+                             },
+                             {
+                                 field: 'ElectricName',
+                                 title: '供电或公司',
+                                 width: 170,
+                             },
+                             {
+                                 field: 'LineName',
+                                 title: '线路名称',
+                                 width: 170,
+                             },
+                             {
+                                 field: 'JointName',
+                                 title: '接头名称',
+                                 width: 170,
+                             },
+                             {
+                                 field: 'Flag',
+                                 title: '报警状态',
+                                 templet: '#FlagStatus',
+                                 width: 130,
+                             },
+                              {
+                                  field: 'StatusName',
+                                  title: '处理状态',
+                                  templet: '#StatusName',
+                                  width: 130,
+                              },
+                             {
+                                 field: 'Value',
+                                 title: '告警值'
+                             },
+                             {
+                                 field: 'StartTime',
+                                 title: '告警时间',
+                                 templet: function (row) { return dateFormat(row.StartTime); },
+                                 width: 170,
+                             },
+                             {
+                                 field: 'EndTime',
+                                 title: '结束时间',
+                                 templet: function (row) { return dateFormat(row.EndTime); },
+                                 width: 170,
+                             },
+                             {
+                                 field: 'Content',
+                                 title: '告警详情',
+                                 width: 170,
+                             },
+                             {
+                                 fixed: 'right',
+                                 field: 'handle',
+                                 title: '操作',
+                                 templet: '#handle',
+                                 width: 140,
+                             }
+                         ]
+                    ], where: {
+                        ElectricId: document.getElementById("ElectricId").value,
+                        LineId: document.getElementById("LineId").value,
+                        JointId: document.getElementById("JointId").value,
+                        bigTypeId: document.getElementById("deviceBigType").value,
+                        smallTypeId: document.getElementById("deviceSmallType").value,
+                        searchText: document.getElementById("searchText").value,
+                        startTime: document.getElementById("startTime").value,
+                        endTime: document.getElementById("endTime").value
+                    }
+                });
+
+                //监听工具条
+                alarmTable.on('tool(alarm)', function (obj) {
+                    var data = obj.data;
+                    if (obj.event === 'edit') {
+                        var Id = data.Id;
+                        var ElectricId = data.ElectricId;
+                        var LineId = data.LineId;
+                        var TerminalId = data.TerminalId;
+                        var url = "/Alarm/HandleAlarm?Id=" + Id + "&ElectricId=" + ElectricId + "&LineId=" + LineId + "&TerminalId=" + TerminalId;
+                        window.top.frameUrl(url);
+                    }
+                    if (obj.event === 'detail') {
+                        var Id = data.Id;
+                        var ElectricId = data.ElectricId;
+                        var LineId = data.LineId;
+                        $.getJSON('/EarthBox/GetEarthBoxAlamPicture?alarmId=' + Id + "&ElectricId=" + ElectricId + "&LineId=" + LineId, function (json) {
+                            layer.photos({
+                                photos: json,
+                                shift: 5
+                            });
+                        });
+                    }
+                });
+            });
+         
+            $("#excelExport").on('click', function () {
+                var typeValue = $("#deviceBigType").val();
+                var ElectricIdval = $("#ElectricId").val();
+                var LineIdval = $("#LineId").val();
+                if (ElectricIdval == null || ElectricIdval == "" || ElectricIdval == "undefined") {
+                    layer.alert('请选择供电或公司!', { title: "提示" });
+                    return;
+                }
+                if (LineIdval == null || LineIdval == "" || LineIdval == "undefined") {
+                    layer.alert('请选择线路名称!', { title: "提示" });
+                    return;
+                }
+                $("#btnSearch").click();
+                var startTime = document.getElementById("startTime").value;
+                var endTime = document.getElementById("endTime").value;
+                var url = "/Alarm/ExcelExport?ElectricId=" + ElectricIdval + "&LineId=" + LineIdval + "&JointId=" + $("#JointId").val() + "&bigTypeId=" + typeValue + "&smallTypeId=" + $("#deviceSmallType").val() + "&searchText=" + $("#searchText").val() + "&startTime=" + startTime + "&endTime=" + endTime;
+                window.open(url);
+            });
+
+            //监听工具条
+            alarmTable.on('tool(alarm)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'edit') {
+                    var Id = data.Id;
+                    var ElectricId = data.ElectricId;
+                    var LineId = data.LineId;
+                    var TerminalId = data.TerminalId;
+                    var url = "/Alarm/HandleAlarm?Id=" + Id + "&ElectricId=" + ElectricId + "&LineId=" + LineId + "&TerminalId=" + TerminalId;
+                    window.top.frameUrl(url);
+                }
+            });
+
+            function dateFormat(item) {
+                if (item == null || item == "" || item == "undefined") {
+                    return "";
+                } else {
+                    var time = new Date(parseInt(item.substr(6))).Format("yyyy-MM-dd hh:mm:ss");
+                    return time;
+                }
+            }
+
+            Date.prototype.Format = function (fmt) {
+                var o = {
+                    "M+": this.getMonth() + 1, //月份
+                    "d+": this.getDate(), //日
+                    "h+": this.getHours(), //小时
+                    "m+": this.getMinutes(), //分
+                    "s+": this.getSeconds() //秒
+                };
+                if (/(y+)/.test(fmt)) { //根据y的长度来截取年
+                    fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                }
+                for (var k in o) {
+                    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                }
+                return fmt;
+            }
+        });
+
+        $(document).ready(function () {
+            getElectric();
+            getLine(null);
+            getJoint(null);
+            bindBigType();
+            binSmallType(null);
+        });
+
+        /*获取供电*/
+        function getElectric() {
+            var url = "/DeviceInfo/GetElectric";
+            $.ajax({
+                url: url,
+                async: true,
+                type: 'post',
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    var html = "<option value=''>请选择所在供电</option>";
+                    $.each(data, function (idx, obj) {
+                        html += "<option value=" + obj.Id + ">" + obj.name + "</option>";
+                    });
+                    $("#ElectricId").html(html);
+                    layui.use(['form'], function () {
+                        var form = layui.form;
+                        form.render('select');
+                    });
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*获取线路*/
+        function getLine(Id) {
+            var url = "/DeviceInfo/GetLine";
+            if (Id == "" || Id == null || Id == "undefined") {
+                Id = -1;
+            }
+            $.ajax({
+                url: url,
+                async: true,
+                type: 'post',
+                data: { electricId: Id },
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    var html = "<option value=''>请选择所在线路</option>";
+                    $.each(data, function (idx, obj) {
+                        html += "<option value=" + obj.Id + ">" + obj.name + "</option>";
+                    });
+                    $("#LineId").html(html);
+                    layui.use(['form'], function () {
+                        var form = layui.form;
+                        form.render('select');
+                    });
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*获取接头*/
+        function getJoint(Id) {
+            var url = "/DeviceInfo/GetJoint";
+            if (Id == "" || Id == null || Id == "undefined") {
+                Id = -1;
+            }
+            $.ajax({
+                url: url,
+                async: true,
+                type: 'post',
+                data: { LineId: Id },
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    var html = "<option value=''>请选择所在接头</option>";
+                    $.each(data, function (idx, obj) {
+                        html += "<option value=" + obj.Id + ">" + obj.name + "</option>";
+                    });
+                    $("#JointId").html(html);
+                    layui.use(['form'], function () {
+                        var form = layui.form;
+                        form.render('select');
+                    });
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*获取设备大类*/
+        function bindBigType() {
+            var url = "/DeviceManager/GetDeviceBigType";
+            $.ajax({
+                url: url,
+                async: true,
+                type: 'post',
+                dataType: 'json',
+                success: function (data, jqxhr, textStatus) {
+                    var html = "<option value=''>请选择设备大类</option>";
+                    $.each(data, function (idx, obj) {
+                        html += "<option value=" + obj.Id + ">" + obj.typeName + "</option>";
+                    });
+                    $("#deviceBigType").html(html);
+                    layui.use(['form'], function () {
+                        var form = layui.form;
+                        form.render('select');
+                    });
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+        }
+
+        /*获取设备小类*/
+        function binSmallType(Id) {
+            if (Id == "" || Id == null || Id == "undefined") {
+                Id = 0;
+            }
+            var url = "/DeviceManager/GetDeviceSmallType";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { bigTypeId: Id },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    var html = "<option value=''>请选择设备小类</option>";
+                    $.each(data, function (idx, obj) {
+                        html += "<option value=" + obj.Id + ">" + obj.typeName + "</option>";
+                    });
+                    $("#deviceSmallType").html(html);
+                    layui.use(['form'], function () {
+                        var form = layui.form;
+                        form.render('select');
+                    });
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

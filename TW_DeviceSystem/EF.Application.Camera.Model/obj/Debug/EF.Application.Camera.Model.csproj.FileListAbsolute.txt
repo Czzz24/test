@@ -1,0 +1,13 @@
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\bin\Debug\EF.Application.Camera.Model.dll
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\bin\Debug\EF.Application.Camera.Model.pdb
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\bin\Debug\EntityFramework.dll
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\bin\Debug\EntityFramework.SqlServer.dll
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\bin\Debug\EntityFramework.xml
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\bin\Debug\EntityFramework.SqlServer.xml
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\bin\Debug\zh-Hans\EntityFramework.resources.dll
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\bin\Debug\zh-Hans\EntityFramework.SqlServer.resources.dll
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\obj\Debug\EF.Application.Camera.Model.csprojAssemblyReference.cache
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\obj\Debug\EF.Application.Camera.Model.csproj.CoreCompileInputs.cache
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\obj\Debug\EF.Application.Camera.Model.csproj.CopyComplete
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\obj\Debug\EF.Application.Camera.Model.dll
+E:\works\TW_DeviceSystem\EF.Application.Camera.Model\obj\Debug\EF.Application.Camera.Model.pdb

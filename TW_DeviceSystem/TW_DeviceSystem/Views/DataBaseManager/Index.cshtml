@@ -1,0 +1,239 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        数据库管理
+    </blockquote>
+    <div class="content_Area">
+        <div class="layui-form">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label" style="width:130px; text-align:left">所在供电(或公司)：</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="ElectricId" lay-filter="ElectricId" lay-search=""></select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">所在线路：</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="LineId" lay-filter="LineId" lay-search=""></select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">项目名称：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" placeholder="请输入项目名称" id="projectName" />
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layui-btn-normal" data-type="reload" id="btnSearch">查询</button>
+                </div>
+            </div>
+            <table class="layui-hide" id="baseInfo" lay-filter="demo"></table>
+        </div>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    </script>
+    <script type="text/javascript">
+        layui.use(['table', 'form'], function () {
+            var form = layui.form;
+            var table = layui.table;
+            table.render({
+                elem: '#baseInfo',
+                url: '/DataBaseManager/GetDataBasePage',
+                cellMinWidth: 80,
+                even: 'true',
+                height: 450,
+                id: 'reload',
+                page: true,
+                done: function (res, curr, count) {
+                    $("[data-field='Id']").css('display', 'none');
+                },
+                cols: [
+                    [
+                         {
+                             field: 'Id',
+                             title: 'ID'
+                         },
+                        {
+                            field: 'projectName',
+                            title: '项目名称',
+                            width: 100,
+                        }
+                        , {
+                            field: 'dataBaseAccount',
+                            title: '数据库账号',
+                            minWidth: 150,
+                        }, {
+                            field: 'dataBasePwd',
+                            title: '数据库密码',
+                            minWidth: 120,
+                        }, {
+                            field: 'dataBaseIP',
+                            title: '数据库地址',
+                            minWidth: 200,
+                        }, {
+                            field: 'dataBaseName',
+                            title: '数据库名称',
+                            minWidth: 150,
+                        }, {
+                            field: 'ElectricName',
+                            title: '供电或公司',
+                            minWidth: 200,
+                        }, {
+                            field: 'LineName',
+                            title: '线路名称',
+                            minWidth: 150,
+                        },
+                        {
+                            field: 'CreateTime',
+                            title: '录入日期',
+                            minWidth: 170,
+                            templet: function (row) { return dateFormat(row.CreateTime); }
+                        },
+                        { fixed: 'right', title: '操作', width: 178, align: 'center', toolbar: '#barDemo' }
+                    ]
+                ], where: {
+                    ElectricId: document.getElementById("ElectricId").value,
+                    LineId: document.getElementById("LineId").value,
+                    projectName:document.getElementById("projectName").value
+                }
+            });
+
+            var $ = layui.$, active = {
+                reload: function () {
+                    var ElectricId = $('#ElectricId');
+                    var LineId = $("#LineId");
+                    var projectName = $("#projectName");
+                    table.reload('reload', {
+                        page: { curr: 1 },
+                        where: {
+                            ElectricId: ElectricId.val(),
+                            LineId: LineId.val(),
+                            projectName: projectName.val()
+                        }
+                    });
+                }
+            };
+
+            //监听工具条
+            table.on('tool(demo)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'detail') {
+                    var url = "/DataBaseManager/Details?Id=" + data.Id;
+                    window.top.frameUrl(url);
+                } else if (obj.event === 'edit') {
+                    var url = "/DataBaseManager/Edit?Id=" + data.Id;
+                    window.top.frameUrl(url);
+                }
+            });
+
+            $('#btnSearch').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            form.on('select(ElectricId)', function (data) {
+                var Id = data.value;
+                getLine(Id);
+            });
+
+            function dateFormat(item) {
+                var time = new Date(parseInt(item.substr(6))).Format("yyyy-MM-dd hh:mm:ss");
+                return time;
+            }
+
+            Date.prototype.Format = function (fmt) {
+                var o = {
+                    "M+": this.getMonth() + 1, //月份
+                    "d+": this.getDate(), //日
+                    "h+": this.getHours(), //小时
+                    "m+": this.getMinutes(), //分
+                    "s+": this.getSeconds() //秒
+                };
+                if (/(y+)/.test(fmt)) { //根据y的长度来截取年
+                    fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                }
+                for (var k in o) {
+                    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                }
+                return fmt;
+            }
+        });
+
+        $(document).ready(function () {
+            getElectric();
+            getLine(null);
+        });
+
+        /*获取供电*/
+        function getElectric() {
+            var url = "/DeviceInfo/GetElectric";
+            $.ajax({
+                url: url,
+                async: true,
+                type: 'post',
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    var html = "<option value=''>请选择所在供电</option>";
+                    $.each(data, function (idx, obj) {
+                        html += "<option value=" + obj.Id + ">" + obj.name + "</option>";
+                    });
+                    $("#ElectricId").html(html);
+                    layui.use(['form'], function () {
+                        var form = layui.form;
+                        form.render('select');
+                    });
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        /*获取线路*/
+        function getLine(Id) {
+            var url = "/DeviceInfo/GetLine";
+            if (Id == "" || Id == null || Id == "undefined") {
+                Id = -1;
+            }
+            $.ajax({
+                url: url,
+                async: true,
+                type: 'post',
+                data: { electricId: Id },
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    var html = "<option value=''>请选择所在线路</option>";
+                    $.each(data, function (idx, obj) {
+                        html += "<option value=" + obj.Id + ">" + obj.name + "</option>";
+                    });
+                    $("#LineId").html(html);
+                    layui.use(['form'], function () {
+                        var form = layui.form;
+                        form.render('select');
+                    });
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+    </script>
+</body>
+</html>

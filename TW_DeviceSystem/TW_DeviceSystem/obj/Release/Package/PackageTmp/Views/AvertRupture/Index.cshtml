@@ -1,0 +1,336 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text top_border">
+        4#防外破
+    </blockquote>
+    <div class="jd_detailsColumns">
+        <div class="product_Container">
+            <table>
+                <tr>
+                    <td><img src="~/Images/dg.png" /></td>
+                    <td><span>电镐</span></td>
+                </tr>
+                <tr>
+                    <td>电稿方位角</td>
+                    <td>36.30</td>
+                </tr>
+                <tr>
+                    <td>电稿概率</td>
+                    <td>70.20</td>
+                </tr>
+            </table>
+            <div class="product_Check">
+                <button class="layui-btn layui-btn-normal"><i class="icon-monitor"></i>&nbsp;查看摄像</button>
+            </div>
+        </div>
+        <div class="product_Container">
+            <table>
+                <tr>
+                    <td><img src="~/Images/wjj.png" /></td>
+                    <td><span>挖掘机</span></td>
+                </tr>
+                <tr>
+                    <td>挖掘机方位角</td>
+                    <td>36.30</td>
+                </tr>
+                <tr>
+                    <td>挖掘机概率</td>
+                    <td>70.20</td>
+                </tr>
+            </table>
+            <div class="product_Check">
+                <button class="layui-btn layui-btn-normal"><i class="icon-monitor"></i>&nbsp;查看摄像</button>
+            </div>
+        </div>
+        <div class="product_Container">
+            <table>
+                <tr>
+                    <td><img src="~/Images/cjc.png" /></td>
+                    <td><span>冲击锤</span></td>
+                </tr>
+                <tr>
+                    <td>冲击锤方位角</td>
+                    <td>36.30</td>
+                </tr>
+                <tr>
+                    <td>冲击锤概率</td>
+                    <td>70.20</td>
+                </tr>
+            </table>
+            <div class="product_Check">
+                <button class="layui-btn layui-btn-normal"><i class="icon-monitor"></i>&nbsp;查看摄像</button>
+            </div>
+        </div>
+        <div class="product_Container">
+            <table>
+                <tr>
+                    <td><img src="~/Images/qgj.png" /></td>
+                    <td><span>切割机</span></td>
+                </tr>
+                <tr>
+                    <td>切割机方位角</td>
+                    <td>36.30</td>
+                </tr>
+                <tr>
+                    <td>切割机概率</td>
+                    <td>70.20</td>
+                </tr>
+            </table>
+            <div class="product_Check">
+                <button class="layui-btn layui-btn-normal"><i class="icon-monitor"></i>&nbsp;查看摄像</button>
+            </div>
+        </div>
+    </div>
+    <div class="tabbar_Container">
+        <div class="layui-tab layui-tab-brief" lay-filter="demo">
+            <ul class="layui-tab-title">
+                <li class="layui-this" lay-id="11">历史数据</li>
+                <li lay-id="22">报警数据</li>
+                <li lay-id="33">数据图表</li>
+            </ul>
+            <div class="layui-tab-content">
+                <!--1-->
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" placeholder="选择开始日期" id="test1">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" placeholder="选择结束日期" id="test2">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn btn-size layui-btn-normal">查询</button>
+                    </div>
+                    <table class="layui-hide" id="historydata"></table>
+
+                </div>
+                <!--2-->
+                <div class="layui-tab-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" placeholder="选择开始日期" id="test3">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" placeholder="选择结束日期" id="test4">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn btn-size layui-btn-normal">查询</button>
+                        <button class="layui-btn btn-size layui-btn-danger">确认报警</button>
+                    </div>
+                    <table class="layui-hide" id="alarmdata"></table>
+                </div>
+                <!--3-->
+                <div class="layui-tab-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" placeholder="选择开始日期" id="test5">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" placeholder="选择结束日期" id="test6">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn btn-size layui-btn-normal">查询</button>
+                    </div>
+                    <div class="chart_Container" id="dataChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/Scripts/Views/AvertRupture/dataChart.js"></script>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        layui.use(['element', 'laydate', 'table'], function () {
+            var element = layui.element;
+            element.on('tab(demo)', function (data) {
+                var index = data.index;
+                switch (index) {
+                    case 0:
+                        break;
+                    case 1:
+                        var alarmTable = layui.table;
+                        alarmTable.render({
+                            elem: '#alarmdata',
+                            url: '/Scripts/data/gj.json',
+                            cellMinWidth: 80,
+                            even: 'true',
+                            height: 400,
+                            page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+                                layout: ['count', 'prev', 'page', 'next', 'skip'],
+                                groups: 5,
+                                first: false,
+                                last: false,
+                                theme: '#127FD1'
+                            },
+                            cols: [
+                                [
+                                    {
+                                        field: 'test1',
+                                        title: '全选',
+                                        type: 'checkbox'
+                                    },
+                                    {
+                                        field: 'test2',
+                                        title: '告警时间'
+                                    },
+                                    {
+                                        field: 'test3',
+                                        title: '终端'
+                                    },
+                                    {
+                                        field: 'test4',
+                                        title: '告警值'
+                                    },
+                                    {
+                                        field: 'test5',
+                                        title: '告警详情'
+                                    }
+                                ]
+                            ]
+                        });
+                        break;
+                    case 2:
+                        initdataChart();
+                        break;
+                    default:
+                        break;
+                }
+            });
+            var laydate = layui.laydate;
+
+            //1
+            laydate.render({
+                elem: '#test1' //指定元素
+					,
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#test2' //指定元素
+					,
+                type: 'datetime'
+            });
+            //2
+            laydate.render({
+                elem: '#test3',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#test4',
+                type: 'datetime'
+            });
+            //3
+            laydate.render({
+                elem: '#test5',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#test6',
+                type: 'datetime'
+            });
+
+            var historyTable = layui.table;
+            historyTable.render({
+                elem: '#historydata',
+                url: '/Scripts/data/fwp.json',
+                cellMinWidth: 80,
+                even: 'true',
+                height: 400,
+                page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+                    layout: ['count', 'prev', 'page', 'next', 'skip'],
+                    groups: 5,
+                    first: false,
+                    last: false,
+                    theme: '#127FD1'
+                },
+                cols: [
+                    [
+                        {
+                            field: 'test1',
+                            title: '时间'
+                        },
+                        {
+                            field: 'test2',
+                            title: '电稿方位角'
+                        },
+                        {
+                            field: 'test3',
+                            title: '电稿概率'
+                        },
+                        {
+                            field: 'test4',
+                            title: '挖掘机方位角'
+                        },
+                        {
+                            field: 'test5',
+                            title: '挖掘机概率'
+                        },
+                        {
+                            field: 'test6',
+                            title: '冲击锤方位角'
+                        },
+                        {
+                            field: 'test7',
+                            title: '冲击锤概率'
+                        },
+                        {
+                            field: 'test8',
+                            title: '切割机方位角'
+                        },
+                        {
+                            field: 'test9',
+                            title: '切割机概率'
+                        },
+                        {
+                            field: 'test10',
+                            title: '信号强度'
+                        }
+                    ]
+                ]
+            });
+        });
+
+		function initdataChart() {
+		    var legendName = ['电镐方位角', '电镐概率', '挖掘机方位角', '挖掘机概率', '冲击锤方位角', '冲击锤概率', '切割机方位角', '切割机概率', '信号强度'];
+		    var xAxisData = ['2018-08-14\n10:01:00', '2018-08-14\n10:02:00', '2018-08-14\n10:03:00', '2018-08-14\n10:04:00', '2018-08-14\n10:05:00', '2018-08-14\n10:06:00', '2018-08-14\n10:07:00'];
+		    var data1 = [120, 132, 101, 134, 90, 230, 210];
+		    var data2 = [220, 182, 191, 234, 290, 330, 310];
+		    var data3 = [150, 232, 201, 154, 190, 330, 410];
+		    var data4 = [320, 332, 301, 334, 390, 330, 320];
+		    var data5 = [820, 932, 901, 934, 1290, 1330, 1320];
+		    var data6 = [150, 232, 201, 154, 190, 330, 410];
+		    var data7 = [150, 232, 201, 154, 190, 330, 410];
+		    var data8 = [150, 232, 201, 154, 190, 330, 410];
+		    var data9 = [150, 232, 201, 154, 190, 330, 410];
+		    dataEchart(legendName, xAxisData, data1, data2, data3, data4, data5, data6, data7, data8, data9);
+		}
+    </script>
+</body>
+</html>

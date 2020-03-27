@@ -1,0 +1,55 @@
+﻿.carousel-01 {
+    width: 70px;
+    background-color: #127FD1;
+}
+
+    .carousel-01 .prev, .carousel-01 .next {
+        height: 50px;
+        width: 100%;
+        overflow: hidden;
+        display: block;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .carousel-01 .prev {
+        background: url(../../../Images/left_top.png) no-repeat center;
+    }
+
+    .carousel-01 .next {
+        background: url(../../../Images/left_btn.png) no-repeat center;
+    }
+
+.jCarouselLite-01 {
+    height: 480px;
+    width: 70px;
+    overflow: hidden; /*必要元素*/
+    color: #fff;
+}
+
+    .jCarouselLite-01 li {
+        height: 70px;
+        width: 70px;
+        text-align: center;
+    }
+
+        .jCarouselLite-01 li i {
+            line-height:45px;
+            font-size: 32px;
+        }
+
+        .jCarouselLite-01 li:hover {
+            background: url(../../../Images/left_nav_bg.jpg) repeat-y;
+            color: #007eed;
+            cursor: pointer;
+        }
+
+        .jCarouselLite-01 li.title {
+            font-size: 12px;
+        }
+
+.MenuSelect {
+    background: url(../../../Images/left_nav_bg.jpg) repeat-y;
+    color: #007eed;
+    cursor: pointer;
+}

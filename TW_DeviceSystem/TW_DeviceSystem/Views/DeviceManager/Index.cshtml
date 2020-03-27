@@ -1,0 +1,1759 @@
+﻿
+@{
+    Layout = null;
+}
+
+@model EF.Application.Model.t_organize
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <link href="~/Scripts/zTree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" />
+    <style type="text/css">
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        .selectTree {
+            width: 250px;
+            height: calc(100% - 40px);
+            overflow: auto;
+            float: left;
+        }
+
+        .selectContent {
+            float: left;
+            width: calc(100% - 252px);
+            height: 100%;
+        }
+
+        .sbtj_Map {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            left: 0px;
+            top: 0px;
+            z-index: 1;
+        }
+
+        ul.ztree {
+            margin-top: 0 !important;
+            width: auto !important;
+            background: none !important;
+            border: none !important;
+            overflow-y: auto !important;
+        }
+
+        .layui-tab {
+            margin: 0 !important;
+        }
+
+        .button-group {
+            width: 120px;
+            height: 60px;
+            position: relative;
+            bottom: 0px;
+            left: calc(100% - 120px);
+            font-size: 12px;
+            padding: 10px;
+            z-index: 9999;
+        }
+
+            .button-group .divbtn {
+                width: 40px;
+                height: 40px;
+                background-color: #0D9BF2;
+                float: left;
+                margin-left: 10px;
+                border-radius: 3px;
+                cursor: pointer;
+            }
+
+        .divbtn img {
+            margin: 4px 0px 0px 4px;
+        }
+
+        .treeSearch {
+            width: calc(90% - 10px);
+            height: 25px;
+            margin-left: 5px;
+            background: url(/Images/buttonIcon/btnSearch.png) no-repeat;
+            background-size: 20px 20px;
+            background-position: right;
+            border-radius: 3px;
+            border: 1px solid #D4D5D9;
+        }
+    </style>
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+    <script src="~/Scripts/zTree/js/jquery.ztree.core.js"></script>
+    <script src="~/Scripts/zTree/js/jquery.ztree.excheck.js"></script>
+    <script src="~/Scripts/zTree/js/jquery.ztree.exedit.js"></script>
+    <script src="/google/js/api.js"></script>
+    <script src="/google/js/drawing.js"></script>
+    <script src="/google/js/geometry.js"></script>
+    <script src="/google/js/places.js"></script>
+    <script src="/google/js/maplabel.js"></script>
+    <script src="/google/js/visualization.js"></script>
+    <script src="/Scripts/map/bigMap.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote" style="margin-bottom: 0;">
+        设备添加
+    </blockquote>
+
+    <div class="selectTree">
+        <input type="text" id="treeSearch" class="treeSearch" placeholder="请输入设备名称或终端Id" onkeyup="AutoMatch(this)" />
+        <ul id="deivceTree" class="ztree"></ul>
+    </div>
+
+    <div class="selectContent">
+        <div class="tabbar_Container">
+            <div class="layui-tab layui-tab-brief" lay-filter="demo">
+                <ul class="layui-tab-title">
+                    <li class="layui-this" lay-id="1">添加根节点</li>
+                    <li lay-id="2">添加同级节点</li>
+                    <li lay-id="3">添加子级节点</li>
+                    <li lay-id="4">添加设备</li>
+                </ul>
+                <div class="layui-tab-content">
+
+                    <div class="layui-tab-item layui-show">
+                        <div class="layui-form">
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label">节点名称:</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" id="rootNodeName" placeholder="请输入节点名称" class="layui-input" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label">排序号:</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" id="orderNoRoot" placeholder="请输入排序号" class="layui-input" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <button class="layui-btn layui-btn-normal sbtj_Submit" id="addRootNode">添加</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-tab-item">
+                        <div class="layui-form">
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label">节点名称:</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" class="layui-input" placeholder="请输入节点名称" id="sameNodeName" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label">排序号:</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" id="orderNoSame" placeholder="请输入排序号" class="layui-input" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label" style="width:auto">是否是(供电或公司):</label>
+                                    <div class="layui-input-inline">
+                                        <input type="checkbox" lay-skin="switch" lay-text="是|否" id="isSameElectric" lay-filter="isSameElectric" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label" style="width:auto">是否是(电缆的线路):</label>
+                                    <div class="layui-input-inline">
+                                        <input type="checkbox" lay-skin="switch" lay-text="是|否" id="isSameLine" lay-filter="isSameLine" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label" style="width:auto">是否是(终端头或中间接头):</label>
+                                    <div class="layui-input-inline">
+                                        <input type="checkbox" id="isSameJoint" lay-skin="switch" lay-text="是|否" lay-filter="isSameJoint" />
+                                    </div>
+                                </div>
+                            </div>
+                            <fieldset class="layui-elem-field site-demo-button" id="dataBaseSame" style="margin-top: 20px;">
+                                <legend>数据库信息</legend>
+                                <div class="layui-form">
+                                    <div class="layui-form-item">
+                                        <div class="layui-inline">
+                                            <label class="layui-form-label sbtj_label">项目名称:</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="projectNameSame" placeholder="请输入项目名称" autocomplete="on" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-inline">
+                                            <label class="layui-form-label sbtj_label">数据库名称:</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="dataBaseNameSame" placeholder="请输入数据库名称" autocomplete="on" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-inline">
+                                            <label class="layui-form-label sbtj_label">数据库地址:</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="dataBaseAddressSame" placeholder="请输入数据库地址" autocomplete="on" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-inline">
+                                            <label class="layui-form-label sbtj_label">数据库账号:</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="dataBaseAccountSame" placeholder="请输入数据库账号" autocomplete="on" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-inline">
+                                            <label class="layui-form-label sbtj_label">数据库密码:</label>
+                                            <div class="layui-input-inline">
+                                                <input type="password" id="dataBasePwdSame" placeholder="请输入数据库密码" autocomplete="on" class="layui-input">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <div class="layui-form-item">
+                                <button class="layui-btn layui-btn-normal sbtj_Submit" id="addSameNode">添加</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-tab-item">
+                        <div class="layui-form">
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label">节点名称:</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" class="layui-input" placeholder="请输入节点名称" id="childNodeName" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label">排序号:</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" id="orderNoChild" placeholder="请输入排序号" class="layui-input" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label" style="width:auto">是否是(供电或公司):</label>
+                                    <div class="layui-input-inline">
+                                        <input type="checkbox" id="isChildElectric" lay-skin="switch" lay-text="是|否" lay-filter="isChildElectric" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label" style="width:auto">是否是(电缆的线路):</label>
+                                    <div class="layui-input-inline">
+                                        <input type="checkbox" id="isChildLine" lay-skin="switch" lay-text="是|否" lay-filter="isChildLine" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-inline">
+                                    <label class="layui-form-label sbtj_label" style="width:auto">是否是(终端头或中间接头):</label>
+                                    <div class="layui-input-inline">
+                                        <input type="checkbox" id="isChildJoint" lay-skin="switch" lay-text="是|否" lay-filter="isChildJoint" />
+                                    </div>
+                                </div>
+                            </div>
+                            <fieldset class="layui-elem-field site-demo-button" id="dataBaseChild" style="margin-top: 20px;">
+                                <legend>数据库信息</legend>
+                                <div class="layui-form">
+                                    <div class="layui-form-item">
+                                        <div class="layui-inline">
+                                            <label class="layui-form-label sbtj_label">项目名称:</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="projectNameChild" placeholder="请输入项目名称" autocomplete="on" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-inline">
+                                            <label class="layui-form-label sbtj_label">数据库名称:</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="dataBaseNameChild" placeholder="请输入数据库名称" autocomplete="on" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-inline">
+                                            <label class="layui-form-label sbtj_label">数据库地址:</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="dataBaseAddressChild" placeholder="请输入数据库地址" autocomplete="on" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-inline">
+                                            <label class="layui-form-label sbtj_label">数据库账号:</label>
+                                            <div class="layui-input-inline">
+                                                <input type="text" id="dataBaseAccountChild" placeholder="请输入数据库账号" autocomplete="on" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-inline">
+                                            <label class="layui-form-label sbtj_label">数据库密码:</label>
+                                            <div class="layui-input-inline">
+                                                <input type="password" id="dataBasePwdChild" placeholder="请输入数据库密码" autocomplete="on" class="layui-input">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <div class="layui-form-item">
+                                <button class="layui-btn layui-btn-normal sbtj_Submit" id="addChildNode">添加</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-tab-item">
+                        <fieldset class="layui-elem-field site-demo-button" style="margin-top: 20px;">
+                            <legend>设备信息</legend>
+                            <div class="layui-form">
+                                <div class="layui-form-item">
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label sbtj_label">设备名称:</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" class="layui-input" id="deviceName" placeholder="请输入设备名称" />
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label sbtj_label">设备ID:</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" class="layui-input" id="TerminalId" placeholder="请输入设备TerminalId" />
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label sbtj_label">设备大类:</label>
+                                        <div class="layui-input-inline">
+                                            <div class="layui-input-inline">
+                                                <select name="quiz" id="deviceBigType" lay-filter="deviceBigType" lay-search=""></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label sbtj_label">设备小类:</label>
+                                        <div class="layui-input-inline">
+                                            <div class="layui-input-inline">
+                                                <select name="quiz" id="deviceSmallType" lay-search=""></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label sbtj_label">SIM卡号:</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" class="layui-input" id="simNo" placeholder="请输入设备SIM卡号">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label sbtj_label">排序号:</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" class="layui-input" id="orderNo" placeholder="请输入排序号">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label sbtj_label">安装人员:</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" class="layui-input" id="Installer" autocomplete="on" placeholder="请输入安装人员">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label sbtj_label">安装日期:</label>
+                                        <div class="layui-input-inline">
+                                            <input type="tel" placeholder="请选择安装日期" id="InstallDate" class="layui-input">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label sbtj_label">生产厂家:</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" class="layui-input" id="manufacturer" value="浙江新图维" placeholder="请输入生产厂家">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label sbtj_label">经度:</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" class="layui-input" id="longitude" placeholder="请输入经度">
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <label class="layui-form-label sbtj_label">纬度:</label>
+                                        <div class="layui-input-inline">
+                                            <input type="text" class="layui-input" id="latitude" placeholder="请输入纬度">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">位置描述:</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" id="localInstructions" lay-verify="title" autocomplete="off" placeholder="地图加点自动获取位置描述" class="layui-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="layui-elem-field site-demo-button" style="margin-top: 20px;">
+                            <legend>地理位置</legend>
+                            @*<div class="button-group">
+                                    <div class="divbtn" title="标注" onclick="javascript:switchCursor()">
+                                        <img src="~/Images/map/sign.png" />
+                                    </div>
+                                    <div class="divbtn" title="清除" onclick="javascript:ClearMarker(false)">
+                                        <img src="~/Images/map/clear.png" />
+                                    </div>
+                                </div>*@
+                            <div class="sbtj_Map" id="mapDiv">
+                            </div>
+                        </fieldset>
+                        <div class="layui-form-item">
+                            <button class="layui-btn layui-btn-normal sbtj_Submit" id="addDevice">添加</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="zNodeData" />
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        /*全局记录选项卡标识*/
+        var tabIndex = 0;
+        layui.use(['element', 'form', 'laydate'], function () {
+            var element = layui.element;
+            var form = layui.form;
+            var laydate = layui.laydate;
+            laydate.render({
+                elem: '#InstallDate',
+                type: 'datetime'
+            });
+
+            form.on('select(deviceBigType)', function (data) {
+                var Id = data.value;
+                binSmallType(Id);
+            });
+
+            form.on('switch(isSameElectric)', function (data) {
+                var zNodeData = $("#zNodeData").val();
+                if (zNodeData != null && zNodeData != "" && zNodeData != "undefined") {
+                    var treeJson = eval('(' + zNodeData + ')');
+                    if (treeJson.isElectric) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = true;
+                            }
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        hideSameData();
+                    } else if (treeJson.isLine) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = false;
+                            }
+                            if (index == 1) {
+                                item.checked = true;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        showSameData();
+                    } else if (treeJson.isJoint) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = false;
+                            }
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = true;
+                            }
+                        });
+                        form.render('checkbox');
+                        hideSameData();
+                    } else {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        hideSameData();
+                    }
+                } else {
+                    var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                    child.each(function (index, item) {
+                        if (index == 1) {
+                            item.checked = false;
+                        }
+                        if (index == 2) {
+                            item.checked = false;
+                        }
+                    });
+                    form.render('checkbox');
+                    hideSameData();
+                }
+            });
+
+            form.on('switch(isSameLine)', function (data) {
+                var zNodeData = $("#zNodeData").val();
+                if (zNodeData != null && zNodeData != "" && zNodeData != "undefined") {
+                    var treeJson = eval('(' + zNodeData + ')');
+                    if (treeJson.isElectric) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = false;
+                            }
+                            if (index == 1) {
+                                item.checked = true;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        hideSameData();
+                    } else if (treeJson.isLine) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = true;
+                            }
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        showSameData();
+                    } else if (treeJson.isJoint) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = false;
+                            }
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = true;
+                            }
+                        });
+                        form.render('checkbox');
+                        hideSameData();
+                    } else {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        showSameData();
+                    }
+                } else {
+                    var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                    child.each(function (index, item) {
+                        if (index == 1) {
+                            item.checked = false;
+                        }
+                        if (index == 2) {
+                            item.checked = false;
+                        }
+                    });
+                    form.render('checkbox');
+                    showSameData();
+                }
+            });
+
+            form.on('switch(isSameJoint)', function (data) {
+                var zNodeData = $("#zNodeData").val();
+                if (zNodeData != null && zNodeData != "" && zNodeData != "undefined") {
+                    var treeJson = eval('(' + zNodeData + ')');
+                    if (treeJson.isElectric) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = false;
+                            }
+                            if (index == 1) {
+                                item.checked = true;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        hideSameData();
+                    }
+                    else if (treeJson.isLine) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = false;
+                            }
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = true;
+                            }
+                        });
+                        form.render('checkbox');
+                        showSameData();
+                    }
+                    else if (treeJson.isJoint) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = true;
+                            }
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        hideSameData();
+                    } else {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        hideSameData();
+                    }
+                } else {
+                    var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                    child.each(function (index, item) {
+                        if (index == 1) {
+                            item.checked = false;
+                        }
+                        if (index == 2) {
+                            item.checked = false;
+                        }
+                    });
+                    form.render('checkbox');
+                    hideSameData();
+                }
+
+            });
+
+            form.on('switch(isChildElectric)', function (data) {
+                var zNodeData = $("#zNodeData").val();
+                if (zNodeData != null && zNodeData != "" && zNodeData != "undefined") {
+                    var treeJson = eval('(' + zNodeData + ')');
+                    if (treeJson.isElectric) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = false;
+                            }
+                            if (index == 1) {
+                                item.checked = true;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        showChildData();
+                    }
+                    else if (treeJson.isLine) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = false;
+                            }
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = true;
+                            }
+                        });
+                        form.render('checkbox');
+                    } else {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        hideChildData();
+                    }
+                } else {
+                    var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                    child.each(function (index, item) {
+                        if (index == 1) {
+                            item.checked = false;
+                        }
+                        if (index == 2) {
+                            item.checked = false;
+                        }
+                    });
+                    form.render('checkbox');
+                    hideChildData();
+                }
+            });
+
+            form.on('switch(isChildLine)', function (data) {
+                var zNodeData = $("#zNodeData").val();
+                if (zNodeData != null && zNodeData != "" && zNodeData != "undefined") {
+                    var treeJson = eval('(' + zNodeData + ')');
+                    if (treeJson.isElectric) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = true;
+                            }
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        showChildData();
+                    }
+                    else if (treeJson.isLine) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = false;
+                            }
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = true;
+                            }
+                        });
+                        form.render('checkbox');
+                    } else {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        showChildData();
+                    }
+                } else {
+                    var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                    child.each(function (index, item) {
+                        if (index == 1) {
+                            item.checked = false;
+                        }
+                        if (index == 2) {
+                            item.checked = false;
+                        }
+                    });
+                    form.render('checkbox');
+                    showChildData();
+                }
+            });
+
+            form.on('switch(isChildJoint)', function (data) {
+                var zNodeData = $("#zNodeData").val();
+                if (zNodeData != null && zNodeData != "" && zNodeData != "undefined") {
+                    var treeJson = eval('(' + zNodeData + ')');
+                    if (treeJson.isElectric) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = false;
+                            }
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = true;
+                            }
+                        });
+                        form.render('checkbox');
+
+                    }
+                    else if (treeJson.isLine) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = true;
+                            }
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                    }
+                    else if (treeJson.isJoint) {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 0) {
+                                item.checked = true;
+                            }
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                    } else {
+                        var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                        child.each(function (index, item) {
+                            if (index == 1) {
+                                item.checked = false;
+                            }
+                            if (index == 2) {
+                                item.checked = false;
+                            }
+                        });
+                        form.render('checkbox');
+                        hideChildData();
+                    }
+                } else {
+                    var child = $(data.elem).parents('div').find('input[type="checkbox"]');
+                    child.each(function (index, item) {
+                        if (index == 1) {
+                            item.checked = false;
+                        }
+                        if (index == 2) {
+                            item.checked = false;
+                        }
+                    });
+                    form.render('checkbox');
+                    hideChildData();
+                }
+            });
+
+            element.on('tab(demo)', function (data) {
+                tabIndex = data.index;
+                var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                zTree.cancelSelectedNode();
+                $("#zNodeData").val(null);
+                layui.use(['form'], function () {
+                    var form = layui.form;
+                    var child = $("input[type='checkbox']");
+                    child.each(function (index, item) {
+                        item.checked = false;
+                    });
+                    form.render('checkbox');
+                    hideChildData();
+                    hideSameData();
+                });
+            });
+        });
+
+        /*添加根节点*/
+        document.getElementById("addRootNode").addEventListener("click", function () {
+            var url = "/DeviceManager/addRootNode";
+            var name = $("#rootNodeName").val();
+            var orderNo = $("#orderNoRoot").val();
+            var data = { name: null, orderNo: null, isDel: false, DelTime: null, DelUser: null };
+            if (name == "" || name == null || name == "undefined") {
+                layer.tips('请输入节点名称', '#rootNodeName');
+                return;
+            } else {
+                data.name = name;
+            }
+            if (orderNo == "" || orderNo == null || orderNo == "undefined") {
+                data.orderNo = null;
+            } else {
+                var reg = /^\+?[1-9][0-9]*$/;
+                if (!reg.test(orderNo)) {
+                    layer.tips('请输入正整数', '#orderNoRoot');
+                    return;
+                } else {
+                    data.orderNo = orderNo;
+                }
+            }
+            $.ajax({
+                url: url,
+                async: true,
+                type: 'post',
+                data: data,
+                timeout: 10000,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    if (data.code == 0) {
+                        $("#rootNodeName").val(null);
+                        $("#orderNoRoot").val(null);
+                        layer.msg(data.msg);
+                        addNodes(true, data.data[0], false);
+                    } else {
+                        layer.msg(data.msg);
+                    }
+
+                }, error: function (jqxhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        });
+
+        /*添加同级节点*/
+        document.getElementById("addSameNode").addEventListener("click", function () {
+            var url = "/DeviceManager/addSameNode";
+            var zNodeData = $("#zNodeData").val();
+            if (zNodeData == null || zNodeData === "" || zNodeData == "undefined") {
+                layer.alert('请选择节点再添加!', { title: "提示" });
+                return;
+            }
+            var data = { name: null, parentId: null, isElectric: false, isLine: false, isJoint: false, orderNo: null, isDel: false, DelTime: null, DelUser: null };
+            var treeJson = eval('(' + zNodeData + ')');
+            var parentId = treeJson.parentId;
+            var name = $("#sameNodeName").val();
+            var isElectric = document.getElementById("isSameElectric").checked;
+            var isLine = document.getElementById("isSameLine").checked;
+            var isJoint = document.getElementById("isSameJoint").checked;
+            var orderNo = $("#orderNoSame").val();
+
+            data.isElectric = isElectric;
+            data.isLine = isLine;
+            data.isJoint = isJoint;
+            data.parentId = parentId;
+            if (name == "" || name == null || name == "undefined") {
+                layer.tips('请输入节点名称', '#sameNodeName');
+                return;
+            } else {
+                data.name = name;
+            }
+            if (orderNo == "" || orderNo == null || orderNo == "undefined") {
+                data.orderNo = null;
+            } else {
+                var reg = /^\+?[1-9][0-9]*$/;
+                if (!reg.test(orderNo)) {
+                    layer.tips('请输入正整数', '#orderNoSame');
+                    return;
+                } else {
+                    data.orderNo = orderNo;
+                }
+            }
+            if (isElectric) {
+                if (treeJson.isLine == true) {
+                    layer.alert('请选择供电再添加供电!', { title: "提示" });
+                    return;
+                }
+            }
+            var managerdata = { dataBaseName: null, dataBaseIP: null, dataBaseAccount: null, dataBasePwd: null, projectName: null, isDel: false, DelUser: null, DelTime: null };
+            if (isLine) {
+                var dataBaseName = $("#dataBaseNameSame").val();
+                var dataBaseAddress = $("#dataBaseAddressSame").val();
+                var dataBaseAccount = $("#dataBaseAccountSame").val();
+                var dataBasePwd = $("#dataBasePwdSame").val();
+                var projectName = $("#projectNameSame").val();
+                if (treeJson.isElectric == true) {
+                    layer.alert('请选择线路再添加线路!', { title: "提示" });
+                    return;
+                }
+                if (treeJson.isElectric == false && treeJson.isLine == false) {
+                    layer.alert('请选择线路再添加线路!', { title: "提示" });
+                    return;
+                }
+                if (projectName == null || projectName == "" || projectName == "undefined") {
+                    layer.tips('请输入项目名称', '#projectNameSame');
+                    return;
+                }
+                if (dataBaseName == null || dataBaseName == "" || dataBaseName == "undefined") {
+                    layer.tips('请输入数据库名称', '#dataBaseNameSame');
+                    return;
+                }
+                if (dataBaseAddress == null || dataBaseAddress == "" || dataBaseAddress == "undefined") {
+                    layer.tips('请输入数据库地址', '#dataBaseAddressSame');
+                    return;
+                }
+                if (dataBaseAccount == null || dataBaseAccount == "" || dataBaseAccount == "undefined") {
+                    layer.tips('请输入数据库账号', '#dataBaseAccountSame');
+                    return;
+                }
+                if (dataBasePwd == null || dataBasePwd == "" || dataBasePwd == "undefined") {
+                    layer.tips('请输入数据库密码', '#dataBasePwdSame');
+                    return;
+                }
+                managerdata.dataBaseName = dataBaseName;
+                managerdata.dataBaseIP = dataBaseAddress;
+                managerdata.dataBaseAccount = dataBaseAccount;
+                managerdata.dataBasePwd = dataBasePwd;
+                managerdata.projectName = projectName;
+            }
+
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { organizeModel: JSON.stringify(data), manager: JSON.stringify(managerdata) },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    if (data.code == 0) {
+                        addNodes(false, data.data[0], true);
+                        var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                        zTree.cancelSelectedNode();
+                        $("#orderNoSame").val(null);
+                        $("#sameNodeName").val(null);
+                        $("#zNodeData").val(null);
+                        $("#dataBaseNameSame").val(null);
+                        $("#dataBaseAddressSame").val(null);
+                        $("#dataBaseAccountSame").val(null);
+                        $("#dataBasePwdSame").val(null);
+                        $("#projectNameSame").val(null);
+                        layer.msg(data.msg);
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }, error: function (jqxhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+
+        });
+
+        /*添加子级节点*/
+        document.getElementById("addChildNode").addEventListener("click", function () {
+            var url = "/DeviceManager/addChildNode";
+            var zNodeData = $("#zNodeData").val();
+            if (zNodeData == null || zNodeData == "" || zNodeData == "undefined") {
+                layer.alert('请选择节点再添加!', { title: "提示" });
+                return;
+            }
+            var data = { name: null, parentId: null, isElectric: false, isLine: false, isJoint: false, orderNo: null, isDel: false, DelTime: null, DelUser: null };
+            var treeJson = eval('(' + zNodeData + ')');
+            var Id = treeJson.Id;
+            var name = $("#childNodeName").val();
+            var isElectric = document.getElementById("isChildElectric").checked;
+            var isLine = document.getElementById("isChildLine").checked;
+            var orderNo = $("#orderNoChild").val();
+            if (name == "" || name == null || name == "undefined") {
+                layer.tips('请输入节点名称', '#childNodeName');
+                return;
+            } else {
+                data.name = name;
+            }
+            if (treeJson.isDevice == true) {
+                layer.alert('请选择不是设备节点添加!', { title: "提示" });
+                return;
+            }
+            data.parentId = Id;
+            data.isElectric = isElectric;
+            data.isLine = isLine;
+            data.isJoint = document.getElementById("isChildJoint").checked;
+            if (orderNo == "" || orderNo == null || orderNo == "undefined") {
+                data.orderNo = null;
+            } else {
+                var reg = /^\+?[1-9][0-9]*$/;
+                if (!reg.test(orderNo)) {
+                    layer.tips('请输入正整数', '#orderNoChild');
+                    return;
+                } else {
+                    data.orderNo = orderNo;
+                }
+            }
+            if (isElectric) {
+                if (treeJson.isLine || treeJson.isElectric) {
+                    layer.alert('请选择供电上级节点再添加供电!', { title: "提示" });
+                    return;
+                }
+            }
+            var managerdata = { dataBaseName: null, dataBaseIP: null, dataBaseAccount: null, dataBasePwd: null, projectName: null, isDel: false, DelUser: null, DelTime: null };
+            if (isLine) {
+                var dataBaseName = $("#dataBaseNameChild").val();
+                var dataBaseAddress = $("#dataBaseAddressChild").val();
+                var dataBaseAccount = $("#dataBaseAccountChild").val();
+                var dataBasePwd = $("#dataBasePwdChild").val();
+                var projectName = $("#projectNameChild").val();
+                if (treeJson.isElectric == false) {
+                    layer.alert('请选择供电再添加线路!', { title: "提示" });
+                    return;
+                }
+                if (projectName == null || projectName == "" || projectName == "undefined") {
+                    layer.tips('请输入项目名称', '#projectNameChild');
+                    return;
+                }
+                if (dataBaseName == null || dataBaseName == "" || dataBaseName == "undefined") {
+                    layer.tips('请输入数据库名称', '#dataBaseNameChild');
+                    return;
+                }
+                if (dataBaseAddress == null || dataBaseAddress == "" || dataBaseAddress == "undefined") {
+                    layer.tips('请输入数据库地址', '#dataBaseAddressChild');
+                    return;
+                }
+                if (dataBaseAccount == null || dataBaseAccount == "" || dataBaseAccount == "undefined") {
+                    layer.tips('请输入数据库账号', '#dataBaseAccountChild');
+                    return;
+                }
+                if (dataBasePwd == null || dataBasePwd == "" || dataBasePwd == "undefined") {
+                    layer.tips('请输入数据库密码', '#dataBasePwdChild');
+                    return;
+                }
+                managerdata.dataBaseName = dataBaseName;
+                managerdata.dataBaseIP = dataBaseAddress;
+                managerdata.dataBaseAccount = dataBaseAccount;
+                managerdata.dataBasePwd = dataBasePwd;
+                managerdata.projectName = projectName;
+            }
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { organizeModel: JSON.stringify(data), manager: JSON.stringify(managerdata) },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    if (data.code == 0) {
+                        addNodes(false, data.data[0], false);
+                        var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                        zTree.cancelSelectedNode();
+                        $("#orderNoChild").val(null);
+                        $("#childNodeName").val(null);
+                        $("#zNodeData").val(null);
+                        $("#dataBaseNameChild").val(null);
+                        $("#dataBaseAddressChild").val(null);
+                        $("#dataBaseAccountChild").val(null);
+                        $("#dataBasePwdChild").val(null);
+                        $("#projectNameChild").val(null);
+                        layer.msg(data.msg);
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }, error: function (jqxhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        });
+
+        /*添加设备*/
+        document.getElementById("addDevice").addEventListener("click", function () {
+            var zNodeData = $("#zNodeData").val();
+            if (zNodeData == null || zNodeData == "" || zNodeData == "undefined") {
+                layer.alert('请选择节点再添加!', { title: "提示" });
+                return;
+            }
+            var treeJson = eval('(' + zNodeData + ')');
+            if (treeJson.isJoint == false) {
+                layer.alert('请选择接头再添加!', { title: "提示" });
+                return;
+            }
+            var deviceName = $("#deviceName").val();
+            if (deviceName == null || deviceName == "" || deviceName == "undefined") {
+                layer.tips('请输入设备名称', '#deviceName');
+                return;
+            }
+            var TerminalId = $("#TerminalId").val();
+            if (TerminalId == null || TerminalId == "" || TerminalId == "undefined") {
+                layer.tips('请输入设备TerminalId', '#TerminalId');
+                return;
+            }
+            var bigTypeId = $("#deviceBigType").val();
+            if (bigTypeId == null || bigTypeId == "" || bigTypeId == "undefined") {
+                layer.alert('请选择设备大类!', { title: "提示" });
+                return;
+            }
+            var smallTypeId = $("#deviceSmallType").val();
+            if (smallTypeId == null || smallTypeId == "" || smallTypeId == "undefined") {
+                layer.alert('请选择设备小类!', { title: "提示" });
+                return;
+            }
+            var simNo = $("#simNo").val();
+            var orderNo = $("#orderNo").val();
+            if (orderNo == "" || orderNo == null || orderNo == "undefined") {
+            } else {
+                var reg = /^\+?[1-9][0-9]*$/;
+                if (!reg.test(orderNo)) {
+                    layer.tips('请输入正整数', '#orderNo');
+                    return;
+                } else {
+                }
+            }
+            var Installer = $("#Installer").val();
+            if (Installer == null || Installer == "" || Installer == "undefined") {
+                layer.tips('请输入安装人员!', '#Installer');
+                return;
+            }
+            var InstallDate = $("#InstallDate").val();
+            if (InstallDate == null || InstallDate == "" || InstallDate == "undefined") {
+                layer.tips('请选择安装日期!', '#InstallDate');
+                return;
+            }
+            var manufacturer = $("#manufacturer").val();
+            if (manufacturer == null || manufacturer == "" || manufacturer == "undefined") {
+                layer.tips('请输入生产厂家!', '#manufacturer');
+                return;
+            }
+            var localInstructions = $("#localInstructions").val();
+            var longitude = $("#longitude").val();
+            var latitude = $("#latitude").val();
+            var postJson = { deviceName: null, TerminalId: null, bigTypeId: null, smallTypeId: null, simNo: null, orderNo: null, Installer: null, InstallDate: null, longitude: null, latitude: null, manufacturer: null, localInstructions: null, ElectricId: null, LineId: null, parentId: null, nodePath: null, isOnline: false, isError: false, isDel: false, DelTime: null, DelUser: null };
+            postJson.deviceName = deviceName;
+            postJson.TerminalId = TerminalId;
+            postJson.bigTypeId = bigTypeId;
+            postJson.smallTypeId = smallTypeId;
+            postJson.simNo = simNo;
+            postJson.orderNo = orderNo;
+            postJson.Installer = Installer;
+            postJson.InstallDate = InstallDate;
+            postJson.longitude = longitude;
+            postJson.latitude = latitude;
+            postJson.manufacturer = manufacturer;
+            postJson.localInstructions = localInstructions;
+            postJson.ElectricId = null;
+            postJson.LineId = treeJson.parentId;
+            postJson.nodePath = treeJson.path;
+            postJson.parentId = treeJson.Id;
+            var url = "/DeviceManager/AddDevice";
+            $.ajax({
+                url: url,
+                type: 'post',
+                async: true,
+                data: postJson,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    if (data.code == 0) {
+                        addNodes(false, data.data[0], false);
+                        var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                        zTree.cancelSelectedNode();
+                        layer.alert('添加设备成功!', { title: "提示" });
+                        $("#deviceName").val(null);
+                        $("#TerminalId").val(null);
+                        $("#deviceBigType").val(null);
+                        $("#deviceSmallType").val(null);
+                        $("#simNo").val(null);
+                        $("#orderNo").val(null);
+                        $("#Installer").val(null);
+                        $("#InstallDate").val(null);
+                        $("#localInstructions").val(null);
+                        $("#longitude").val(null);
+                        $("#latitude").val(null);
+                        $("#zNodeData").val(null);
+                        bindBigType();
+                        binSmallType(null);
+                        ClearMarker(false);
+
+                    } else {
+                        layer.alert(data.msg, { title: "提示" });
+                    }
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+
+        });
+
+        /*界面异步添加节点*/
+        function addNodes(isRootNode, nodeData, isSameNode) {
+            var zTree = $.fn.zTree.getZTreeObj("deivceTree"),
+			nodes = zTree.getSelectedNodes(),
+			treeNode = nodes[0];
+            if (treeNode && isRootNode == false && isSameNode == false) {
+                treeNode = zTree.addNodes(treeNode, nodeData);
+                window.top.addNodes(isRootNode, nodeData, isSameNode, nodes[0]);
+            } else if (treeNode && isRootNode == false && isSameNode == true) {
+                var pNode = treeNode.getParentNode();
+                treeNode = zTree.addNodes(pNode, nodeData);
+                window.top.addNodes(isRootNode, nodeData, isSameNode, nodes[0]);
+            } else {
+                treeNode = zTree.addNodes(null, nodeData);
+                window.top.addNodes(isRootNode, nodeData, isSameNode, nodes[0]);
+            }
+        }
+
+        /*zTree配置以及回调*/
+        var zTreeObj;
+        var setting = {
+            edit: {
+                enable: true,
+                removeTitle: "删除节点",
+                renameTitle: "编辑节点名称",
+            },
+            view: {
+                expandSpeed: ""
+            },
+            callback: {
+                onClick: function (event, treeId, treeNode) {
+                    $("#zNodeData").val(JSON.stringify(treeNode));
+                    if (tabIndex == 1) {
+                        if (treeNode.isElectric) {
+                            layui.use(['form'], function () {
+                                var form = layui.form;
+                                var child = $("input[type='checkbox']");
+                                child.each(function (index, item) {
+                                    if (index == 0) {
+                                        item.checked = true;
+                                    } else {
+                                        item.checked = false;
+                                    }
+                                });
+                                form.render('checkbox');
+                                showChildData();
+                                hideSameData();
+                            });
+                        }
+                        if (treeNode.isLine) {
+                            layui.use(['form'], function () {
+                                var form = layui.form;
+                                var child = $("input[type='checkbox']");
+                                child.each(function (index, item) {
+                                    if (index == 1) {
+                                        item.checked = true;
+                                    } else {
+                                        item.checked = false;
+                                    }
+                                });
+                                form.render('checkbox');
+                                showSameData();
+                                showChildData();
+
+                            });
+                        }
+                        if (treeNode.isJoint) {
+                            layui.use(['form'], function () {
+                                var form = layui.form;
+                                var child = $("input[type='checkbox']");
+                                child.each(function (index, item) {
+                                    if (index == 2) {
+                                        item.checked = true;
+                                    } else {
+                                        item.checked = false;
+                                    }
+                                });
+                                form.render('checkbox');
+                                hideSameData();
+                                hideChildData();
+                            });
+                        }
+                        if (treeNode.isDevice) {
+                            hideChildData();
+                            hideSameData();
+                            layui.use(['form'], function () {
+                                var form = layui.form;
+                                var child = $("input[type='checkbox']");
+                                child.each(function (index, item) {
+                                    item.checked = false;
+                                });
+                                form.render('checkbox');
+                            });
+                            layer.alert('此节点不能添加同级了!', { title: "提示" });
+                            var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                            zTree.cancelSelectedNode();
+                            $("#zNodeData").val(null);
+                        }
+                    }
+                    if (tabIndex == 2) {
+                        if (treeNode.isElectric) {
+                            layui.use(['form'], function () {
+                                var form = layui.form;
+                                var child = $("input[type='checkbox']");
+                                child.each(function (index, item) {
+                                    if (index == 4) {
+                                        item.checked = true;
+                                    } else {
+                                        item.checked = false;
+                                    }
+                                });
+                                form.render('checkbox');
+                                showChildData();
+                                hideSameData();
+                            });
+                        }
+                        if (treeNode.isLine) {
+                            layui.use(['form'], function () {
+                                var form = layui.form;
+                                var child = $("input[type='checkbox']");
+                                child.each(function (index, item) {
+                                    if (index == 5) {
+                                        item.checked = true;
+                                    } else {
+                                        item.checked = false;
+                                    }
+                                });
+                                form.render('checkbox');
+                                hideChildData();
+                                hideSameData();
+                            });
+                        }
+                        if (treeNode.isJoint) {
+                            hideChildData();
+                            hideSameData();
+                            layui.use(['form'], function () {
+                                var form = layui.form;
+                                var child = $("input[type='checkbox']");
+                                child.each(function (index, item) {
+                                    item.checked = false;
+                                });
+                                form.render('checkbox');
+                            });
+                            layer.alert('此节点不能添加子级了!', { title: "提示" });
+                            var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                            zTree.cancelSelectedNode();
+                            $("#zNodeData").val(null);
+                        }
+                        if (treeNode.isDevice) {
+                            hideChildData();
+                            hideSameData();
+                            layui.use(['form'], function () {
+                                var form = layui.form;
+                                var child = $("input[type='checkbox']");
+                                child.each(function (index, item) {
+                                    item.checked = false;
+                                });
+                                form.render('checkbox');
+                            });
+                            layer.alert('此节点不能添加子级了!', { title: "提示" });
+                            var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                            zTree.cancelSelectedNode();
+                            $("#zNodeData").val(null);
+                        }
+                    }
+                    if (treeNode.isElectric == false && treeNode.isLine == false && treeNode.isJoint == false) {
+                        hideSameData();
+                        hideChildData();
+                        layui.use(['form'], function () {
+                            var form = layui.form;
+                            var child = $("input[type='checkbox']");
+                            child.each(function (index, item) {
+                                if (index == 6) {
+                                    item.checked = true;
+                                } else {
+                                    item.checked = false;
+                                }
+                            });
+                            form.render('checkbox');
+                        });
+                    }
+                },
+                beforeRename: bfRename,
+                beforeDrag: beforeDrag,
+                onRename: onRename,
+                beforeRemove: beforeRemove,
+                onRemove: onRemove,
+            }
+        };
+
+        function bfRename(treeId, treeNode, newName, isCancel) {
+            if (newName.length == 0) {
+                layer.alert('节点名称不能为空!', { title: "提示" });
+                return false;
+            }
+            var Cnodes = getPeerNodes(treeNode);
+
+            //获取当前节点的同级兄弟节点，不包含本节点
+            function getPeerNodes(targetNode) {
+                if (targetNode == null) {
+                    return null;
+                } else {
+                    if (targetNode.getParentNode() != null) {
+                        return targetNode.getParentNode().children;
+                    }
+                    return null;
+                }
+            }
+            for (var n in Cnodes) {
+                if (Cnodes[n].name == newName) {
+                    if (Cnodes[n].Id == treeNode.Id) {
+                        return;
+                    } else {
+                        layer.alert('节点名称已存在!', { title: "提示" });
+                    }
+                    var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                    zTree.cancelEditName();
+                    return result;
+                }
+            }
+            var isDeled = false;
+            var Id=treeNode.Id;
+            var TerminalId = treeNode.TerminalId;
+            var Name = newName;
+            var isDevice = treeNode.isDevice;
+            var url = "/DeviceManager/ReNameNode";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { TerminalId: TerminalId, Name: Name, isDevice: isDevice,Id:Id },
+                async: false,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    if (data.code == 0) {
+                        isDeled = true;
+                        layer.msg(data.msg);
+                        window.top.initTree();
+                    } else {
+                        isDeled = false;
+                        layer.msg(data.msg);
+                    }
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+            return isDeled;
+        }
+
+        function onRename(e, treeId, treeNode, isCancel) {
+            if (isCancel) return;
+        }
+
+        function beforeDrag(treeId, treeNodes) {
+            return false;
+        }
+
+        function beforeRemove(treeId, treeNode) {
+            if (confirm('真的删除' + treeNode.name + '节点吗,(子节点以及配置项也会删除的)?')) {
+                var url = "/DeviceManager/DelNode";
+                var Id;
+                if (treeNode.isDevice) {
+                    Id = treeNode.dId;
+                } else {
+                    Id = treeNode.Id;
+                }
+                var nodePath = treeNode.path;
+                var isDevice = treeNode.isDevice;
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    async: false,
+                    data: { Id: Id, isDevice: isDevice, nodePath: nodePath },
+                    dataType: 'json',
+                    success: function (data, jqxhr, txtStatus) {
+                        if (data.code == 0) {
+                            var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                            zTree.removeNode(treeNode);
+                            window.top.initTree();
+                            layer.msg(data.msg);
+                            return true;
+                        } else {
+                            layer.msg(data.msg);
+                            return false;
+                        }
+                    }, error: function (xhr, txtStatus) {
+                        console.log(txtStatus);
+                    }
+                })
+            } else {
+                return false;
+            }
+            return false;
+        }
+
+        function onRemove(e, treeId, treeNode) {
+            console.log("删除节点" + treeNode.name);
+        }
+
+        var zNodes;
+        /*初始化zTree*/
+        function initTree() {
+            var url = "/DeviceManager/GetOrganizeTree";
+            $.ajax({
+                url: url,
+                async: true,
+                type: 'post',
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    zNodes = convertToTreeData(data, 0);
+                    zTreeObj = $.fn.zTree.init($("#deivceTree"), setting, zNodes);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        function convertToTreeData(data, pid) {
+            const result = [];
+            let temp = [];
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].parentId === pid) {
+                    const obj = { 'name': data[i].name, 'Id': data[i].Id, 'icon': data[i].icon, 'iconOpen': data[i].iconOpen, 'iconClose': data[i].iconClose, 'path': data[i].path, 'actionAddress': data[i].actionAddress, 'parentId': data[i].parentId, 'orderNo': data[i].orderNo, 'isElectric': data[i].isElectric, 'isLine': data[i].isLine, 'isJoint': data[i].isJoint, 'isDevice': data[i].isDevice, 'CreateTime': data[i].CreateTime, 'TerminalId': data[i].TerminalId, 'ElectricId': data[i].ElectricId, 'LineId': data[i].LineId, 'dId': data[i].dId }
+                    temp = this.convertToTreeData(data, data[i].Id)
+                    if (temp.length > 0) {
+                        obj.children = temp
+                    }
+                    result.push(obj);
+                }
+            }
+            return result;
+        }
+
+        ///根据文本框的关键词输入情况自动匹配树内节点 进行模糊查找
+        function AutoMatch(txtObj) {
+            if (txtObj.value.length > 0) {
+                InitialZtree();
+                var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                var nodeList = zTree.getNodesByParamFuzzy("name", txtObj.value);
+                //将找到的nodelist节点更新至Ztree内
+                $.fn.zTree.init($("#deivceTree"), setting, nodeList);
+                showMenu();
+            } else {
+                //隐藏树
+                //hideMenu();
+                InitialZtree();
+            }
+        }
+
+        //还原zTree的初始数据
+        function InitialZtree() {
+            $.fn.zTree.init($("#deivceTree"), setting, zNodes);
+        }
+
+        //显示树
+        function showMenu() {
+            var cityObj = $("#treeSearch");
+            var cityOffset = $("#treeSearch").offset();
+            //$("#menuContent").css({ left: cityOffset.left + "px", top: cityOffset.top + cityObj.outerHeight() + "px" }).slideDown("fast");
+            $("#menuContent").slideDown("fast");
+        }
+
+        $(document).ready(function () {
+            initTree();
+            hideChildData();
+            hideSameData();
+            bindBigType();
+            binSmallType(null);
+        });
+
+        /*获取设备大类*/
+        function bindBigType() {
+            var url = "/DeviceManager/GetDeviceBigType";
+            $.ajax({
+                url: url,
+                async: true,
+                type: 'post',
+                dataType: 'json',
+                success: function (data, jqxhr, textStatus) {
+                    var html = "<option value=''>请选择设备大类</option>";
+                    $.each(data, function (idx, obj) {
+                        html += "<option value=" + obj.Id + ">" + obj.typeName + "</option>";
+                    });
+                    $("#deviceBigType").html(html);
+                    layui.use(['form'], function () {
+                        var form = layui.form;
+                        form.render('select');
+                    });
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+        }
+
+        /*获取设备小类*/
+        function binSmallType(Id) {
+            if (Id == "" || Id == null || Id == "undefined") {
+                Id = 0;
+            }
+            var url = "/DeviceManager/GetDeviceSmallType";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { bigTypeId: Id },
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    var html = "<option value=''>请选择设备小类</option>";
+                    $.each(data, function (idx, obj) {
+                        html += "<option value=" + obj.Id + ">" + obj.typeName + "</option>";
+                    });
+                    $("#deviceSmallType").html(html);
+                    layui.use(['form'], function () {
+                        var form = layui.form;
+                        form.render('select');
+                    });
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+        }
+
+        /*数据库配置*/
+        function hideChildData() {
+            $("#dataBaseChild").hide();
+        }
+
+        function showChildData() {
+            $("#dataBaseChild").show();
+        }
+
+        function hideSameData() {
+            $("#dataBaseSame").hide();
+        }
+
+        function showSameData() {
+            $("#dataBaseSame").show();
+        }
+
+        /*加载地图*/
+        $(function () {
+            var bigmaps = bigmap.prototype;
+            var mapcontainer = document.getElementById("mapDiv");
+            var map = bigmaps.init(mapOption, myOption, mapcontainer);
+            var html = "<div class='button-group'><div class='divbtn' title='标注' id='drawPoint'><img src='/Images/map/sign.png' /></div><div class='divbtn' title='清除' id='clearPoint'><img src='/Images/map/clear.png' /></div></div>";
+            $("#mapDiv").append(html);
+            var lngobj = document.getElementById("longitude");
+            var latobj = document.getElementById("latitude");
+            markerOption.icon = "/Images/location.png";
+            var draw_Manager;
+            document.getElementById("drawPoint").addEventListener("click", function () {
+                draw_Manager = bigmaps.addDraw(markerOption, polylineOption, polygonOption, rectangleOption, circleOption, drawOption, map);
+                //开启绘点
+                bigmaps.setDrawMarker(draw_Manager);
+                //监听绘点
+                bigmaps.setlistenDrawMarker(draw_Manager, latobj, lngobj);
+            });
+
+            document.getElementById("clearPoint").addEventListener("click", function () {
+                //停止绘制
+                bigmaps.setStopDraw(draw_Manager);
+                //清除绘点
+                bigmaps.clearDraw(arrayOption.markerArray);
+                lngobj.value = null;
+                latobj.value = null;
+            });
+        })
+    </script>
+</body>
+</html>

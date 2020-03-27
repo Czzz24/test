@@ -1,0 +1,292 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <link href="~/Scripts/jcarousellite/css/jcarousellite.css" rel="stylesheet" />
+    <link href="~/Scripts/zTree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.5.1.js"></script>
+    <script src="~/Scripts/jcarousellite/jcarousellite.js"></script>
+    <script src="~/Scripts/jcarousellite/easing.js"></script>
+    <script src="~/Scripts/jquery.cookie.js"></script>
+    <script src="~/Scripts/zTree/js/jquery.ztree.core.js"></script>
+    <script src="~/Scripts/zTree/js/jquery.ztree.excheck.js"></script>
+    <script src="~/Scripts/zTree/js/jquery.ztree.exedit.js"></script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.8&key=9faefb7423a19be841d9936a75a3bb2f"></script>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        html, body {
+            background: #ffffff;
+            font: normal 14px "Microsoft YaHei";
+        }
+
+        .top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background-color: #007eed;
+            z-index:100;
+        }
+
+        .top_logo {
+            width: 30%;
+            float: left;
+            vertical-align: middle;
+            height: 68px;
+            line-height: 68px;
+            padding: 1px 1px 1px 10px;
+            background: url(../../Images/header/index_top_leftbg.jpg) no-repeat;
+        }
+
+            .top_logo span {
+                font-size: 18px;
+                font-weight: bold;
+                color: white;
+            }
+
+        .top_center {
+            width: 42%;
+            height: 70px;
+            background: url(../../Images/header/index_top_centerbg.jpg) no-repeat;
+            float: left;
+            text-align: right;
+            position: relative;
+        }
+
+        .top_right {
+            width: 25%;
+            height: 70px;
+            background: url(../../Images/header/index_top_rightbg.jpg) no-repeat;
+            float: right;
+            text-align: right;
+            position: relative;
+        }
+
+            .top_right a:link {
+                color: white;
+                list-style: none;
+                text-decoration: none;
+            }
+
+            .top_right a:hover {
+                text-decoration: underline;
+            }
+
+        .top_close {
+            max-width: 320px;
+            height: 50px;
+            margin-top: 10px;
+            padding-left: 10px;
+            float: right;
+            border-left: 1px solid #fff;
+            vertical-align: text-top;
+            overflow: hidden;
+        }
+
+            .top_close a {
+                display: block;
+                float: right;
+                font-size: 20px;
+                height: 50px;
+                line-height: 50px;
+                margin-right: 10px;
+            }
+
+            .top_close img {
+                padding-top: 3px;
+                display: block;
+                float: left;
+                margin-right: 10px;
+            }
+
+            .top_close span {
+                max-width: 220px;
+                overflow: hidden;
+                font-size: 12px;
+                color: #fff;
+                line-height: 50px;
+                display: block;
+                float: left;
+                margin-right: 10px;
+            }
+
+        .foot {
+            width: 100%;
+            height: 25px;
+            line-height: 25px;
+            text-align: center;
+            background: #005db0;
+            position: fixed;
+            bottom: 0;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .top_nav {
+            position: fixed;
+            width: 100%;
+            height: 25px;
+            left: 0;
+            top: 70px;
+            line-height: 25px;
+            color: #8A8A8A;
+            font-size: 12px;
+            border-bottom: 1px solid #EDEDED;
+        }
+
+        .mapTitle{
+            width:250px;
+            height:25px;
+            float:left;
+        }
+
+        .mapTitle i{
+            font-style:normal;
+            font-size:14px;
+            color:#999;
+            margin-left:5px;
+            display:block;
+            float:left;
+        }
+
+        .mapTitle i:nth-child(2n+1){
+            margin-top:3px;
+            font-size:16px;
+        }
+
+        .time {
+            width: 295px;
+            height: 25px;
+            float: left;
+        }
+
+            .time i:nth-child(2n+1) {
+                margin-top: 5px;
+                font-size: 15px;
+            }
+
+            .time i {
+                font-style: normal;
+                font-size: 14px;
+                color: #999;
+                margin-left: 10px;
+                display: block;
+                float: left;
+            }
+
+            .time span {
+                display: block;
+                float: left;
+                height: 25px;
+                line-height: 25px;
+            }
+
+        #here_area a {
+            color: #007eed;
+        }
+
+        .mapside {
+            position: absolute;
+            left: 0;
+            top: 95px;
+            bottom: 25px;
+            width: 250px;
+            overflow: hidden;
+            background: #eafeff;
+        }
+
+        .menuside {
+            position: absolute;
+            left: 0px;
+            top: 95px;
+            bottom: 25px;
+            width: 280px;
+            overflow: hidden;
+            border-right: 2px solid #005db0;
+            border-left: 2px solid #005db0;
+            background: #eafeff;
+        }
+
+        .left_menu {
+            width: 70px;
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            background: #127fd1;
+            float: left;
+        }
+
+        .gncd {
+            width: 210px;
+            height: 30px;
+            line-height: 30px;
+            margin-left: 70px;
+            text-align: center;
+            color: #fff;
+            background: url(../../Images/gncd_bg.png) no-repeat;
+            float: left;
+        }
+
+        .main {
+            position: absolute;
+            left: 285px;
+            top: 95px;
+            bottom: 25px;
+            right: 0px;
+            width: auto;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .left_main_nr {
+            width: 210px;
+            margin-left: 70px;
+            position: absolute;
+            top: 30px;
+            bottom: 0px;
+            float: left;
+        }
+
+        .xmgl_tt {
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+        }
+
+            .xmgl_tt i {
+                color: #069;
+                font-size: 18px;
+            }
+
+            .xmgl_tt span {
+                padding-left: 10px;
+            }
+
+        .leftTreeContainer {
+            width: 100%;
+            overflow: auto;
+            float: left;
+            position: absolute;
+            top: 60px;
+            bottom: 0px;
+        }
+    </style>
+
+    @RenderSection("css", required: false)
+</head>
+<body>
+    @RenderBody()
+    @RenderSection("scripts", required: false)
+</body>
+</html>

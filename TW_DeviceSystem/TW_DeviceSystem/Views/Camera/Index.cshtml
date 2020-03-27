@@ -1,0 +1,642 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.js"></script>
+    <style type="text/css">
+        .leftContent {
+            width: 220px;
+            height: auto;
+            float: left;
+            border: 1px solid gray;
+        }
+
+        .leftevery {
+            width: 200px;
+            height: 60px;
+            float: left;
+            border: 1px solid #808080;
+            margin: 10px 0px 0px 10px;
+        }
+
+            .leftevery:hover {
+                cursor: pointer;
+            }
+
+            .leftevery canvas {
+                width: 60px;
+                height: 60px;
+                float: left;
+            }
+
+            .leftevery.active {
+                border: 2px solid #35A4F3;
+            }
+
+        .channel-name {
+            font-weight: 700;
+            width: 140px;
+            height: 30px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 30px;
+            white-space: nowrap;
+            float: left;
+            display: block;
+        }
+
+        .channel-time {
+            width: 140px;
+            height: 30px;
+            font-size: 12px;
+            line-height: 30px;
+            float: left;
+            display: block;
+        }
+
+        .centerContent {
+            width: calc(100% - 222px);
+            height: 722px;
+            float: left;
+            position: relative;
+        }
+
+        .bigImage {
+            width: 850px;
+            height: 474px;
+            float: left;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            margin: auto;
+        }
+
+            .bigImage canvas {
+                width: 850px;
+                height: 474px;
+                float: left;
+            }
+
+        .bottomPage {
+            width: 100%;
+            height: 30px;
+            float: left;
+        }
+    </style>
+</head>
+<body>
+    <input type="hidden" id="TerminalId" value="@ViewBag.TerminalId" />
+    <input type="hidden" id="ElectricId" value="@ViewBag.ElectricId" />
+    <input type="hidden" id="LineId" value="@ViewBag.LineId" />
+
+    <blockquote class="layui-elem-quote layui-text" id="FreeServicingTitle"></blockquote>
+    <div class="jd_detailsColumns">
+        <div class="product_Container">
+            <img src="~/Images/camera/Camera.png" />
+        </div>
+        <div class="product_Container" style="width:auto">
+            <table>
+                <tr>
+                    <td><img src="~/Images/camera/Camera.png" /></td>
+                    <td><span>AI防外破设备信息</span></td>
+                </tr>
+                <tr>
+                    <td>地理位置(Geography)</td>
+                    <td id="Geography">--.--</td>
+                </tr>
+                <tr>
+                    <td>设备名称(DeviceName)</td>
+                    <td id="DeviceName">--.--</td>
+                </tr>
+                <tr>
+                    <td>安装位置:(Address)</td>
+                    <td id="Address">--.--</td>
+                </tr>
+                <tr>
+                    <td>安装日期(Install Date)</td>
+                    <td id="InstallData">--.--</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="tabbar_Container">
+        <div class="layui-tab layui-tab-brief" lay-filter="demo">
+            <ul class="layui-tab-title">
+                <li class="layui-this">历史数据</li>
+                <li>AI识别相册</li>
+            </ul>
+            <div class="layui-tab-content">
+                <!--1-->
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="historystartTime" placeholder="请选择开始时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="hitoryendTime" placeholder="请选择结束时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn layui-btn-normal" data-type="reloadhistory" id="btnHitorySearch">查询</button>
+                    </div>
+                    <table class="layui-hide" id="historydata" lay-filter="history"></table>
+
+                </div>
+                <!--2-->
+                <div class="layui-tab-item">
+                    <div class="leftContent" id="leftContent">
+                    </div>
+                    <div class="centerContent">
+                        <div class="bigImage">
+                            <canvas width="850" height="474" id="bigImage" class="bigImage"></canvas>
+                        </div>
+                    </div>
+                    <div class="bottomPage">
+                        <span>共<span id="totalCount"></span>条</span>
+                        <a href="#" onclick="lastPage()">上一页</a>
+                        <a href="#" onclick="nextPage()">下一页</a>
+                        <span id="nowPage">1</span>
+                        <span>/</span>
+                        <span id="pageCount">0</span>
+                        <span>页</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看AI分析照片</a>
+    </script>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        layui.use(['element', 'laydate', 'table'], function () {
+            var historyTable = layui.table;
+            historyTable.render({
+                elem: '#historydata',
+                url: '/Camera/GetHistoryData',
+                cellMinWidth: 300,
+                even: 'true',
+                height: 400,
+                id: 'reloadhistory',
+                page: true,
+                cols: [
+                    [
+                        {
+                            field: 'time',
+                            title: '拍摄时间',
+                            templet: function (row) { return dateFormat(row.time); }
+                        },
+                        {
+                            field: 'createTime',
+                            title: '录入时间',
+                            templet: function (row) { return dateFormat(row.createTime); }
+                        },
+                        {
+                            field: 'msgId',
+                            title: '消息Id',
+                        }
+                        ,
+                        {
+                            field: 'msgType',
+                            title: '消息类型'
+                        },
+                        {
+                            field: 'traceId',
+                            title: '跟踪Id'
+                        },
+                        {
+                            field: 'taskId',
+                            title: '任务Id'
+                        },
+                        {
+                            field: 'taskName',
+                            title: '任务名称'
+                        },
+                        {
+                            field: 'taskType',
+                            title: '任务类型'
+                        },
+                        {
+                            field: 'trainId',
+                            title: '列车Id'
+                        },
+                        {
+                            field: 'channelId',
+                            title: '通道Id',
+                        },
+                        {
+                            field: 'deviceId',
+                            title: '设备Id',
+                        },
+                        {
+                            field: 'deviceSerial',
+                            title: '设备序列号',
+                        },
+                        {
+                            field: 'deviceName',
+                            title: '设备名称',
+                        },
+                        {
+                            field: 'channelNo',
+                            title: '通道号',
+                        },
+                        {
+                            field: 'channelName',
+                            title: '通道名称',
+                        },
+                        {
+                            field: 'groupId',
+                            title: '组织Id',
+                        },
+                        {
+                            field: 'groupName',
+                            title: '组织名称',
+                        },
+                        {
+                            field: 'captureTime',
+                            title: '识别时间',
+                        },
+                        {
+                            field: 'resultUrl',
+                            title: '识别图片网络路径',
+                        },
+                        {
+                            field: 'width',
+                            title: '宽度',
+                        },
+                        {
+                            field: 'height',
+                            title: '高度',
+                        },
+                        {
+                            field: 'ruleId',
+                            title: '规则Id',
+                        },
+                        {
+                            field: 'ruleName',
+                            title: '规则名称',
+                        },
+                        {
+                            field: 'diskPath',
+                            title: '磁盘路径',
+                        },
+                        {
+                            fixed: 'right',
+                            width: 165,
+                            align: 'center',
+                            toolbar: '#barDemo'
+                        }
+                    ]
+                ], where: {
+                    TerminalId: document.getElementById("TerminalId").value,
+                    ElectricId: document.getElementById("ElectricId").value,
+                    LineId: document.getElementById("LineId").value
+                }
+            });
+
+            var $ = layui.$, active = {
+                reloadhistory: function () {
+                    var TerminalId = $("#TerminalId").val();
+                    var ElectricId = $("#ElectricId").val();
+                    var LineId = $("#LineId").val();
+                    var historystartTime = $("#historystartTime").val();
+                    var hitoryendTime = $("#hitoryendTime").val();
+                    historyTable.reload('reloadhistory', {
+                        page: { curr: 1 },
+                        where: {
+                            TerminalId: TerminalId,
+                            ElectricId: ElectricId,
+                            LineId: LineId,
+                            startTime: historystartTime,
+                            endTime: hitoryendTime
+                        }
+                    });
+                },
+            };
+
+            $('#btnHitorySearch').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            var element = layui.element;
+            element.on('tab(demo)', function (data) {
+                var index = data.index;
+                switch (index) {
+                    case 0:
+                        var type = "reloadhistory";
+                        active[type] ? active[type].call(this) : '';
+                        break;
+                    case 1:
+                        getCameraPage(1, 10);
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            historyTable.on('tool(history)', function (obj) { //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+                var data = obj.data //获得当前行数据
+                , layEvent = obj.event; //获得 lay-event 对应的值
+                if (layEvent === 'detail') {
+                    var url = "/Camera/AIResult?msgId=" + data.msgId;
+                    //iframe层
+                    layer.open({
+                        type: 2,
+                        title: 'AI图片分析结果',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['850px', '517px'],
+                        content: url //iframe的url
+                    });
+                }
+            });
+
+            var laydate = layui.laydate;
+            //1
+            laydate.render({
+                elem: '#historystartTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#hitoryendTime',
+                type: 'datetime'
+            });
+            //2
+            laydate.render({
+                elem: '#alarmStartTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#alarmEndTime',
+                type: 'datetime'
+            });
+            //3
+            laydate.render({
+                elem: '#chartStartTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#chartEndTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#netStartTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#netEndTime',
+                type: 'datetime'
+            });
+        });
+
+        function dateFormat(item) {
+            if (item == null || item == "" || item == "undefined") {
+                return "";
+            } else {
+                var time = new Date(parseInt(item.substr(6))).Format("yyyy-MM-dd hh:mm:ss");
+                return time;
+            }
+        }
+
+        Date.prototype.Format = function (fmt) {
+            var o = {
+                "M+": this.getMonth() + 1, //月份
+                "d+": this.getDate(), //日
+                "h+": this.getHours(), //小时
+                "m+": this.getMinutes(), //分
+                "s+": this.getSeconds() //秒
+            };
+            if (/(y+)/.test(fmt)) { //根据y的长度来截取年
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            }
+            for (var k in o) {
+                if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            }
+            return fmt;
+        }
+
+        $(document).ready(function () {
+            getBestNew();
+            getDevice();
+            setInterval("getBestNew()", 5000);
+        });
+
+        function getBestNew() {
+            var url = "/Camera/GetSingByBestNew";
+            var TerminalId = $("#TerminalId").val();
+            var data = { TerminalId: TerminalId };
+            $.ajax({
+                url: url,
+                async: true,
+                type: 'get',
+                dataType: 'json',
+                data: data,
+                success: function (data, jqxhr, txtStatus) {
+                    $("#FreeServicingTitle").html("数据接入时间:" + "<span style='color:red'>" + dateFormat(data.time) + "</span>");
+                }, error(xhr, txtstatus) {
+                    console.log(txtstatus);
+                }
+            })
+        }
+
+        function getDevice() {
+            var url = "/Camera/getDevice";
+            var TerminalId = document.getElementById("TerminalId").value;
+            var ElectricId = document.getElementById("ElectricId").value;
+            var LineId = document.getElementById("LineId").value;
+            var data = { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId };
+            $.ajax({
+                url: url,
+                type: 'get',
+                async: true,
+                dataType: 'json',
+                data: data,
+                success: function (data, jqxhr, txtStatus) {
+                    var Geography = data.longitude + "," + data.latitude;
+                    $("#Geography").text(Geography);
+                    $("#DeviceName").text(data.deviceName);
+                    $("#Address").text(data.localInstructions);
+                    $("#InstallData").text(dateFormat(data.InstallDate));
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        function getCameraPage(page, pageSize) {
+            var ElectricId = document.getElementById("ElectricId").value;
+            var TerminalId = document.getElementById("TerminalId").value;
+            var LineId = document.getElementById("LineId").value;
+            var data = { page: page, limit: pageSize, TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId, startTime: null, endTime: null };
+            var url = "/Camera/GetHistoryData";
+            $.ajax({
+                url: url,
+                type: 'get',
+                async: true,
+                dataType: 'json',
+                data: data,
+                success: function (data, jqxhr, txtStatus) {
+                    var pageCount = Math.ceil(data.count / pageSize);
+                    $("#pageCount").text(pageCount);
+                    $("#leftContent").html("");
+                    $("#totalCount").text(data.count);
+                    $.each(data.data, function (i, n) {
+                        if (i == 0) {
+                            var html = "<div class='leftevery active' data-id=" + n.msgId + " onclick='loadBigImage(this)'><canvas id=" + n.msgId + " width='60' height='60'></canvas><span class='channel-name'>" + n.channelName + "</span><span class='channel-time'>" + dateFormat(n.time) + "</span></div>";
+                            $("#leftContent").append(html);
+                        } else {
+                            var html = "<div class='leftevery' data-id=" + n.msgId + " onclick='loadBigImage(this)'><canvas id=" + n.msgId + " width='60' height='60'></canvas><span class='channel-name'>" + n.channelName + "</span><span class='channel-time'>" + dateFormat(n.time) + "</span></div>";
+                            $("#leftContent").append(html);
+                        }
+
+                        var imgurl = null;
+                        var diskPath = n.diskPath;
+                        var url = "/Camera/getStrImgByDisPath";
+                        $.ajax({
+                            url: url,
+                            type: 'get',
+                            async: false,
+                            dataType: 'json',
+                            data: { diskPath: diskPath },
+                            success: function (data, jqxhr, txtStatus) {
+                                imgurl = data;
+                            }, error: function (xhr, txtStatus) {
+                                console.log(txtStatus);
+                            }
+                        });
+
+                        var msgId = n.msgId;
+                        var url = '/Camera/getRectData';
+                        var rectList = null;
+                        var data = { msgId: n.msgId };
+                        $.ajax({
+                            url: url,
+                            type: 'get',
+                            async: false,
+                            dataType: 'json',
+                            data: data,
+                            success: function (data, jqxhr, txtStatus) {
+                                rectList = data;
+                            }, error: function (xhr, txtStatus) {
+                                console.log(txtStatus);
+                            }
+                        });
+                        drawImg(msgId, imgurl, 60, 60, rectList);
+                        if (i == 0) {
+                            drawImg("bigImage", imgurl, 850, 474, rectList);
+                        }
+                    });
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        //上一页
+        function lastPage() {
+            //获取当前页
+            var page = $("#nowPage").text();
+            if (page != 1) {
+                var nowPage = parseInt(page) - 1;
+                $("#nowPage").text(nowPage);
+                getCameraPage(nowPage, 10);
+            } else {
+                return;
+            }
+        }
+
+        //下一页
+        function nextPage() {
+            //获取当前页
+            var page = $("#nowPage").text();
+            //获取总页数
+            var totalPage = $("#pageCount").text();
+            var nowPage = parseInt(page) + 1;
+            if (nowPage <= parseInt(totalPage)) {
+                $("#nowPage").text(nowPage);
+                getCameraPage(nowPage, 10);
+            } else {
+                return;
+            }
+        }
+
+        function drawImg(obj, imgsrc, width, height, rectList) {
+            var mycanvas = document.getElementById(obj);
+            var ctx = mycanvas.getContext('2d');
+            var img = new Image();
+            img.onload = function () {
+                // 将图片画到canvas上面上去！
+                ctx.drawImage(img, 0, 0, width, height);
+                $.each(rectList, function (i, n) {
+                    ctx.strokeStyle = "#F34747";
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(n.x * width, n.y * height, n.w * width, n.h * height);
+                    ctx.stroke();
+                })
+            }
+            img.src = imgsrc;
+        }
+
+        function loadBigImage(obj) {
+            for (var i = 0; i < obj.parentElement.children.length; i++) {
+                obj.parentElement.children[i].className = "leftevery";
+            }
+
+            obj.className = "leftevery active";
+            obj.parentElement.children
+            var msgId = obj.dataset.id;
+            var url = "/Camera/getAIByMsgId";
+            var data = { msgId: msgId };
+
+            var base64img=null;
+            var rectList = null;
+            $.ajax({
+                url: url,
+                type: 'get',
+                async: false,
+                dataType: 'json',
+                data: data,
+                success: function (data, jqxhr, txtStatus) {
+                    base64img=data;
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+
+            var url = "/Camera/getRectData";
+            $.ajax({
+                url: url,
+                type: 'get',
+                async: false,
+                dataType: 'json',
+                data: data,
+                success: function (data, jqxhr, txtStatus) {
+                    rectList = data;
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+
+            drawImg("bigImage", base64img, 850, 474, rectList);
+        }
+
+    </script>
+</body>
+</html>

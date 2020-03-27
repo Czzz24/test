@@ -1,0 +1,124 @@
+﻿
+@{
+    Layout = null;
+}
+
+@model EF.Application.Model.t_userInfo
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        用户详情
+    </blockquote>
+    @Html.HiddenFor(model=>model.roleId)
+    <div class="layui-form">
+        <fieldset class="layui-elem-field site-demo-button" style="margin-top: 20px;">
+            <legend>用户信息</legend>
+            <div class="layui-form">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">用户名称:</label>
+                        <div class="layui-input-inline">
+                            @Html.EditorFor(model => model.userName, new { htmlAttributes = new { @class = "layui-input", @placeholder = "请输入用户名称", @readonly = "readonly" } })
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">用户账号:</label>
+                        <div class="layui-input-inline">
+                            @Html.EditorFor(model => model.userAccount, new { htmlAttributes = new { @class = "layui-input", @placeholder = "请输入用户账号", @readonly = "readonly" } })
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">用户角色:</label>
+                        <div class="layui-input-inline">
+                            <div class="layui-input-inline">
+                                <select name="quiz" id="userRole" disabled="disabled"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">用户密码:</label>
+                        <div class="layui-input-inline">
+                            @Html.EditorFor(model => model.userPwd, new { htmlAttributes = new { @class = "layui-input", @placeholder = "请输入用户密码" }, @readonly = "readonly" })
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">联系电话:</label>
+                        <div class="layui-input-inline">
+                            @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "layui-input", @placeholder = "请输入联系电话", @readonly = "readonly" } })
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">邮箱Email:</label>
+                        <div class="layui-input-inline">
+                            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "layui-input", @placeholder = "请输入邮箱Email", @readonly = "readonly" } })
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">排序号:</label>
+                        <div class="layui-input-inline">
+                            @Html.EditorFor(model => model.orderNo, new { htmlAttributes = new { @class = "layui-input", @placeholder = "请输入排序号", @readonly = "readonly" } })
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户说明:</label>
+                    <div class="layui-input-block">
+                        @Html.TextAreaFor(model => model.userDescription, new { @class = "layui-textarea", @placeholder = "请输入用户说明", @readonly = "readonly" })
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-primary"  onclick="window.history.back()">返回</button>
+        </div>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script>
+        layui.use(['form', 'table'], function () {
+            var table = layui.table;
+            var form = layui.form;
+        });
+
+        $(document).ready(function () {
+            bindUserRoleSelectList();
+        })
+
+        /*绑定用户角色下拉*/
+        function bindUserRoleSelectList() {
+            var url = "/UserManager/GetRoleSelectList";
+            $.ajax({
+                url, url,
+                type: 'post',
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    var roleId = $("#roleId").val();
+                    var html = "<option value=''>请选择用户角色</option>";
+                    $.each(data, function (idx, obj) {
+                        html += "<option value=" + obj.Id + ">" + obj.roleName + "</option>";
+                    });
+                    $("#userRole").html(html);
+                    $("#userRole").find("option[value=" + roleId + "]").attr("selected", true);
+                    layui.use(['form'], function () {
+                        var form = layui.form;
+                        form.render('select');
+                    });
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+    </script>
+</body>
+</html>

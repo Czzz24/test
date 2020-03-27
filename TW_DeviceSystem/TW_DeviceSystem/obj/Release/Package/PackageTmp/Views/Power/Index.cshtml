@@ -1,0 +1,401 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <link href="~/Scripts/zTree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+    <script src="~/Scripts/zTree/js/jquery.ztree.core.js"></script>
+    <script src="~/Scripts/zTree/js/jquery.ztree.excheck.js"></script>
+    <style>
+        html,body{
+            width:100%;
+            height:100%;
+        }
+        .layui-table, .layui-table-view {
+            margin: 0px;
+        }
+
+        .demoTable {
+            width: 100%;
+            height: 50px;
+            margin: 20px 0px 0px 0px;
+            float: left;
+        }
+         .treeSearch {
+            width: calc(80% - 10px);
+            height: 25px;
+            margin-left: 5px;
+            background: url(/Images/buttonIcon/btnSearch.png) no-repeat;
+            background-size:20px 20px;
+            background-position:right;
+            border-radius: 3px;
+            border: 1px solid #D4D5D9;
+        }
+    </style>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        用户树形分配
+    </blockquote>
+    <div style="width: 20%; height: calc(100% - 38px); float: left;">
+        <div style="width:calc(100% - 5px); height:38px; float:left;  background:#F2F2F2;border-left:5px solid #127FD1;">
+            <span style="color:#666666; padding-left:8px; line-height:38px;">权限结构树</span>
+        </div>
+        <div style="width:100%; height:calc(100% - 38px); float:left; overflow:auto">
+            <input type="text" id="treeSearch" class="treeSearch" placeholder="请输入设备名称或终端Id" onkeyup="AutoMatch(this)" />
+            <ul id="deivceTree" class="ztree"></ul>
+        </div>
+    </div>
+    <div style="width:80%; height:400px; float:left">
+        <div style="width:calc(100% - 5px); height:38px; float:left;  background:#F2F2F2;border-left:5px solid #127FD1;">
+            <span style="color:#666666; padding-left:8px; line-height:38px;">用户列表</span>
+        </div>
+        <div style="width: 100%; height: 350px; float:left;">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">搜索关键词:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" placeholder="请输入用户名称|账号" id="searchText" />
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn layui-btn-normal" data-type="reload" id="btnSearch">查询</button>
+                </div>
+            </div>
+            <div style="width: 100%; height: auto; float: left;">
+                <table class="layui-hide" id="jsgl" lay-filter="demo"></table>
+            </div>
+            <div style="width: 100%; height: auto; float: left;">
+                <div class="demoTable">
+                    <button class="layui-btn layui-btn-normal" id="submit">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">拥有树形</a>
+    </script>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        var Id = null;
+        var table;
+        var form;
+        layui.use(['form', 'table'], function () {
+            table = layui.table;
+            form = layui.form;
+
+            table.render({
+                elem: '#jsgl',
+                even: true,
+                cellMinWidth: 80,
+                height: 350,
+                url: '/UserManager/GetUserTable',
+                id: 'reload',
+                page: true,
+                done: function (res, curr, count) {
+                    $("[data-field='Id']").css('display', 'none');
+                },
+                cols: [
+                    [
+                         {
+                             type: 'checkbox',
+                             fixed: 'left'
+                         },
+                         {
+                             field: 'Id',
+                             title: 'ID',
+                         },
+                        {
+                            field: 'userName',
+                            title: '用户名称',
+                            width: 150,
+                        },
+                         {
+                             field: 'userAccount',
+                             title: '用户账号',
+                             width: 150,
+                         },
+                        {
+                            field: 'Phone',
+                            title: '联系电话',
+                            width: 150,
+                        },
+                        {
+                            field: 'Email',
+                            title: '邮箱',
+                            width: 150,
+                        },
+                        {
+                            field: 'orderNo',
+                            title: '排序号',
+                            width: 150,
+                        },
+                        {
+                            field: 'CreateTime',
+                            title: '录入日期',
+                            width: 150,
+                            templet: function (row) { return dateFormat(row.CreateTime); }
+                        },
+                        {
+                            title: '操作',
+                            width: 130,
+                            fixed: 'right',
+                            toolbar: '#barDemo'
+                        }
+                    ]
+                ], where: {
+                    searchText: document.getElementById("searchText").value,
+                }
+            });
+
+            var $ = layui.$, active = {
+                reload: function () {
+                    var searchText = $("#searchText");
+                    table.reload('reload', {
+                        page: { curr: 1 },
+                        where: {
+                            searchText: searchText.val()
+                        }
+                    });
+                }
+            };
+
+            $('#btnSearch').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            table.on('tool(demo)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'detail') {
+                    var html = "<div><ul id='userPowerTree' class='ztree'></ul></div>";
+                    Id = data.Id;
+                    var name = data.userName;
+                    layer.open({
+                        type: 1,
+                        skin: 'layui-layer-rim', //加上边框
+                        area: ['420px', '240px'], //宽高
+                        title: "" + name + "拥有树形",
+                        content: html
+                    });
+                    var url = "/Power/getUserTree";
+                    $.ajax({
+                        url: url,
+                        type: 'post',
+                        data: { userId: Id },
+                        async: true,
+                        dataType: 'json',
+                        success: function (data, jqxhr, txtStatus) {
+                            var zNodes = convertToTreeData(data, 0);
+                            zTreeObjUser = $.fn.zTree.init($("#userPowerTree"), settingUserTree, zNodes);
+                        }, error: function (xhr, txtStatus) {
+                            console.log(txtStatus);
+                        }
+                    })
+                }
+            });
+
+
+            document.getElementById("submit").addEventListener("click", function () {
+                var checkStatus = table.checkStatus('reload')
+                      , data = checkStatus.data;
+                var userArray = new Array();
+                var nodeArray = new Array();
+                for (var j = 0; j < data.length; j++) {
+                    if (data[j].roleId == 1) {
+                        layer.alert('超级管理员不需要分配权限!', { title: "提示" });
+                        return;
+                    } else if (data[j].roleId == 3) {
+                        layer.alert('安装人员不需要分配权限!', { title: "提示" });
+                        return;
+                    } else {
+                        userArray.push(data[j].Id);
+                    }
+                }
+                var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                var nodes = zTree.getCheckedNodes();
+                for (var i = 0; i < nodes.length; i++) {
+                    nodeArray.push(nodes[i].Id);
+                }
+                if (userArray.length <= 0) {
+                    layer.alert('请选择分配用户再提交!', { title: "提示" });
+                    return;
+                }
+                if (nodeArray.length <= 0) {
+                    layer.alert('请选择分配节点再提交!', { title: "提示" });
+                    return;
+                }
+                organizeDisSub(userArray, nodeArray);
+            });
+
+            /*权限分配*/
+            function organizeDisSub(userArray, nodeArray) {
+                var url = "/Power/AddUserOrganize";
+                $.ajax({
+                    url: url,
+                    type: 'post',
+                    dataType: 'json',
+                    data: { userArray: userArray, nodeArray: nodeArray },
+                    async: true,
+                    success: function (data, jqxhr, txtStatus) {
+                        userArray.splice(0, userArray.length);
+                        nodeArray.splice(0, nodeArray.length);
+                        if (data.code == 0) {
+                            layer.alert(data.msg, { title: "提示" });
+                            //取消选中
+                            var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                            var nodes = zTree.getCheckedNodes();
+                            for (var k = 0; k < nodes.length; k++) {
+                                zTree.checkNode(nodes[k]);//取消这个节点的勾选状态
+                            }
+                            var type = 'reload';
+                            active[type] ? active[type].call(this) : '';
+                        } else {
+                            layer.alert(data.msg, { title: "提示" });
+                        }
+                    }, error: function (xhr, txtStatus) {
+                        console.log(txtStatus);
+                    }
+                })
+            }
+        });
+
+        function dateFormat(item) {
+            var time = new Date(parseInt(item.substr(6))).Format("yyyy-MM-dd hh:mm:ss");
+            return time;
+        }
+
+        Date.prototype.Format = function (fmt) {
+            var o = {
+                "M+": this.getMonth() + 1, //月份
+                "d+": this.getDate(), //日
+                "h+": this.getHours(), //小时
+                "m+": this.getMinutes(), //分
+                "s+": this.getSeconds() //秒
+            };
+            if (/(y+)/.test(fmt)) { //根据y的长度来截取年
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            }
+            for (var k in o) {
+                if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            }
+            return fmt;
+        }
+
+        /*用户拥有权限树*/
+        var zTreeObjUser;
+        var settingUserTree = {
+            async: {
+                enable: true,
+            },
+            view: {
+                expandSpeed: ""
+            },
+            callback: {
+                onClick: function (event, treeId, treeNode) {
+
+                },
+            }
+        };
+
+        /*zTree配置以及回调(权限结构树)*/
+        var zTreeObj;
+        var setting = {
+            check: {
+                enable: true
+            },
+            async: {
+                enable: true,
+            },
+            view: {
+                expandSpeed: ""
+            },
+            callback: {
+                onClick: function (event, treeId, treeNode) {
+
+                },
+            }
+        };
+
+
+        var zNodes;
+        /*初始化zTree*/
+        function initTree() {
+            var url = "/Power/getPowerTree";
+            $.ajax({
+                url: url,
+                async: true,
+                type: 'post',
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    zNodes = convertToTreeData(data, 0);
+                    zTreeObj = $.fn.zTree.init($("#deivceTree"), setting, zNodes);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        function convertToTreeData(data, pid) {
+            const result = [];
+            let temp = [];
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].parentId === pid) {
+                    const obj = { 'name': data[i].name, 'Id': data[i].Id, 'icon': data[i].icon, 'iconOpen': data[i].iconOpen, 'iconClose': data[i].iconClose, 'path': data[i].path, 'actionAddress': data[i].actionAddress, 'parentId': data[i].parentId, 'orderNo': data[i].orderNo, 'isElectric': data[i].isElectric, 'isLine': data[i].isLine, 'isJoint': data[i].isJoint, 'isDevice': data[i].isDevice, 'CreateTime': data[i].CreateTime, 'TerminalId': data[i].TerminalId, 'ElectricId': data[i].ElectricId, 'LineId': data[i].LineId }
+                    temp = this.convertToTreeData(data, data[i].Id)
+                    if (temp.length > 0) {
+                        obj.children = temp
+                    }
+                    result.push(obj);
+                }
+            }
+            return result;
+        }
+
+        ///根据文本框的关键词输入情况自动匹配树内节点 进行模糊查找
+        function AutoMatch(txtObj) {
+            if (txtObj.value.length > 0) {
+                InitialZtree();
+                var zTree = $.fn.zTree.getZTreeObj("deivceTree");
+                var nodeList = zTree.getNodesByParamFuzzy("name", txtObj.value);
+                //将找到的nodelist节点更新至Ztree内
+                $.fn.zTree.init($("#deivceTree"), setting, nodeList);
+                showMenu();
+            } else {
+                //隐藏树
+                //hideMenu();
+                InitialZtree();
+            }
+        }
+
+        //还原zTree的初始数据
+        function InitialZtree() {
+            $.fn.zTree.init($("#deivceTree"), setting, zNodes);
+        }
+
+        //显示树
+        function showMenu() {
+            var cityObj = $("#treeSearch");
+            var cityOffset = $("#treeSearch").offset();
+            //$("#menuContent").css({ left: cityOffset.left + "px", top: cityOffset.top + cityObj.outerHeight() + "px" }).slideDown("fast");
+            $("#menuContent").slideDown("fast");
+        }
+
+        $(document).ready(function () {
+            initTree();
+        });
+
+        
+    </script>
+</body>
+</html>

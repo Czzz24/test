@@ -1,0 +1,67 @@
+﻿
+@{
+    Layout = null;
+}
+@using EF.Application.Model;
+@model EF.Application.Model.t_userRole
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        角色添加
+    </blockquote>
+    @using (Html.BeginForm("addComit", "RoleManager", FormMethod.Post, new { @class = "layui-form" }))
+    {
+        <div class="content_Area">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">角色名称:</label>
+                    <div class="layui-input-inline">
+                        @Html.EditorFor(model => model.roleName, new { htmlAttributes = new { @class = "layui-input", @placeholder = "请输入角色名称", @autocomplete = "off" } })
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">角色说明:</label>
+                <div class="layui-input-block">
+                    @Html.TextAreaFor(model => model.roleDescription, new { @class = "layui-textarea", @placeholder = "请输入角色说明" })
+                </div>
+            </div>
+        </div>
+    }
+    <div class="layui-form-item jsgl_Submit">
+        <button class="layui-btn layui-btn-normal" id="commit">提交</button>
+        <button class="layui-btn layui-btn-primary" onclick="window.history.back()">返回</button>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        var layer;
+        layui.use("layer", function () {
+            layer = layui.layer;  //layer初始化
+        });
+        document.getElementById("commit").addEventListener("click", function () {
+            var roleName = $("#roleName").val();
+            var roleDescription = $("#roleDescription").val();
+            if (roleName == "" || roleName == null || roleName == "undefined") {
+                layer.tips('请输入角色名称!', '#roleName');
+                return;
+            }
+            if (roleDescription == "" || roleDescription == null || roleDescription == "undefined") {
+                layer.tips('请输入角色说明!', '#roleDescription');
+                return;
+            }
+            $("form").submit();
+        });
+    </script>
+</body>
+</html>

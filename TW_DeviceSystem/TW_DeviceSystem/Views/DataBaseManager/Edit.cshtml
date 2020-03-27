@@ -1,0 +1,175 @@
+﻿
+@{
+    Layout = null;
+}
+@using EF.Application.Model;
+
+@model t_dataBaseManager
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        数据库配置详情
+    </blockquote>
+    @using (Html.BeginForm("editComit", "DataBaseManager", FormMethod.Post, new { @class = "layui-form" }))
+    {
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.attributeElectricId)
+        @Html.HiddenFor(model => model.attributeLineId)
+        @Html.HiddenFor(model=>model.isDel)
+        @Html.HiddenFor(model => model.DelUser)
+        @Html.HiddenFor(model => model.DelTime)
+        <div class="content_Area">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">项目名称:</label>
+                    <div class="layui-input-inline">
+                        @Html.EditorFor(model => model.projectName, new { htmlAttributes = new { @class = "layui-input", @autocomplete = "off", @placeholder = "请输入项目名称" } })
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">数据库账号:</label>
+                    <div class="layui-input-block">
+                        @Html.EditorFor(model => model.dataBaseAccount, new { htmlAttributes = new { @class = "layui-input", @autocomplete = "off", @placeholder = "请输入数据库账号"} })
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">数据库密码:</label>
+                    <div class="layui-input-block">
+                        @Html.EditorFor(model => model.dataBasePwd, new { htmlAttributes = new { @class = "layui-input", @autocomplete = "off", @placeholder = "请输入数据库密码" } })
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">数据库地址:</label>
+                    <div class="layui-input-block">
+                        @Html.EditorFor(model => model.dataBaseIP, new { htmlAttributes = new { @class = "layui-input", @autocomplete = "off", @placeholder = "请输入数据库地址" } })
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">数据库名称:</label>
+                    <div class="layui-input-block">
+                        @Html.EditorFor(model => model.dataBaseName, new { htmlAttributes = new { @class = "layui-input", @autocomplete = "off", @placeholder = "请输入数据库名称" } })
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">供电或公司:</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="ElectricName" readonly="readonly" class="layui-input" placeholder="请输入供电或公司" />
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">线路名称:</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="LineName" readonly="readonly" class="layui-input" placeholder="请输入线路名称" />
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">录入日期:</label>
+                    <div class="layui-input-block">
+                        @Html.EditorFor(model => model.CreateTime, new { htmlAttributes = new { @class = "layui-input", @autocomplete = "off", @placeholder = "请输入录入日期", @readonly = "readonly" } })
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="layui-form-item jsgl_Submit">
+        <button class="layui-btn layui-btn-normal" id="commit">提交</button>
+        <button class="layui-btn layui-btn-primary" onclick="window.history.back()">返回</button>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        var layer;
+        layui.use("layer", function () {
+            layer = layui.layer;  //layer初始化
+        });
+        document.getElementById("commit").addEventListener("click", function () {
+            var projectName = $("#projectName").val();
+            var dataBaseAccount = $("#dataBaseAccount").val();
+            var dataBasePwd = $("#dataBasePwd").val();
+            var dataBaseIP = $("#dataBaseIP").val();
+            var dataBaseName = $("#dataBaseName").val();
+            if (projectName == "" || projectName == null || projectName == "undefined") {
+                layer.alert('请输入项目名称!', { title: "提示" });
+                return;
+            }
+            if (dataBaseAccount == "" || dataBaseAccount == null || dataBaseAccount == "undefined") {
+                layer.alert('请输入数据库账号!', { title: "提示" });
+                return;
+            }
+            if (dataBasePwd == "" || dataBasePwd == null || dataBasePwd == "undefined") {
+                layer.alert('请输入数据库密码!', { title: "提示" });
+                return;
+            }
+            if (dataBaseIP == "" || dataBaseIP == null || dataBaseIP == "undefined") {
+                layer.alert('请输入数据库IP地址!', { title: "提示" });
+                return;
+            }
+            if (dataBaseName == "" || dataBaseName == null || dataBaseName == "undefined") {
+                layer.alert('请输入数据库名称!', { title: "提示" });
+                return;
+            }
+            $("form").submit();
+        });
+
+        $(document).ready(function () {
+            GetElectricName();
+            GetLineName();
+        });
+        function GetElectricName() {
+            var url = "/DeviceManager/GetOrganizeSingle";
+            $.ajax({
+                url: url,
+                type: 'post',
+                dataType: 'json',
+                data: { id: $("#attributeElectricId").val() },
+                async: true,
+                success: function (data, jqxhr, txtStatus) {
+                    $("#ElectricName").val(data.name);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+        }
+
+        function GetLineName() {
+            var url = "/DeviceManager/GetOrganizeSingle";
+            $.ajax({
+                url: url,
+                type: 'post',
+                dataType: 'json',
+                data: { id: $("#attributeLineId").val() },
+                async: true,
+                success: function (data, jqxhr, txtStatus) {
+                    $("#LineName").val(data.name);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

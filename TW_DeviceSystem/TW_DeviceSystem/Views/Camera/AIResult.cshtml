@@ -1,0 +1,82 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>AIResult</title>
+    <style type="text/css">
+        html, body {
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+    </style>
+    <script src="~/Scripts/jquery-1.8.0.js"></script>
+</head>
+<body>
+    <input type="hidden" id="msgId" value="@ViewBag.msgId" />
+    <canvas id="mycanvas" style="width:850px; height:474px;" width="850" height="474"></canvas>
+    <script type="text/javascript">
+        window.onload = function () {
+            var width = $("#mycanvas").width();
+            var height = $("#mycanvas").height();
+            var msgId = $("#msgId").val();
+
+            var url = "/Camera/getAIByMsgId";
+            var data = { msgId: msgId };
+            $.ajax({
+                url: url,
+                type: 'get',
+                async: true,
+                dataType: 'json',
+                data: data,
+                success: function (data, jqxhr, txtStatus) {
+                    drawImg(data, width, height);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+        }
+
+        function drawImg(imgsrc, width, height) {
+            var mycanvas = document.getElementById('mycanvas');
+            var ctx = mycanvas.getContext('2d');
+
+            var img = new Image();
+            img.onload = function () {
+                // 将图片画到canvas上面上去！
+                ctx.drawImage(img, 0, 0, width, height);
+
+                var msgId = $("#msgId").val();
+                var data = { msgId: msgId };
+                var url = "/Camera/getRectData";
+                $.ajax({
+                    url: url,
+                    type: 'get',
+                    async: true,
+                    dataType: 'json',
+                    data: data,
+                    success: function (data, jqxhr, txtStatus) {
+                        $.each(data, function (i, n) {
+                            ctx.strokeStyle = "#F34747";
+                            ctx.lineWidth = 2;
+                            ctx.strokeRect(n.x * width, n.y * height, n.w * width, n.h * height);
+                            ctx.stroke();
+                        });
+                    }, error: function (xhr, txtStatus) {
+                        console.log(txtStatus);
+                    }
+                });
+
+            }
+            img.src = imgsrc;
+        }
+
+    </script>
+</body>
+</html>

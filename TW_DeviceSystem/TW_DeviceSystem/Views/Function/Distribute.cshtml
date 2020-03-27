@@ -1,0 +1,242 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <link href="~/Scripts/tableList/css/list-style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery.min.js"></script>
+    <script src="~/Scripts/tableList/jquery-ui.min.js"></script>
+    <script src="~/Scripts/tableList/list-script.js"></script>
+    <style type="text/css">
+        .layui-input-block {
+            margin-left: 0px;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            getFunction();
+        });
+
+        /*获取所有功能项目*/
+        function getFunction() {
+            var url = "/Function/GetAllList";
+            $.ajax({
+                url: url,
+                type: 'get',
+                dataType: 'json',
+                async: true,
+                success: function (data, jqxhr, txtStatus) {
+                    $.each(data, function (idx, obj) {
+                        var html = "<span class='item' tabindex=" + obj.Id + ">" + obj.functionName + "</span>";
+                        $("#leftbox").append(html);
+                    });
+                    $('#selectTitle').initList();
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        角色菜单分配
+    </blockquote>
+    <div style="width: 520px; height: auto; float: left;">
+        <div id="selectTitle">
+            <div class="list-body">
+                <div class="item-box left-box" id="leftbox">
+                </div>
+                <div class="center-box">
+                    <button class="add-one" title="添加选中项">></button>
+                    <button class="add-all" title="添加全部">>></button>
+                    <button class="remove-one" title="移除选中项"><</button>
+                    <button class="remove-all" title="移除全部"><<</button>
+                </div>
+                <div class="item-box right-box" id="rightbox">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="width: calc(100% - 530px); height: auto; float: left;">
+        <table class="layui-hide" id="jsgl" lay-filter="demo"></table>
+    </div>
+    <div class="demoTable">
+        <button class="layui-btn layui-btn-normal" style="margin-left:20px;" data-type="getCheckData" id="btnSubmit">提交</button>
+        <button class="layui-btn layui-btn-primary" onclick="window.history.back()">返回</button>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">拥有菜单</a>
+    </script>
+    <script type="text/javascript">
+        layui.use(['form', 'table'], function () {
+            var table = layui.table;
+            var form = layui.form;
+            table.render({
+                elem: '#jsgl',
+                even: true,
+                cellMinWidth: 80,
+                height: 305,
+                url: '/RoleManager/GetPageList',
+                page: true,
+                done: function (res, curr, count) {
+                    $("[data-field='Id']").css('display', 'none');
+                },
+                cols: [
+                    [
+                         {
+                             type: 'checkbox',
+                             fixed: 'left'
+                         },
+                         {
+                             field: 'Id',
+                             title: 'ID',
+                         },
+                        {
+                            field: 'roleName',
+                            title: '角色名称',
+                            width: 150,
+                        },
+                        {
+                            field: 'roleDescription',
+                            title: '角色说明',
+                            width: 300,
+                        },
+                        {
+                            field: 'test3',
+                            title: '操作',
+                            fixed: 'right',
+                            width: 130,
+                            toolbar: '#barDemo'
+                        }
+                    ]
+                ]
+            });
+
+            var $ = layui.$, active = {
+                getCheckData: function () { //获取选中数据
+                    var checkStatus = table.checkStatus('jsgl')
+                    , data = checkStatus.data;
+                    var rightbox = $("#rightbox").children();
+                    var arrayfId = new Array();
+                    for (var i = 0; i < rightbox.length; i++) {
+                        arrayfId.push(rightbox[i].tabIndex);
+                    }
+                    var arrayrId = new Array();
+                    for (var j = 0; j < data.length; j++) {
+                        arrayrId.push(data[j].Id);
+                    }
+                    if (arrayfId.length <= 0) {
+                        layer.alert('请选择要分配的菜单再提交!', { title: "提示" });
+                        return;
+                    }
+                    if (arrayrId.length <= 0) {
+                        layer.alert('请选择要分配的角色再提交!', { title: "提示" });
+                        return;
+                    }
+                    var isExitSuperManager = false;
+                    arrayrId.find(function (value, index, attr) {
+                        if (value == 1) {
+                            isExitSuperManager = true;
+                        }
+                    });
+                    if (isExitSuperManager) {
+                        layer.alert('超级管理员不需要分配菜单!', { title: "提示" });
+                        return;
+                    }
+                    document.getElementById("btnSubmit").disabled = true;
+                    AddRoleFunction(arrayrId, arrayfId);
+                }
+            };
+
+            table.on('tool(demo)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'detail') {
+                    var Id = data.Id;
+                    var name = data.roleName;
+                    var url = "/Function/GetRoleFunction";
+                    $.ajax({
+                        url: url,
+                        type: 'post',
+                        data: { roleId: Id },
+                        async: true,
+                        dataType: 'json',
+                        success: function (data, jqxhr, txtStatus) {
+                            var html = "";
+                            html += "<table>";
+                            $.each(data, function (idx, obj) {
+                                var name = GetFunctionName(obj.functionId);
+                                html += "<tr><td><span style='width:10px; height:10px; background:#0DA622;border-radius:100%; margin:4px 0px 0px 10px; display:inline-block; float:left'></span><p style='float:left'>" + name + "</p></td></tr>";
+                            });
+                            html += "</table>";
+                            layer.open({
+                                type: 1,
+                                skin: 'layui-layer-rim', //加上边框
+                                area: ['420px', '240px'], //宽高
+                                title: "" + name + "拥有菜单",
+                                content: html
+                            });
+                        }, error: function (xhr, txtStatus) {
+                            console.log(txtStatus);
+                        }
+                    })
+                }
+            });
+
+            $('.demoTable .layui-btn').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+        });
+
+        function GetFunctionName(fId) {
+            var name = null;
+            var url = "/Function/GetFunctionName";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { functionId: fId },
+                async: false,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    name = data.functionName;
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+            return name;
+        }
+
+        function AddRoleFunction(roleId, functionId) {
+            var url = "/Function/AddRoleFunction";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { roleId: roleId, functionId: functionId },
+                dataType: 'json',
+                async: true,
+                success: function (data, jqxhr, txtStatus) {
+                    if (data.code == 0) {
+                        layer.alert(data.msg);
+                        setTimeout(function () {
+                            window.location.reload();
+                        },3000);
+                    }
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1493 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        数据中心
+    </blockquote>
+    <div class="content_Area">
+        <div class="layui-form">
+            <div class="layui-form-item" style="margin-bottom: 0px !important;">
+                <div class="layui-inline">
+                    <label class="layui-form-label">开始时间:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" placeholder="选择开始日期" id="startTime">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">结束时间:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" placeholder="选择结束日期" id="endTime">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-size layui-btn-normal" id="btnSearch">查询</button>
+                    <button class="layui-btn btn-size" id="excelExport"><i class="layui-icon layui-icon-upload" style="font-size: 14px;line-height: 38px;"></i>数据导出</button>
+                </div>
+            </div>
+            <div class="layui-form-item" style="margin-bottom: 0px !important;">
+                <div class="layui-inline">
+                    <label class="layui-form-label">供电或公司:</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="ElectricId" lay-filter="ElectricId" lay-search=""></select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">线路名称:</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="LineId" lay-filter="LineId" lay-search=""></select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">所在接头:</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="JointId" lay-filter="JointId" lay-search=""></select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">设备大类:</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="deviceBigType" lay-filter="deviceBigType" lay-search=""></select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">设备小类:</label>
+                    <div class="layui-input-inline">
+                        <select name="quiz" id="deviceSmallType"></select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">设备名称:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" placeholder="请输入设备名称|终端ID" class="layui-input"  id="searchText" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="layui-hide" id="dataCenter"></table>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        layui.use(['form', 'laydate', 'table'], function () {
+            var form = layui.form;
+            var laydate = layui.laydate;
+
+            laydate.render({
+                elem: '#startTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#endTime',
+                type: 'datetime'
+            });
+
+            var table = layui.table;
+
+            form.on('select(ElectricId)', function (data) {
+                var Id = data.value;
+                getLine(Id);
+                getJoint(null);
+            });
+
+            form.on('select(LineId)', function (data) {
+                var Id = data.value;
+                getJoint(Id);
+            });
+
+            form.on('select(deviceBigType)', function (data) {
+                var Id = data.value;
+                binSmallType(Id);
+            });
+
+            $("#excelExport").on('click', function () {
+                var typeValue = $("#deviceBigType").val();
+                var ElectricIdval = $("#ElectricId").val();
+                var LineIdval = $("#LineId").val();
+                if (ElectricIdval == null || ElectricIdval == "" || ElectricIdval == "undefined") {
+                    layer.alert('请选择供电或公司!', { title: "提示" });
+                    return;
+                }
+                if (LineIdval == null || LineIdval == "" || LineIdval == "undefined") {
+                    layer.alert('请选择线路名称!', { title: "提示" });
+                    return;
+                }
+                if (typeValue == null || typeValue == "" || typeValue == "undefined") {
+                    layer.alert('请选择设备大类!', { title: "提示" });
+                    return;
+                }
+                $("#btnSearch").click();
+                var startTime = document.getElementById("startTime").value;
+                var endTime = document.getElementById("endTime").value;
+                var url= "/DataCenter/ExcelExport?ElectricId=" + ElectricIdval + "&LineId=" + LineIdval + "&JointId=" + $("#JointId").val() + "&bigTypeId=" + typeValue + "&smallTypeId=" + $("#deviceSmallType").val() + "&searchText=" + $("#searchText").val() + "&startTime=" + startTime + "&endTime=" + endTime;
+                window.open(url);
+            });
+
+            $('#btnSearch').on('click', function () {
+                var typeValue = $("#deviceBigType").val();
+                var ElectricIdval=$("#ElectricId").val();
+                var LineIdval=$("#LineId").val();
+                if (ElectricIdval == null || ElectricIdval=="" || ElectricIdval=="undefined") {
+                    layer.alert('请选择供电或公司!', { title: "提示" });
+                    return;
+                }
+                if (LineIdval == null || LineIdval == "" || LineIdval == "undefined") {
+                    layer.alert('请选择线路名称!', { title: "提示" });
+                    return;
+                }
+                if (typeValue == null || typeValue == "" || typeValue == "undefined") {
+                    layer.alert('请选择设备大类!', { title: "提示" });
+                    return;
+                }
+                switch (parseFloat(typeValue)) {
+                    case 1:
+                        table.render({
+                            elem: '#dataCenter',
+                            even: true,
+                            url: '/DataCenter/GetPartialData',
+                            cellMinWidth: 150,
+                            even: 'true',
+                            height: 400,
+                            page: true,
+                            cols: [
+                                [
+                                    {
+                                        field: 'DeviceName',
+                                        title: '终端名称'
+                                    },
+                                    {
+                                        field: 'TerminalId',
+                                        title: '终端ID'
+                                    },
+                                    {
+                                        field: 'ElectricName',
+                                        title: '供电或公司'
+                                    },
+                                    {
+                                        field: 'LineName',
+                                        title: '线路名称'
+                                    },
+                                    {
+                                        field: 'JointName',
+                                        title: '接头名称'
+                                    },
+                                    {
+                                        field: 'Astatus',
+                                        title: 'A相状态',
+                                        templet: function (row) { return chkStatus(row.Astatus); }
+                                    },
+                                    {
+                                        field: 'Bstatus',
+                                        title: 'B相状态',
+                                        templet: function (row) { return chkStatus(row.Bstatus); }
+                                    },
+                                    {
+                                        field: 'Cstatus',
+                                        title: 'C相状态',
+                                        templet: function (row) { return chkStatus(row.Cstatus); }
+                                    },
+                                    {
+                                        field: 'AElectricMaxValue',
+                                        title: 'A相放电量最大值',
+                                    },
+                                    {
+                                        field: 'AFrequencyMaxValue',
+                                        title: 'A相放电频率最大值',
+                                    },
+                                    {
+                                        field: 'BElectricMaxValue',
+                                        title: 'B相放电量最大值',
+                                    },
+                                    {
+                                        field: 'BFrequencyMaxValue',
+                                        title: 'B相放电频率最大值',
+                                    },
+                                    {
+                                        field: 'CElectricMaxValue',
+                                        title: 'C相放电量最大值',
+                                    },
+                                    {
+                                        field: 'CFrequencyMaxValue',
+                                        title: 'C相放电频率最大值',
+                                    },
+                                    {
+                                        field: 'PartialId',
+                                        title: 'Hex地址',
+                                    },
+                                    {
+                                        field: 'status1',
+                                        title: '状态字1',
+                                    },
+                                    {
+                                        field: 'status2',
+                                        title: '状态字2',
+                                    },
+                                    {
+                                        field: 'status3',
+                                        title: '状态字3',
+                                    },
+                                    {
+                                        field: 'A1Voltage1',
+                                        title: '设备A1电源5v电压单位(mV)',
+                                    },
+                                    {
+                                        field: 'A1Voltage2',
+                                        title: '设备A1电源3.3V电压(mV)',
+                                    },
+                                    {
+                                        field: 'A1Voltage3',
+                                        title: '设备A1电源2.5V电压(mV)',
+                                    },
+                                    {
+                                        field: 'A2Voltage1',
+                                        title: '设备A2电源12V电压(mV)',
+                                    },
+                                    {
+                                        field: 'A2Voltage2',
+                                        title: '设备A2电源5V电压(mV)',
+                                    },
+                                    {
+                                        field: 'A2Voltage3',
+                                        title: '设备A2电源3.3V电压(mV)',
+                                    },
+                                    {
+                                        field: 'B1Voltage1',
+                                        title: '设备B1电源5V电压(mV)',
+                                    },
+                                    {
+                                        field: 'B1Voltage2',
+                                        title: '设备B1电源3.3V电压(mV)',
+                                    },
+                                    {
+                                        field: 'B1Voltage3',
+                                        title: '设备B1电源2.5V电压(mV)',
+                                    },
+                                    {
+                                        field: 'B2Voltage1',
+                                        title: '设备B2电源12V电压(mV)',
+                                    },
+                                    {
+                                        field: 'B2Voltage2',
+                                        title: '设备B2电源5V电压(mV)',
+                                    },
+                                    {
+                                        field: 'B2Voltage3',
+                                        title: '设备B2电源3.3V电压(mV)',
+                                    },
+                                    {
+                                        field: 'C1Voltage1',
+                                        title: '设备C1电源5V电压(mV)',
+                                    },
+                                    {
+                                        field: 'C1Voltage2',
+                                        title: '设备C1电源3.3V电压(mV)',
+                                    },
+                                    {
+                                        field: 'C1Voltage3',
+                                        title: '设备C1电源2.5V电压(mV)',
+                                    },
+                                    {
+                                        field: 'C2Voltage1',
+                                        title: '设备C2电源12V电压(mV)',
+                                    },
+                                    {
+                                        field: 'C2Voltage2',
+                                        title: '设备C2电源5V电压(mV)',
+                                    },
+                                    {
+                                        field: 'C2Voltage3',
+                                        title: '设备C2电源3.3V电压(mV)',
+                                    },
+                                    {
+                                        field: 'd3Voltage1',
+                                        title: '设备3电源12V电压(mV)',
+                                    },
+                                    {
+                                        field: 'd3Voltage2',
+                                        title: '设备3电源5V电压(mV)',
+                                    },
+                                    {
+                                        field: 'd3Voltage3',
+                                        title: '设备3电源3.3V电压(mV)',
+                                    },
+                                    {
+                                        field: 'A1AvgElectric',
+                                        title: 'A相1通道平均放电量',
+                                    },
+                                    {
+                                        field: 'A1Frequency',
+                                        title: 'A相1通道放电频率',
+                                    },
+                                    {
+                                        field: 'A1waveform',
+                                        title: 'A相1通道波形',
+                                    },
+                                    {
+                                        field: 'A2AvgElectric',
+                                        title: 'A相2通道平均放电量',
+                                    },
+                                    {
+                                        field: 'A2Frequency',
+                                        title: 'A相2通道放电频率',
+                                    },
+                                    {
+                                        field: 'A2waveform',
+                                        title: 'A相2通道波形',
+                                    },
+                                    {
+                                        field: 'A3AvgElectric',
+                                        title: 'A相3通道平均放电量',
+                                    },
+                                    {
+                                        field: 'A3Frequency',
+                                        title: 'A相3通道放电频率',
+                                    },
+                                    {
+                                        field: 'A3waveform',
+                                        title: 'A相3通道波形',
+                                    },
+                                    {
+                                        field: 'A4AvgElectric',
+                                        title: 'A相4通道平均放电量',
+                                    },
+                                    {
+                                        field: 'A4Frequency',
+                                        title: 'A相4通道放电频率',
+                                    },
+                                    {
+                                        field: 'A4waveform',
+                                        title: 'A相4通道波形',
+                                    },
+                                    {
+                                        field: 'A5AvgElectric',
+                                        title: 'A相5通道平均放电量',
+                                    },
+                                    {
+                                        field: 'A5Frequency',
+                                        title: 'A相5通道放电频率',
+                                    },
+                                    {
+                                        field: 'A5waveform',
+                                        title: 'A相5通道波形',
+                                    },
+                                    {
+                                        field: 'B1AvgElectric',
+                                        title: 'B相1通道平均放电量',
+                                    },
+                                    {
+                                        field: 'B1Frequency',
+                                        title: 'B相1通道放电频率',
+                                    },
+                                    {
+                                        field: 'B1waveform',
+                                        title: 'B相1通道波形',
+                                    },
+                                    {
+                                        field: 'B2AvgElectric',
+                                        title: 'B相2通道平均放电量',
+                                    },
+                                    {
+                                        field: 'B2Frequency',
+                                        title: 'B相2通道放电频率',
+                                    },
+                                    {
+                                        field: 'B2waveform',
+                                        title: 'B相2通道波形',
+                                    },
+                                    {
+                                        field: 'B3AvgElectric',
+                                        title: 'B相3通道平均放电量',
+                                    },
+                                    {
+                                        field: 'B3Frequency',
+                                        title: 'B相3通道放电频率',
+                                    },
+                                    {
+                                        field: 'B3waveform',
+                                        title: 'B相3通道波形',
+                                    },
+                                    {
+                                        field: 'B4AvgElectric',
+                                        title: 'B相4通道平均放电量',
+                                    },
+                                    {
+                                        field: 'B4Frequency',
+                                        title: 'B相4通道放电频率',
+                                    },
+                                    {
+                                        field: 'B4waveform',
+                                        title: 'B相4通道波形',
+                                    },
+                                    {
+                                        field: 'B5AvgElectric',
+                                        title: 'B相5通道平均放电量',
+                                    },
+                                    {
+                                        field: 'B5Frequency',
+                                        title: 'B相5通道放电频率',
+                                    },
+                                    {
+                                        field: 'B5waveform',
+                                        title: 'B相5通道波形',
+                                    },
+                                    {
+                                        field: 'C1AvgElectric',
+                                        title: 'C相1通道平均放电量',
+                                    },
+                                    {
+                                        field: 'C1Frequency',
+                                        title: 'C相1通道放电频率',
+                                    },
+                                    {
+                                        field: 'C1waveform',
+                                        title: 'C相1通道波形',
+                                    },
+                                    {
+                                        field: 'C2AvgElectric',
+                                        title: 'C相2通道平均放电量',
+                                    },
+                                    {
+                                        field: 'C2Frequency',
+                                        title: 'C相2通道放电频率',
+                                    },
+                                    {
+                                        field: 'C2waveform',
+                                        title: 'C相2通道波形',
+                                    },
+                                    {
+                                        field: 'C3AvgElectric',
+                                        title: 'C相3通道平均放电量',
+                                    },
+                                    {
+                                        field: 'C3Frequency',
+                                        title: 'C相3通道放电频率',
+                                    },
+                                    {
+                                        field: 'C3waveform',
+                                        title: 'C相3通道波形',
+                                    },
+                                    {
+                                        field: 'C4AvgElectric',
+                                        title: 'C相4通道平均放电量',
+                                    },
+                                    {
+                                        field: 'C4Frequency',
+                                        title: 'C相4通道放电频率',
+                                    },
+                                    {
+                                        field: 'C4waveform',
+                                        title: 'C相4通道波形',
+                                    },
+                                    {
+                                        field: 'C5AvgElectric',
+                                        title: 'C相5通道平均放电量',
+                                    },
+                                    {
+                                        field: 'C5Frequency',
+                                        title: 'C相5通道放电频率',
+                                    },
+                                    {
+                                        field: 'C5waveform',
+                                        title: 'C相5通道波形',
+                                    },
+                                    {
+                                        field: 'A1hardversion',
+                                        title: '设备A1硬件版本号',
+                                    },
+                                    {
+                                        field: 'A1softversion',
+                                        title: '设备A1软件版本号',
+                                    },
+                                    {
+                                        field: 'A2hardversion',
+                                        title: '设备A2硬件版本号',
+                                    },
+                                    {
+                                        field: 'A2softversion',
+                                        title: '设备A2硬件版本号',
+                                    },
+                                    {
+                                        field: 'B1hardversion',
+                                        title: '设备B1硬件版本号',
+                                    },
+                                    {
+                                        field: 'B1softversion',
+                                        title: '设备B1软件版本号',
+                                    },
+                                    {
+                                        field: 'B2hardversion',
+                                        title: '设备B2硬件版本号',
+                                    },
+                                    {
+                                        field: 'B2softversion',
+                                        title: '设备B2软件版本号',
+                                    },
+                                    {
+                                        field: 'C1hardversion',
+                                        title: '设备C1硬件版本号',
+                                    },
+                                    {
+                                        field: 'C1softversion',
+                                        title: '设备C1软件版本号',
+                                    },
+                                    {
+                                        field: 'C2hardversion',
+                                        title: '设备C2硬件版本号',
+                                    },
+                                    {
+                                        field: 'C2softversion',
+                                        title: '设备C2软件版本号',
+                                    },
+                                    {
+                                        field: 'd3hardversion',
+                                        title: '设备3硬件版本号',
+                                    },
+                                    {
+                                        field: 'd3softversion',
+                                        title: '设备3软件版本号',
+                                    },
+                                    {
+                                        field: 'CreateTime',
+                                        title: '数据录入时间',
+                                        templet: function (row) { return dateFormat(row.CreateTime); }
+                                    }
+                                ]
+                            ], where: {
+                                ElectricId: document.getElementById("ElectricId").value,
+                                LineId: document.getElementById("LineId").value,
+                                JointId: document.getElementById("JointId").value,
+                                bigTypeId: document.getElementById("deviceBigType").value,
+                                smallTypeId: document.getElementById("deviceSmallType").value,
+                                searchText: document.getElementById("searchText").value,
+                                startTime: document.getElementById("startTime").value,
+                                endTime: document.getElementById("endTime").value
+                            }
+                        });
+                        break;
+                    case 2:
+                        table.render({
+                            elem: '#dataCenter',
+                            even: true,
+                            url: '/DataCenter/GetEarthBoxData',
+                            cellMinWidth: 150,
+                            even: 'true',
+                            height: 400,
+                            id: 'reloadData',
+                            page:true,
+                            cols: [
+                                [
+                                    {
+                                        field: 'DeviceName',
+                                        title: '终端名称'
+                                    },
+                                    {
+                                        field: 'TerminalId',
+                                        title: '终端ID'
+                                    },
+                                    {
+                                        field: 'ElectricName',
+                                        title: '供电或公司'
+                                    },
+                                    {
+                                        field: 'LineName',
+                                        title: '线路名称'
+                                    },
+                                    {
+                                        field: 'JointName',
+                                        title: '接头名称'
+                                    },
+                                    {
+                                        field: 'Time',
+                                        title: '采集时间',
+                                        templet: function (row) { return dateFormat(row.Time); }
+                                    },
+                                    {
+                                        field: 'BoxTemp',
+                                        title: '箱内温度'
+                                    },
+                                    {
+                                        field: 'BoxHumidity',
+                                        title: '箱内湿度'
+                                    },
+                                    {
+                                        field: 'AElectric',
+                                        title: 'A相电流(A)'
+                                    },
+                                    {
+                                        field: 'BElectric',
+                                        title: 'B相电流(A)'
+                                    },
+                                    {
+                                        field: 'CElectric',
+                                        title: 'C相电流(A)'
+                                    },
+                                    {
+                                        field: 'AVolt',
+                                        title: 'A相电压(V)'
+                                    },
+                                    {
+                                        field: 'BVolt',
+                                        title: 'B相电压(V)'
+                                    },
+                                    {
+                                        field: 'CVolt',
+                                        title: 'C相电压(V)'
+                                    },
+                                    {
+                                        field: 'Volt1',
+                                        title: '电缆取电电压(V)'
+                                    },
+                                    {
+                                        field: 'Volt2',
+                                        title: '太阳能取电电压(V)'
+                                    },
+                                    {
+                                        field: 'Volt3',
+                                        title: '供电3电压(V)'
+                                    },
+                                    {
+                                        field: 'BatteryVolt',
+                                        title: '铅酸电池电压(V)'
+                                    },
+                                    {
+                                        field: 'ClockVolt',
+                                        title: '时钟电池电压(V)'
+                                    },
+                                    {
+                                        field: 'A1Temp',
+                                        title: 'A相接头温度℃'
+                                    },
+                                    {
+                                        field: 'A2Temp',
+                                        title: 'A相表皮温度℃'
+                                    },
+                                    {
+                                        field: 'B1Temp',
+                                        title: 'B相接头温度℃'
+                                    },
+                                    {
+                                        field: 'B2Temp',
+                                        title: 'B相表皮温度℃'
+                                    },
+                                    {
+                                        field: 'C1Temp',
+                                        title: 'C相接头温度℃'
+                                    },
+                                    {
+                                        field: 'C2Temp',
+                                        title: 'C相表皮温度℃'
+                                    },
+                                    {
+                                        field: 'PTCT',
+                                        title: 'PTCT状态字'
+                                    },
+                                    {
+                                        field: 'PBUS',
+                                        title: 'PBUS状态字'
+                                    },
+                                    {
+                                        field: 'Alarm',
+                                        title: '报警状态字'
+                                    },
+                                    {
+                                        field: 'PRS',
+                                        title: 'GPRS信号强度'
+                                    },
+                                    {
+                                        field: 'CreateTime',
+                                        title: '数据录入时间',
+                                        templet: function (row) { return dateFormat(row.CreateTime); }
+                                    }
+                                ]
+                            ],where: {
+                                ElectricId: document.getElementById("ElectricId").value,
+                                LineId: document.getElementById("LineId").value,
+                                JointId: document.getElementById("JointId").value,
+                                bigTypeId: document.getElementById("deviceBigType").value,
+                                smallTypeId: document.getElementById("deviceSmallType").value,
+                                searchText: document.getElementById("searchText").value,
+                                startTime: document.getElementById("startTime").value,
+                                endTime: document.getElementById("endTime").value
+                            }
+                        });
+                        break;
+                    case 3:
+                        table.render({
+                            elem: '#dataCenter',
+                            even: true,
+                            url: '/DataCenter/GetFreeServicingData',
+                            cellMinWidth: 150,
+                            even: 'true',
+                            height: 400,
+                            page: true,
+                            cols: [
+                                [
+                                   {
+                                       field: 'DeviceName',
+                                       title: '终端名称'
+                                   },
+                                    {
+                                        field: 'TerminalId',
+                                        title: '终端ID'
+                                    },
+                                    {
+                                        field: 'ElectricName',
+                                        title: '供电或公司'
+                                    },
+                                    {
+                                        field: 'LineName',
+                                        title: '线路名称'
+                                    },
+                                    {
+                                        field: 'JointName',
+                                        title: '接头名称'
+                                    },
+                                    {
+                                        field: 'Time',
+                                        title: '采集时间',
+                                        templet: function (row) { return dateFormat(row.Time); }
+                                    }
+                                    ,
+                                    {
+                                        field: 'AElectric',
+                                        title: 'A相电流(A)'
+                                    },
+                                    {
+                                        field: 'BElectric',
+                                        title: 'B相电流(A)'
+                                    },
+                                    {
+                                        field: 'CElectric',
+                                        title: 'C相电流(A)'
+                                    },
+                                    {
+                                        field: 'TElectric',
+                                        title: '总电流(A)'
+                                    },
+                                    {
+                                        field: 'BatteryVolt',
+                                        title: '蓄电池电压(V)'
+                                    },
+                                    {
+                                        field: 'PRS',
+                                        title: '信号强度'
+                                    },
+                                    {
+                                        field: 'CreateTime',
+                                        title: '数据录入时间',
+                                        templet: function (row) { return dateFormat(row.CreateTime); }
+                                    }
+                                ]
+                            ], where: {
+                                ElectricId: document.getElementById("ElectricId").value,
+                                LineId: document.getElementById("LineId").value,
+                                JointId: document.getElementById("JointId").value,
+                                bigTypeId: document.getElementById("deviceBigType").value,
+                                smallTypeId: document.getElementById("deviceSmallType").value,
+                                searchText: document.getElementById("searchText").value,
+                                startTime: document.getElementById("startTime").value,
+                                endTime: document.getElementById("endTime").value
+                            }
+                        });
+                        break;
+                    case 4:
+                        table.render({
+                            elem: '#dataCenter',
+                            even: true,
+                            url: '/DataCenter/GetTempData',
+                            cellMinWidth: 170,
+                            even: 'true',
+                            height: 400,
+                            page:true,
+                            cols: [
+                                [
+                                    {
+                                        field: 'DeviceName',
+                                        title: '终端名称'
+                                    },
+                                    {
+                                        field: 'TerminalId',
+                                        title: '终端ID'
+                                    },
+                                    {
+                                        field: 'ElectricName',
+                                        title: '供电或公司'
+                                    },
+                                    {
+                                        field: 'LineName',
+                                        title: '线路名称'
+                                    },
+                                    {
+                                        field: 'JointName',
+                                        title: '接头名称'
+                                    },
+                                    {
+                                        field: 'Time',
+                                        title: '采集时间',
+                                        templet: function (row) { return dateFormat(row.Time); }
+                                    },
+                                    {
+                                        field: 'A1Temp',
+                                        title: 'A相接头温度(℃)'
+                                    },
+                                   {
+                                       field: 'B1Temp',
+                                       title: 'B相接头温度(℃)'
+                                   },
+                                   {
+                                       field: 'C1Temp',
+                                       title: 'C相接头温度(℃)'
+                                   },
+                                    {
+                                        field: 'A2Temp',
+                                        title: 'A相表皮温度(℃)'
+                                    },
+                                   {
+                                       field: 'B2Temp',
+                                       title: 'B相表皮温度(℃)'
+                                   },
+                                   {
+                                       field: 'C2Temp',
+                                       title: 'C相表皮温度(℃)'
+                                   },
+                                   {
+                                       field: 'Volt1',
+                                       title: '电缆取电电压(V)'
+                                   },
+                                   {
+                                       field: 'Volt2',
+                                       title: '太阳能取电电压(V)'
+                                   },
+                                   {
+                                       field: 'BatteryVolt',
+                                       title: '蓄电池电压(V)'
+                                   },
+                                    {
+                                        field: 'CreateTime',
+                                        title: '录入日期',
+                                        templet: function (row) { return dateFormat(row.CreateTime); }
+                                    }
+                                ]
+                            ], where: {
+                                ElectricId: document.getElementById("ElectricId").value,
+                                LineId: document.getElementById("LineId").value,
+                                JointId: document.getElementById("JointId").value,
+                                bigTypeId: document.getElementById("deviceBigType").value,
+                                smallTypeId: document.getElementById("deviceSmallType").value,
+                                searchText: document.getElementById("searchText").value,
+                                startTime: document.getElementById("startTime").value,
+                                endTime: document.getElementById("endTime").value
+                            }
+                        });
+                        break;
+                    case 5:
+                        table.render({
+                            elem: '#dataCenter',
+                            even: true,
+                            url: '/DataCenter/GetOutPartialData',
+                            cellMinWidth: 170,
+                            even: 'true',
+                            height: 400,
+                            page: true,
+                            cols: [
+                                [
+                                     {
+                                         field: 'DeviceName',
+                                         title: '终端名称'
+                                     },
+                                    {
+                                        field: 'TerminalId',
+                                        title: '终端ID'
+                                    },
+                                    {
+                                        field: 'ElectricName',
+                                        title: '供电或公司'
+                                    },
+                                    {
+                                        field: 'LineName',
+                                        title: '线路名称'
+                                    },
+                                    {
+                                        field: 'JointName',
+                                        title: '接头名称'
+                                    },
+                                    {
+                                        field: 'Astatus',
+                                        title: 'A相状态',
+                                        templet: function (row) { return chkStatus(row.Astatus); }
+                                    },
+                                    {
+                                        field: 'Bstatus',
+                                        title: 'B相状态',
+                                        templet: function (row) { return chkStatus(row.Bstatus); }
+                                    },
+                                    {
+                                        field: 'Cstatus',
+                                        title: 'C相状态',
+                                        templet: function (row) { return chkStatus(row.Cstatus); }
+                                    },
+                                    {
+                                        field: 'AMaxElectric',
+                                        title: 'A相最大放电量'
+                                    },
+                                    {
+                                        field: 'AMaxFrequency',
+                                        title: 'A相最大放电次数'
+                                    },
+                                    {
+                                        field: 'BMaxElectric',
+                                        title: 'B相最大放电'
+                                    },
+                                    {
+                                        field: 'BMaxFrequency',
+                                        title: 'B相最大放电次数'
+                                    },
+                                    {
+                                        field: 'CMaxElectric',
+                                        title: 'C相最大放电',
+                                    },
+                                    {
+                                        field: 'CMaxFrequency',
+                                        title: 'C相最大放电次数',
+                                    },
+                                    {
+                                        field: 'AElectric',
+                                        title: 'A相放电'
+                                    },
+                                    {
+                                        field: 'AFrequency',
+                                        title: 'A相放电次数'
+                                    },
+                                    {
+                                        field: 'BElectric',
+                                        title: 'B相放电'
+                                    },
+                                    {
+                                        field: 'BFrequency',
+                                        title: 'B相放电次数'
+                                    },
+                                    {
+                                        field: 'CElectric',
+                                        title: 'C相放电'
+                                    },
+                                    {
+                                        field: 'CFrequency',
+                                        title: 'C相放电次数'
+                                    },
+                                    {
+                                        field: 'CreateTime',
+                                        title: '数据录入时间',
+                                        templet: function (row) { return dateFormat(row.CreateTime); }
+                                    }
+                                ]
+                            ], where: {
+                                ElectricId: document.getElementById("ElectricId").value,
+                                LineId: document.getElementById("LineId").value,
+                                JointId: document.getElementById("JointId").value,
+                                bigTypeId: document.getElementById("deviceBigType").value,
+                                smallTypeId: document.getElementById("deviceSmallType").value,
+                                searchText: document.getElementById("searchText").value,
+                                startTime: document.getElementById("startTime").value,
+                                endTime: document.getElementById("endTime").value
+                            }
+                        });
+                        break;
+                    case 6:
+                        table.render({
+                            elem: '#dataCenter',
+                            even: true,
+                            url: '/DataCenter/GetFreeVoltData',
+                            cellMinWidth: 170,
+                            even: 'true',
+                            height: 400,
+                            page: true,
+                            cols: [
+                                [
+                                     {
+                                         field: 'DeviceName',
+                                         title: '终端名称'
+                                     },
+                                    {
+                                        field: 'TerminalId',
+                                        title: '终端ID'
+                                    },
+                                    {
+                                        field: 'ElectricName',
+                                        title: '供电或公司'
+                                    },
+                                    {
+                                        field: 'LineName',
+                                        title: '线路名称'
+                                    },
+                                    {
+                                        field: 'JointName',
+                                        title: '接头名称'
+                                    },
+                                    {
+                                        field: 'Time',
+                                        title: '采集时间',
+                                        templet: function (row) { return dateFormat(row.Time); }
+                                    },
+                                    {
+                                        field: 'AVolt',
+                                        title: 'A相电压',
+                                    },
+                                    {
+                                        field: 'BVolt',
+                                        title: 'B相电压',
+                                    },
+                                    {
+                                        field: 'CVolt',
+                                        title: 'C相电压',
+                                    },
+                                    {
+                                        field: 'TVolt',
+                                        title: '总电压'
+                                    },
+                                    {
+                                        field: 'BatteryVolt',
+                                        title: '电池电压'
+                                    },
+                                    {
+                                        field: 'SoftVersion',
+                                        title: '软件版本号'
+                                    },
+                                    {
+                                        field: 'CPUID',
+                                        title: 'CPUID'
+                                    },
+                                    {
+                                        field: 'PRS',
+                                        title: '信号强度'
+                                    },
+                                    {
+                                        field: 'CreateTime',
+                                        title: '数据录入时间',
+                                        templet: function (row) { return dateFormat(row.CreateTime); }
+                                    },
+                                    {
+                                        field: 'Remark1',
+                                        title: '备注一'
+                                    },
+                                    {
+                                        field: 'Remark2',
+                                        title: '备注二'
+                                    }
+                                ]
+                            ], where: {
+                                ElectricId: document.getElementById("ElectricId").value,
+                                LineId: document.getElementById("LineId").value,
+                                JointId: document.getElementById("JointId").value,
+                                bigTypeId: document.getElementById("deviceBigType").value,
+                                smallTypeId: document.getElementById("deviceSmallType").value,
+                                searchText: document.getElementById("searchText").value,
+                                startTime: document.getElementById("startTime").value,
+                                endTime: document.getElementById("endTime").value
+                            }
+                        });
+                        break;
+                    case 7:
+                        table.render({
+                            elem: '#dataCenter',
+                            even: true,
+                            url: '/DataCenter/GetThiefLineData',
+                            cellMinWidth: 170,
+                            even: 'true',
+                            height: 400,
+                            page: true,
+                            cols: [
+                                [
+                                     {
+                                         field: 'DeviceName',
+                                         title: '终端名称'
+                                     },
+                                    {
+                                        field: 'TerminalId',
+                                        title: '终端ID'
+                                    },
+                                    {
+                                        field: 'ElectricName',
+                                        title: '供电或公司'
+                                    },
+                                    {
+                                        field: 'LineName',
+                                        title: '线路名称'
+                                    },
+                                    {
+                                        field: 'JointName',
+                                        title: '接头名称'
+                                    },
+                                    {
+                                        field: 'Time',
+                                        title: '采集时间',
+                                        templet: function (row) { return dateFormat(row.Time); }
+                                    },
+                                    {
+                                        field: 'xAmplitude',
+                                        title: 'X轴振动值',
+                                    },
+                                    {
+                                        field: 'yAmplitude',
+                                        title: 'Y轴振动值',
+                                    },
+                                    {
+                                        field: 'zAmplitude',
+                                        title: 'Z轴振动值',
+                                    },
+                                    {
+                                        field: 'SoftVersion',
+                                        title: '软件版本号'
+                                    },
+                                    {
+                                        field: 'CPUID',
+                                        title: 'CPUID'
+                                    },
+                                    {
+                                        field: 'CreateTime',
+                                        title: '数据录入时间',
+                                        templet: function (row) { return dateFormat(row.CreateTime); }
+                                    },
+                                    {
+                                        field: 'Remark1',
+                                        title: '备注一'
+                                    },
+                                    {
+                                        field: 'Remark2',
+                                        title: '备注二'
+                                    },
+                                    {
+                                        field: 'Remark3',
+                                        title: '备注三'
+                                    }
+                                ]
+                            ], where: {
+                                ElectricId: document.getElementById("ElectricId").value,
+                                LineId: document.getElementById("LineId").value,
+                                JointId: document.getElementById("JointId").value,
+                                bigTypeId: document.getElementById("deviceBigType").value,
+                                smallTypeId: document.getElementById("deviceSmallType").value,
+                                searchText: document.getElementById("searchText").value,
+                                startTime: document.getElementById("startTime").value,
+                                endTime: document.getElementById("endTime").value
+                            }
+                        });
+                        break;
+                    case 8:
+                        table.render({
+                            elem: '#dataCenter',
+                            even: true,
+                            url: '/DataCenter/GetDestroyData',
+                            cellMinWidth: 170,
+                            even: 'true',
+                            height: 400,
+                            page: true,
+                            cols: [
+                                [
+                                     {
+                                         field: 'DeviceName',
+                                         title: '终端名称'
+                                     },
+                                    {
+                                        field: 'TerminalId',
+                                        title: '终端ID'
+                                    },
+                                    {
+                                        field: 'ElectricName',
+                                        title: '供电或公司'
+                                    },
+                                    {
+                                        field: 'LineName',
+                                        title: '线路名称'
+                                    },
+                                    {
+                                        field: 'JointName',
+                                        title: '接头名称'
+                                    },
+                                    {
+                                        field: 'Time',
+                                        title: '采集时间',
+                                        templet: function (row) { return dateFormat(row.Time); }
+                                    },
+                                    {
+                                        field: 'areaone',
+                                        title: '防区一',
+                                    },
+                                    {
+                                        field: 'areatwo',
+                                        title: '防区二',
+                                    },
+                                    {
+                                        field: 'CreateTime',
+                                        title: '数据录入时间',
+                                        templet: function (row) { return dateFormat(row.CreateTime); }
+                                    }
+                                ]
+                            ], where: {
+                                ElectricId: document.getElementById("ElectricId").value,
+                                LineId: document.getElementById("LineId").value,
+                                JointId: document.getElementById("JointId").value,
+                                bigTypeId: document.getElementById("deviceBigType").value,
+                                smallTypeId: document.getElementById("deviceSmallType").value,
+                                searchText: document.getElementById("searchText").value,
+                                startTime: document.getElementById("startTime").value,
+                                endTime: document.getElementById("endTime").value
+                            }
+                        });
+                        break;
+                    case 9:
+                        table.render({
+                            elem: '#dataCenter',
+                            even: true,
+                            url: '/DataCenter/GetErrorLocationData',
+                            cellMinWidth: 170,
+                            even: 'true',
+                            height: 400,
+                            page: true,
+                            cols: [
+                                [
+                                     {
+                                         field: 'DeviceName',
+                                         title: '终端名称'
+                                     },
+                                    {
+                                        field: 'TerminalId',
+                                        title: '终端ID'
+                                    },
+                                    {
+                                        field: 'ElectricName',
+                                        title: '供电或公司'
+                                    },
+                                    {
+                                        field: 'LineName',
+                                        title: '线路名称'
+                                    },
+                                    {
+                                        field: 'JointName',
+                                        title: '接头名称'
+                                    },
+                                    {
+                                        field: 'Time',
+                                        title: '采集时间',
+                                        templet: function (row) { return dateFormat(row.Time); }
+                                    },
+                                    {
+                                        field: 'distance',
+                                        title: '距离',
+                                    },
+                                    {
+                                        field: 'longitude',
+                                        title: '基点经度',
+                                    },
+                                    {
+                                        field: 'latitude',
+                                        title: '基点纬度'
+                                    },
+                                    {
+                                        field: 'CreateTime',
+                                        title: '数据录入时间',
+                                        templet: function (row) { return dateFormat(row.CreateTime); }
+                                    }
+                                ]
+                            ], where: {
+                                ElectricId: document.getElementById("ElectricId").value,
+                                LineId: document.getElementById("LineId").value,
+                                JointId: document.getElementById("JointId").value,
+                                bigTypeId: document.getElementById("deviceBigType").value,
+                                smallTypeId: document.getElementById("deviceSmallType").value,
+                                searchText: document.getElementById("searchText").value,
+                                startTime: document.getElementById("startTime").value,
+                                endTime: document.getElementById("endTime").value
+                            }
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            function dateFormat(item) {
+                if (item) {
+                    var time = new Date(parseInt(item.substr(6))).Format("yyyy-MM-dd hh:mm:ss");
+                    return time;
+                } else {
+                    return item;
+                }
+            }
+
+            Date.prototype.Format = function (fmt) {
+                var o = {
+                    "M+": this.getMonth() + 1, //月份
+                    "d+": this.getDate(), //日
+                    "h+": this.getHours(), //小时
+                    "m+": this.getMinutes(), //分
+                    "s+": this.getSeconds() //秒
+                };
+                if (/(y+)/.test(fmt)) { //根据y的长度来截取年
+                    fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+                }
+                for (var k in o) {
+                    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+                }
+                return fmt;
+            }
+
+            function chkStatus(value) {
+                var statusName = value == 0 ? "正常" : "异常";
+                return statusName;
+            }
+        });
+
+		$(document).ready(function () {
+		    getElectric();
+		    getLine(null);
+		    getJoint(null);
+		    bindBigType();
+		    binSmallType(null);
+		});
+
+		/*获取供电*/
+		function getElectric() {
+		    var url = "/DeviceInfo/GetElectric";
+		    $.ajax({
+		        url: url,
+		        async: true,
+		        type: 'post',
+		        dataType: 'json',
+		        success: function (data, jqxhr, txtStatus) {
+		            var html = "<option value=''>请选择所在供电</option>";
+		            $.each(data, function (idx, obj) {
+		                html += "<option value=" + obj.Id + ">" + obj.name + "</option>";
+		            });
+		            $("#ElectricId").html(html);
+		            layui.use(['form'], function () {
+		                var form = layui.form;
+		                form.render('select');
+		            });
+		        }, error: function (xhr, txtStatus) {
+		            console.log(txtStatus);
+		        }
+		    })
+		}
+
+		/*获取线路*/
+		function getLine(Id) {
+		    var url = "/DeviceInfo/GetLine";
+		    if (Id == "" || Id == null || Id == "undefined") {
+		        Id = -1;
+		    }
+		    $.ajax({
+		        url: url,
+		        async: true,
+		        type: 'post',
+		        data: { electricId: Id },
+		        dataType: 'json',
+		        success: function (data, jqxhr, txtStatus) {
+		            var html = "<option value=''>请选择所在线路</option>";
+		            $.each(data, function (idx, obj) {
+		                html += "<option value=" + obj.Id + ">" + obj.name + "</option>";
+		            });
+		            $("#LineId").html(html);
+		            layui.use(['form'], function () {
+		                var form = layui.form;
+		                form.render('select');
+		            });
+		        }, error: function (xhr, txtStatus) {
+		            console.log(txtStatus);
+		        }
+		    })
+		}
+
+        /*获取接头*/
+		function getJoint(Id) {
+		    var url = "/DeviceInfo/GetJoint";
+		    if (Id == "" || Id == null || Id == "undefined") {
+		        Id = -1;
+		    }
+		    $.ajax({
+		        url: url,
+		        async: true,
+		        type: 'post',
+		        data: { LineId: Id },
+		        dataType: 'json',
+		        success: function (data, jqxhr, txtStatus) {
+		            var html = "<option value=''>请选择所在接头</option>";
+		            $.each(data, function (idx, obj) {
+		                html += "<option value=" + obj.Id + ">" + obj.name + "</option>";
+		            });
+		            $("#JointId").html(html);
+		            layui.use(['form'], function () {
+		                var form = layui.form;
+		                form.render('select');
+		            });
+		        }, error: function (xhr, txtStatus) {
+		            console.log(txtStatus);
+		        }
+		    })
+		}
+
+		/*获取设备大类*/
+		function bindBigType() {
+		    var url = "/DeviceManager/GetDeviceBigType";
+		    $.ajax({
+		        url: url,
+		        async: true,
+		        type: 'post',
+		        dataType: 'json',
+		        success: function (data, jqxhr, textStatus) {
+		            var html = "<option value=''>请选择设备大类</option>";
+		            $.each(data, function (idx, obj) {
+		                html += "<option value=" + obj.Id + ">" + obj.typeName + "</option>";
+		            });
+		            $("#deviceBigType").html(html);
+		            layui.use(['form'], function () {
+		                var form = layui.form;
+		                form.render('select');
+		            });
+		        }, error: function (xhr, txtStatus) {
+		            console.log(txtStatus);
+		        }
+		    });
+		}
+
+		/*获取设备小类*/
+		function binSmallType(Id) {
+		    if (Id == "" || Id == null || Id == "undefined") {
+		        Id = 0;
+		    }
+		    var url = "/DeviceManager/GetDeviceSmallType";
+		    $.ajax({
+		        url: url,
+		        type: 'post',
+		        data: { bigTypeId: Id },
+		        async: true,
+		        dataType: 'json',
+		        success: function (data, jqxhr, txtStatus) {
+		            var html = "<option value=''>请选择设备小类</option>";
+		            $.each(data, function (idx, obj) {
+		                html += "<option value=" + obj.Id + ">" + obj.typeName + "</option>";
+		            });
+		            $("#deviceSmallType").html(html);
+		            layui.use(['form'], function () {
+		                var form = layui.form;
+		                form.render('select');
+		            });
+		        }, error: function (xhr, txtStatus) {
+		            console.log(txtStatus);
+		        }
+		    });
+		}
+    </script>
+</body>
+</html>

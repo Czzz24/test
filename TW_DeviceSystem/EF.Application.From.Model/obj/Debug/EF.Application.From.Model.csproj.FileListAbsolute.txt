@@ -1,0 +1,13 @@
+E:\works\TW_DeviceSystem\EF.Application.From.Model\bin\Debug\EF.Application.From.Model.dll
+E:\works\TW_DeviceSystem\EF.Application.From.Model\bin\Debug\EF.Application.From.Model.pdb
+E:\works\TW_DeviceSystem\EF.Application.From.Model\bin\Debug\EntityFramework.dll
+E:\works\TW_DeviceSystem\EF.Application.From.Model\bin\Debug\EntityFramework.SqlServer.dll
+E:\works\TW_DeviceSystem\EF.Application.From.Model\bin\Debug\EntityFramework.xml
+E:\works\TW_DeviceSystem\EF.Application.From.Model\bin\Debug\EntityFramework.SqlServer.xml
+E:\works\TW_DeviceSystem\EF.Application.From.Model\bin\Debug\zh-Hans\EntityFramework.resources.dll
+E:\works\TW_DeviceSystem\EF.Application.From.Model\bin\Debug\zh-Hans\EntityFramework.SqlServer.resources.dll
+E:\works\TW_DeviceSystem\EF.Application.From.Model\obj\Debug\EF.Application.From.Model.csprojAssemblyReference.cache
+E:\works\TW_DeviceSystem\EF.Application.From.Model\obj\Debug\EF.Application.From.Model.csproj.CoreCompileInputs.cache
+E:\works\TW_DeviceSystem\EF.Application.From.Model\obj\Debug\EF.Application.From.Model.csproj.CopyComplete
+E:\works\TW_DeviceSystem\EF.Application.From.Model\obj\Debug\EF.Application.From.Model.dll
+E:\works\TW_DeviceSystem\EF.Application.From.Model\obj\Debug\EF.Application.From.Model.pdb

@@ -1,0 +1,16 @@
+E:\works\TW_DeviceSystem\EF.Camera.Side\bin\Debug\EF.Camera.Side.dll
+E:\works\TW_DeviceSystem\EF.Camera.Side\bin\Debug\EF.Camera.Side.pdb
+E:\works\TW_DeviceSystem\EF.Camera.Side\bin\Debug\EF.Application.Camera.Model.dll
+E:\works\TW_DeviceSystem\EF.Camera.Side\bin\Debug\EF.Component.Data.dll
+E:\works\TW_DeviceSystem\EF.Camera.Side\bin\Debug\EntityFramework.dll
+E:\works\TW_DeviceSystem\EF.Camera.Side\bin\Debug\LinqKit.dll
+E:\works\TW_DeviceSystem\EF.Camera.Side\bin\Debug\EF.Application.Camera.Model.pdb
+E:\works\TW_DeviceSystem\EF.Camera.Side\bin\Debug\EF.Component.Data.pdb
+E:\works\TW_DeviceSystem\EF.Camera.Side\bin\Debug\EF.Component.Data.dll.config
+E:\works\TW_DeviceSystem\EF.Camera.Side\bin\Debug\EntityFramework.xml
+E:\works\TW_DeviceSystem\EF.Camera.Side\bin\Debug\LinqKit.xml
+E:\works\TW_DeviceSystem\EF.Camera.Side\obj\Debug\EF.Camera.Side.csprojAssemblyReference.cache
+E:\works\TW_DeviceSystem\EF.Camera.Side\obj\Debug\EF.Camera.Side.csproj.CoreCompileInputs.cache
+E:\works\TW_DeviceSystem\EF.Camera.Side\obj\Debug\EF.Camera.Side.csproj.CopyComplete
+E:\works\TW_DeviceSystem\EF.Camera.Side\obj\Debug\EF.Camera.Side.dll
+E:\works\TW_DeviceSystem\EF.Camera.Side\obj\Debug\EF.Camera.Side.pdb

@@ -1,0 +1,688 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.js"></script>
+</head>
+<body>
+    <input type="hidden" id="TerminalId" value="@ViewBag.TerminalId" />
+    <input type="hidden" id="ElectricId" value="@ViewBag.ElectricId" />
+    <input type="hidden" id="LineId" value="@ViewBag.LineId" />
+
+    <blockquote class="layui-elem-quote layui-text" id="earthboxTitle">
+    </blockquote>
+    <div class="jd_detailsColumns">
+        <div class="product_Container">
+            <img src="~/Images/earthbox/jdx.jpg" />
+        </div>
+        <div class="product_Container">
+            <table>
+                <tr>
+                    <td><img src="~/Images/earthbox/temp.png" /></td>
+                    <td><span>箱内</span></td>
+                </tr>
+                <tr>
+                    <td>箱内温度(℃)</td>
+                    <td id="BoxTemp">--.--</td>
+                </tr>
+                <tr>
+                    <td>箱内湿度(%)</td>
+                    <td id="BoxHumidity">--.--</td>
+                </tr>
+            </table>
+        </div>
+        <div class="product_Container">
+            <table>
+                <tr>
+                    <td><img src="~/Images/earthbox/circular.png" /></td>
+                    <td><span>护套环流</span></td>
+                </tr>
+                <tr>
+                    <td>A相电流(A)</td>
+                    <td id="AElectric">--.--</td>
+                </tr>
+                <tr>
+                    <td>B相电流(A)</td>
+                    <td id="BElectric">--.--</td>
+                </tr>
+                <tr>
+                    <td>C相电流(A)</td>
+                    <td id="CElectric">--.--</td>
+                </tr>
+            </table>
+        </div>
+        <div class="product_Container">
+            <table>
+                <tr>
+                    <td><img src="~/Images/earthbox/electric.png" /></td>
+                    <td><span>铠装电压</span></td>
+                </tr>
+                <tr>
+                    <td>A相感应电压(V)</td>
+                    <td id="AVolt">--.--</td>
+                </tr>
+                <tr>
+                    <td>B相感应电压(V)</td>
+                    <td id="BVolt">--.--</td>
+                </tr>
+                <tr>
+                    <td>C相感应电压(V)</td>
+                    <td id="CVolt">--.--</td>
+                </tr>
+            </table>
+        </div>
+        <div class="product_Container">
+            <table>
+                <tr>
+                    <td><img src="~/Images/earthbox/redelectric.png" /></td>
+                    <td><span>供电电源</span></td>
+                </tr>
+                <tr>
+                    <td>蓄电池电压(V)</td>
+                    <td id="BatteryVolt">--.--</td>
+                </tr>
+                <tr>
+                    <td>电缆取电电压(V)</td>
+                    <td id="Volt1">--.--</td>
+                </tr>
+                <tr>
+                    <td>太阳能取电电压(V)</td>
+                    <td id="Volt2">--.--</td>
+
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="tabbar_Container">
+        <div class="layui-tab layui-tab-brief" lay-filter="demo">
+            <ul class="layui-tab-title">
+                <li class="layui-this">历史数据</li>
+                <li>报警数据<span class="layui-badge" id="alarmCount"></span></li>
+                <li>数据图表</li>
+            </ul>
+            <div class="layui-tab-content">
+                <!--1-->
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="historystartTime" name="phone" placeholder="请选择开始时间" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="hitoryendTime" name="phone" placeholder="请选择结束时间" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn layui-btn-normal" data-type="reloadhistory" id="btnHitorySearch">查询</button>
+                    </div>
+                    <table class="layui-hide" id="historydata"></table>
+                </div>
+                <!--2-->
+                <div class="layui-tab-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="alarmStartTime" placeholder="请选择开始时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="alarmEndTime" name="phone" placeholder="请选择结束时间" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn layui-btn-normal"  data-type="reloadAlarm" id="btnAlarmSearch">查询</button>
+                        <button class="layui-btn layui-btn-danger" lay-event="getCheckLength" id="confirmAlarm">确认告警</button>
+                    </div>
+                    <table class="layui-hide" id="alarmdata" lay-filter="alarm"></table>
+                </div>
+                <!--3-->
+                <div class="layui-tab-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="chartStartTime" placeholder="请选择开始时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="chartEndTime" name="phone" placeholder="请选择结束时间" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn layui-btn-normal" id="chartBtnSearch">查询</button>
+                    </div>
+                    <div class="chart_Container" id="dataChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/html" id="StatusName">
+        {{#  if(d.Status === 1){ }}
+        <span style="color: red;">{{ d.StatusName }}</span>
+        {{# } }}
+        {{#  if(d.Status === 2){ }}
+        <span style="color: #FFB700;">{{ d.StatusName }}</span>
+        {{# } }}
+        {{#  if(d.Status === 3){ }}
+        <span style="color: #417505;">{{ d.StatusName }}</span>
+        {{# } }}
+    </script>
+
+    <script type="text/html" id="FlagStatus">
+        {{#  if(d.Flag === -1){ }}
+        <span style="color: red;">告警中</span>
+        {{#  } else { }}
+        <span style="color: #417505;">已恢复</span>
+        {{#  } }}
+    </script>
+
+    <script type="text/html" id="handle">
+        @*箱柜门打开可查看照片/其他变处理*@
+        <a class="layui-btn layui-btn-xs layui-btn-normal"  lay-event="showPicture">查看处理照片</a>
+        {{#  if(d.AlarmCode === 257 && d.Status===1){ }}
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看照片</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">处理</a>
+        {{#  } else if(d.Status===2 && d.AlarmCode===257) { }}
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看照片</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit">处理</a>
+        {{#  } else if(d.Status===3 && d.AlarmCode===257) { }}
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看照片</a>
+        {{#  } else if(d.Status===3) { }}
+
+        {{#  } else { }}
+        <a class="layui-btn layui-btn-xs" lay-event="edit">处理</a>
+        {{#  } }}
+    </script>
+
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script src="~/Scripts/Views/EarthBox/dataChart.js"></script>
+    <script type="text/javascript">
+        layui.use(['element', 'laydate', 'table', 'layer'], function () {
+            var historyTable = layui.table;
+            historyTable.render({
+                elem: '#historydata',
+                url: '/EarthBox/GetPageList',
+                cellMinWidth: 200,
+                even: 'true',
+                height: 400,
+                id: 'reloadhistory',
+                page: true,
+                cols: [
+                    [
+                        {
+                            field: 'Time',
+                            title: '时间',
+                            templet: function (row) { return dateFormat(row.Time); }
+                        },
+                        {
+                            field: 'BoxTemp',
+                            title: '箱内温度(℃)',
+                        },
+                        {
+                            field: 'BoxHumidity',
+                            title: '箱内湿度(%)'
+                        },
+                        {
+                            field: 'AElectric',
+                            title: 'A相电流(A)'
+                        },
+                        {
+                            field: 'BElectric',
+                            title: 'B相电流(A)'
+                        },
+                        {
+                            field: 'CElectric',
+                            title: 'C相电流(A)'
+                        },
+                        {
+                            field: 'AVolt',
+                            title: 'A相感应电压(V)'
+                        },
+                        {
+                            field: 'BVolt',
+                            title: 'B相感应电压(V)'
+                        },
+                        {
+                            field: 'CVolt',
+                            title: 'C相感应电压(V)'
+                        },
+                        {
+                            field: 'Volt1',
+                            title: '电缆取电电压(V)'
+                        },
+                        {
+                            field: 'Volt2',
+                            title: '太阳能取电电压(V)'
+                        },
+                        {
+                            field: 'BatteryVolt',
+                            title: '蓄电池电压(V)'
+                        },
+                        {
+                            field: 'PBUS',
+                            title: 'PBUS'
+                        },
+                         {
+                             field: 'CreateTime',
+                             title: '录入日期',
+                             templet: function (row) { return dateFormat(row.CreateTime); }
+                         }
+                    ]
+                ], where: {
+                    TerminalId: document.getElementById("TerminalId").value,
+                    ElectricId: document.getElementById("ElectricId").value,
+                    LineId: document.getElementById("LineId").value
+                }
+            });
+
+            var alarmTable = layui.table;
+            alarmTable.render({
+                elem: '#alarmdata',
+                url: '/Alarm/GetAlarmPageList',
+                cellMinWidth: 80,
+                even: 'true',
+                height: 400,
+                id: 'reloadAlarm',
+                page: true,
+                cols: [
+                        [
+                            {
+                                field: 'test1',
+                                title: '全选',
+                                type: 'checkbox'
+                            },
+                            {
+                                field: 'DeviceName',
+                                title: '终端名称',
+                                width: 170,
+                            },
+                            {
+                                field: 'TerminalId',
+                                title: '终端ID',
+                                width: 130,
+                            },
+                            {
+                                field: 'ElectricName',
+                                title: '供电或公司',
+                                width: 170,
+                            },
+                            {
+                                field: 'LineName',
+                                title: '线路名称',
+                                width: 170,
+                            },
+                            {
+                                field: 'JointName',
+                                title: '接头名称',
+                                width: 170,
+                            },
+                            {
+                                field: 'Flag',
+                                title: '报警状态',
+                                templet: '#FlagStatus',
+                                width: 130,
+                            },
+                             {
+                                 field: 'StatusName',
+                                 title: '处理状态',
+                                 templet: '#StatusName',
+                                 width: 130,
+                             },
+                            {
+                                field: 'Value',
+                                title: '告警值'
+                            },
+                            {
+                                field: 'StartTime',
+                                title: '告警时间',
+                                templet: function (row) { return dateFormat(row.StartTime); },
+                                width: 170,
+                            },
+                            {
+                                field: 'EndTime',
+                                title: '结束时间',
+                                templet: function (row) { return dateFormat(row.EndTime); },
+                                width: 170,
+                            },
+                            {
+                                field: 'Content',
+                                title: '告警详情',
+                                width: 170,
+                            },
+                            {
+                                field: 'handEndTime',
+                                title: '处理时间',
+                                templet: function (row) { return dateFormat(row.handEndTime); },
+                                width: 170,
+                            },
+                            {
+                                field: 'handUser',
+                                title: '处理人',
+                                width: 130,
+                            },
+                            {
+                                field: 'Cause',
+                                title: '处理原因',
+                                width: 130,
+                            },
+                            {
+                                field: 'handContent',
+                                title: '处理内容',
+                                width: 130,
+                            },
+                            {
+                                fixed: 'right',
+                                field: 'handle',
+                                title: '操作',
+                                templet: '#handle',
+                                width: 240,
+                            }
+                        ]
+                ], where: {
+                    TerminalId: document.getElementById("TerminalId").value,
+                    ElectricId: document.getElementById("ElectricId").value,
+                    LineId: document.getElementById("LineId").value
+                }
+            });
+
+            //监听工具条
+            alarmTable.on('tool(alarm)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'edit') {
+                    var Id = data.Id;
+                    var ElectricId = data.ElectricId;
+                    var LineId = data.LineId;
+                    var TerminalId = data.TerminalId;
+                    var url = "/Alarm/HandleAlarm?Id=" + Id + "&ElectricId=" + ElectricId + "&LineId=" + LineId + "&TerminalId=" + TerminalId;
+                    window.top.frameUrl(url);
+                }
+                if (obj.event === 'detail') {
+                    var Id = data.Id;
+                    var ElectricId = data.ElectricId;
+                    var LineId = data.LineId;
+                    $.getJSON('/EarthBox/GetEarthBoxAlamPicture?alarmId=' + Id + "&ElectricId=" + ElectricId + "&LineId=" + LineId, function (json) {
+                        layer.photos({
+                            photos: json,
+                            shift: 5
+                        });
+                    });
+                }
+                if (obj.event === 'showPicture') {
+                    var Id = data.Id;
+                    var ElectricId = data.ElectricId;
+                    var LineId = data.LineId;
+                    $.getJSON('/Alarm/GetPicture?AlarmId=' + Id + "&ElectricId=" + ElectricId + "&LineId=" + LineId, function (json) {
+                        layer.photos({
+                            photos: json,
+                            shift: 5
+                        });
+                    });
+                }
+            });
+
+            var $ = layui.$, active = {
+                reloadhistory: function () {
+                    var TerminalId = $("#TerminalId").val();
+                    var ElectricId = $("#ElectricId").val();
+                    var LineId = $("#LineId").val();
+                    var historystartTime = $("#historystartTime").val();
+                    var hitoryendTime = $("#hitoryendTime").val();
+                    historyTable.reload('reloadhistory', {
+                        page: { curr: 1 },
+                        where: {
+                            TerminalId: TerminalId,
+                            ElectricId: ElectricId,
+                            LineId: LineId,
+                            startTime: historystartTime,
+                            endTime: hitoryendTime,
+                        }
+                    });
+                },
+                reloadAlarm: function () {
+                    var TerminalId = $("#TerminalId").val();
+                    var ElectricId = $("#ElectricId").val();
+                    var LineId = $("#LineId").val();
+                    var alarmStartTime = $("#alarmStartTime").val();
+                    var alarmEndTime = $("#alarmEndTime").val();
+                    alarmTable.reload('reloadAlarm', {
+                        page: { curr: 1 },
+                        where: {
+                            TerminalId: TerminalId,
+                            ElectricId: ElectricId,
+                            LineId: LineId,
+                            startTime: alarmStartTime,
+                            endTime: alarmEndTime
+                        }
+                    });
+                }
+            };
+
+            $('#btnHitorySearch').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            $('#btnAlarmSearch').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            $('#confirmAlarm').on('click', function () {
+                var checkStatus = alarmTable.checkStatus("reloadAlarm");
+                var data = checkStatus.data;
+                var arrayAlarmId = new Array();
+                $.each(data, function (idx, obj) {
+                    arrayAlarmId.push(obj.Id);
+                });
+                if (arrayAlarmId.length > 0) {
+                    layer.confirm('是否确认报警', { title: "提示" }, function () {
+                        var TerminalId = $("#TerminalId").val();
+                        var ElectricId = $("#ElectricId").val();
+                        var LineId = $("#LineId").val();
+                        var url = '/Alarm/confirmAlarm';
+                        $.ajax({
+                            url: url,
+                            type: 'post',
+                            data: { listId: arrayAlarmId, TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId },
+                            async: true,
+                            dataType: 'json',
+                            success: function (data, jqxhr, txtStatus) {
+                                if (data.code == 0) {
+                                    layer.msg(data.msg);
+                                    var type = "reloadAlarm";
+                                    active[type] ? active[type].call(this) : '';
+                                }
+                            }, error: function (xhr, txtStatus) {
+                                console.log(txtStatus);
+                            }
+                        })
+                    });
+                } else {
+                    layer.alert('请选择需要处理的告警!', { title: "提示" });
+                }
+            });
+
+            var element = layui.element;
+            element.on('tab(demo)', function (data) {
+                var index = data.index;
+                switch (index) {
+                    case 0:
+                        var type = "reloadhistory";
+                        active[type] ? active[type].call(this) : '';
+                        break;
+                    case 1:
+                        var type = "reloadAlarm";
+                        active[type] ? active[type].call(this) : '';
+                        break;
+                    case 2:
+                        initDataChart();
+                        break;
+                    case 3:
+                        break;
+                    default:
+                        break;
+                }
+            });
+            var laydate = layui.laydate;
+            //1
+            laydate.render({
+                elem: '#historystartTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#hitoryendTime',
+                type: 'datetime'
+            });
+            //2
+            laydate.render({
+                elem: '#alarmStartTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#alarmEndTime',
+                type: 'datetime'
+            });
+            //3
+            laydate.render({
+                elem: '#chartStartTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#chartEndTime',
+                type: 'datetime'
+            });
+
+            var layer = layui.layer;
+            $("body").on("click", ".monitor_Container img", function (e) {
+                layer.photos({
+                    photos: { "data": [{ "src": e.target.src }] },
+                    closeBtn: 1
+                });
+            });
+        });
+
+        function dateFormat(item) {
+            if (item == null || item == "" || item == "undefined") {
+                return "";
+            } else {
+                var time = new Date(parseInt(item.substr(6))).Format("yyyy-MM-dd hh:mm:ss");
+                return time;
+            }
+        }
+
+
+        Date.prototype.Format = function (fmt) {
+            var o = {
+                "M+": this.getMonth() + 1, //月份 
+                "d+": this.getDate(), //日 
+                "h+": this.getHours(), //小时 
+                "m+": this.getMinutes(), //分 
+                "s+": this.getSeconds() //秒 
+            };
+            if (/(y+)/.test(fmt)) { //根据y的长度来截取年
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            }
+            for (var k in o) {
+                if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            }
+            return fmt;
+        }
+
+        function initDataChart() {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var startTime = $("#chartStartTime").val();
+            var endTime = $("#chartEndTime").val();
+            var url = "/EarthBox/GetChartData";
+            $.ajax({
+                url:url,
+                type: 'post',
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId, startTime: startTime, endTime: endTime },
+                async: false,
+                dataType:'json',
+                success: function (data, jqxhr, txtStatus) {
+                    dataEchart(data);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            });
+        }
+
+        $("#chartBtnSearch").on('click', function () {
+            initDataChart();
+        });
+
+        $(document).ready(function () {
+            GetSingData();
+            GetAlarmCount();
+        });
+
+        setInterval(GetSingData, 10000);
+        
+        function GetSingData() {
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var url = "/EarthBox/GetEarthBoxData";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId },
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    $("#BoxTemp").html(data.BoxTemp);
+                    $("#BoxHumidity").html(data.BoxHumidity);
+                    $("#AElectric").html(data.AElectric);
+                    $("#BElectric").html(data.BElectric);
+                    $("#CElectric").html(data.CElectric);
+                    $("#AVolt").html(data.AVolt);
+                    $("#BVolt").html(data.BVolt);
+                    $("#CVolt").html(data.CVolt);
+                    $("#BatteryVolt").html(data.BatteryVolt);
+                    $("#Volt1").html(data.Volt1);
+                    $("#Volt2").html(data.Volt2);
+                    $("#earthboxTitle").html("数据接入时间:" + "<span style='color:red'>" + dateFormat(data.CreateTime) + "</span>");
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        function GetAlarmCount() {
+            var url = "/Alarm/GetAlarmCount";
+            var TerminalId = $("#TerminalId").val();
+            var ElectricId = $("#ElectricId").val();
+            var LineId = $("#LineId").val();
+            var data= { TerminalId: TerminalId, ElectricId: ElectricId, LineId: LineId };
+            $.ajax({
+                url: url,
+                type: 'post',
+                async: true,
+                dataType: 'json',
+                data:data,
+                success: function (data, jqxhr, txtStatus) {
+                    $("#alarmCount").text(data.count);
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+    </script>
+</body>
+</html>

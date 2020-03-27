@@ -1,0 +1,78 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        告警管理
+    </blockquote>
+    <div class="gaojing_Title">报警设置</div>
+
+    <div class="content_Area">
+        <table class="layui-hide" id="gjgl1"></table>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/html" id="switchTpl">
+        <input type="checkbox" lay-skin="switch" lay-text="开|关" lay-filter="switchDemo" checked />
+    </script>
+    <script type="text/javascript">
+			layui.use('table', function() {
+				var table2 = layui.table,
+				form = layui.form;
+				table2.render({
+					elem: '#gjgl1',
+					url: '/Scripts/data/gaojingguanli.json',
+					cellMinWidth: 80,
+					even: 'true',
+					height: 472,
+					page: {
+						layout: ['count', 'prev', 'page', 'next', 'skip'],
+						groups: 5,
+						first: false,
+						last: false,
+						theme: '#127FD1'
+					},
+					cols: [
+						[{
+								field: 'test1',
+								title: 'ID',
+								width: 85
+							},
+							{
+								field: 'test2',
+								title: '告警编号'
+							},
+							{
+								field: 'test3',
+								title: '告警内容'
+							},
+							{
+								field: 'test4',
+								title: '屏蔽',
+								templet: '#switchTpl',
+								width: 85,
+								unresize: true
+							}
+						]
+					]
+				});
+				//监听开关操作
+				form.on('switch(switchDemo)', function(obj) {
+					//添加操作...
+
+				});
+			});
+    </script>
+</body>
+</html>

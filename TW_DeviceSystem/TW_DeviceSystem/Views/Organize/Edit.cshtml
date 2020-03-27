@@ -1,0 +1,97 @@
+﻿
+@{
+    Layout = null;
+}
+@model EF.Application.Model.t_organize
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <link href="~/Scripts/tableList/css/list-style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+    <script src="~/Scripts/jquery.min.js"></script>
+    <script src="~/Scripts/tableList/jquery-ui.min.js"></script>
+    <script src="~/Scripts/tableList/list-script.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        组织架构编辑
+    </blockquote>
+    @using (Html.BeginForm("EditCommit", "Organize", FormMethod.Post, new { @class = "layui-form" }))
+    {
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.CreateTime)
+        @Html.HiddenFor(model=>model.isDel)
+        @Html.HiddenFor(model => model.DelTime)
+        @Html.HiddenFor(model => model.DelUser)
+        <div class="content_Area">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">节点名称:</label>
+                    <div class="layui-input-inline">
+                        @Html.EditorFor(model => model.name, new { htmlAttributes = new { @class = "layui-input", @readonly = "readonly" } })
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">节点路径:</label>
+                <div class="layui-input-inline">
+                    @Html.EditorFor(model => model.nodePath, new { htmlAttributes = new { @class = "layui-input", @readonly = "readonly" } })
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">父节Id:</label>
+                <div class="layui-input-inline">
+                    @Html.EditorFor(model => model.parentId, new { htmlAttributes = new { @class = "layui-input", @readonly = "readonly" } })
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">供电或公司:</label>
+                <div class="layui-input-inline">
+                    @Html.TextBoxFor(model => model.isElectric,new { @class = "layui-input", @readonly = "readonly" })
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否是线路:</label>
+                <div class="layui-input-inline">
+                    @Html.TextBoxFor(model => model.isLine, new { @class = "layui-input", @readonly = "readonly" })
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否是接头:</label>
+                <div class="layui-input-inline">
+                    @Html.TextBoxFor(model => model.isJoint, new { @class = "layui-input", @readonly = "readonly" })
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序号:</label>
+                <div class="layui-input-inline">
+                    @Html.TextBoxFor(model => model.orderNo, new { @class = "layui-input" })
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">录入日期:</label>
+                <div class="layui-input-inline">
+                    @Html.EditorFor(model => model.CreateTime, new { htmlAttributes = new { @class = "layui-input", @readonly = "readonly" } })
+                </div>
+            </div>
+        </div>
+    }
+    <div class="layui-form-item jsgl_Submit">
+        <button class="layui-btn layui-btn-normal" onclick="OrganizeSubmit()">提交</button>
+        <button class="layui-btn layui-btn-primary" onclick="window.history.back()">返回</button>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        function OrganizeSubmit() {
+            $("form").submit();
+        }
+    </script>
+</body>
+</html>

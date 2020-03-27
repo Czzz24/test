@@ -1,0 +1,151 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>维护历史</title>
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/echarts/echarts-liquidfill.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        历史维护
+    </blockquote>
+
+    <input type="hidden" id="ElectricId" value="@ViewBag.ElectricId" />
+    <input type="hidden" id="LineId" value="@ViewBag.LineId" />
+    <input type="hidden" id="TerminalId" value="@ViewBag.TerminalId" />
+    <input type="hidden" id="JointId" value="@ViewBag.JointId" />
+    <table class="layui-hide" id="maintainInfo" lay-filter="demo"></table>
+    <button class="layui-btn layui-btn-primary" style="margin-left:20px" onclick="window.history.back()">返回</button>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="lookPicture">查看照片</a>
+    </script>
+    <script type="text/javascript">
+        layui.use(['table', 'form'], function () {
+            var form = layui.form;
+            var table = layui.table;
+            table.render({
+                elem: '#maintainInfo',
+                url: '/Maintain/getPageList',
+                cellMinWidth: 80,
+                even: 'true',
+                height: 450,
+                id: 'reload',
+                page: true,
+                done: function (res, curr, count) {
+                    $("[data-field='Id']").css('display', 'none');
+                },
+                cols: [
+                    [
+                        {
+                            field: 'Id',
+                            title: 'ID'
+                        },
+                        {
+                            field: 'TerminalId',
+                            title: '终端ID'
+                        },
+                        {
+                            field: 'deviceName',
+                            title: '设备名称'
+                        },
+                        {
+                            field: 'ElectricName',
+                            title: '供电或公司',
+                            width: 100,
+                        },
+                        {
+                            field: 'LineName',
+                            title: '线路名称',
+                            minWidth: 150,
+                        },
+                        {
+                            field: 'JointName',
+                            title: '接头名称',
+                            minWidth: 150,
+                        },
+                        {
+                            field: 'bigTypeName',
+                            title: '设备大类',
+                            minWidth: 120,
+                        },
+                        {
+                            field: 'smallTypeName',
+                            title: '设备小类',
+                            minWidth: 200,
+                        },
+                        {
+                            field: 'userName',
+                            title: '维护人员',
+                        },
+                        {
+                            field: 'failureCause',
+                            title: '故障原因',
+                        },
+                        {
+                            field: 'createTime',
+                            title: '维护日期',
+                            minWidth: 170,
+                            templet: function (row) { return dateFormat(row.CreateTime); }
+                        },
+                        { fixed: 'right', title: '操作', width: 178, align: 'center', toolbar: '#barDemo' }
+                    ]
+                ],
+                where: {
+                    ElectricId: document.getElementById("ElectricId").value,
+                    LineId: document.getElementById("LineId").value,
+                    TerminalId: document.getElementById("TerminalId").value,
+                    JointId: document.getElementById("JointId").value,
+                }
+            });
+
+            //监听工具条
+            table.on('tool(demo)', function (obj) {
+                var data = obj.data;
+                var Id = data.Id;
+                if (obj.event === 'lookPicture') {
+                    $.getJSON('/Maintain/GetPicture?maintainId=' + Id, function (json) {
+                        layer.photos({
+                            photos: json,
+                            shift: 5
+                        });
+                    });
+                }
+            });
+        });
+
+        function dateFormat(item) {
+            var time = new Date(parseInt(item.substr(6))).Format("yyyy-MM-dd hh:mm:ss");
+            return time;
+        }
+
+        Date.prototype.Format = function (fmt) {
+            var o = {
+                "M+": this.getMonth() + 1, //月份 
+                "d+": this.getDate(), //日 
+                "h+": this.getHours(), //小时 
+                "m+": this.getMinutes(), //分 
+                "s+": this.getSeconds() //秒 
+            };
+            if (/(y+)/.test(fmt)) { //根据y的长度来截取年
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            }
+            for (var k in o) {
+                if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            }
+            return fmt;
+        }
+    </script>
+</body>
+</html>

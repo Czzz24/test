@@ -1,0 +1,49 @@
+{
+	"code": 0,
+	"msg": "",
+	"count": 20,
+	"data": [
+		{
+			"username":"李四",
+			"userdetail":"生产部",
+			"role":"管理员"
+		},{
+			"username":"张三",
+			"userdetail":"服务器管理",
+			"role":"超级管理员"
+		} ,{
+			"username":"李四",
+			"userdetail":"生产部",
+			"role":"管理员"
+		},{
+			"username":"张三",
+			"userdetail":"服务器管理",
+			"role":"超级管理员"
+		} ,{
+			"username":"李四",
+			"userdetail":"生产部",
+			"role":"管理员"
+		}
+		,{
+			"username":"李四",
+			"userdetail":"生产部",
+			"role":"管理员"
+		},{
+			"username":"张三",
+			"userdetail":"服务器管理",
+			"role":"超级管理员"
+		} ,{
+			"username":"李四",
+			"userdetail":"生产部",
+			"role":"管理员"
+		},{
+			"username":"张三",
+			"userdetail":"服务器管理",
+			"role":"超级管理员"
+		} ,{
+			"username":"李四",
+			"userdetail":"生产部",
+			"role":"管理员"
+		}
+	]
+}

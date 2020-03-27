@@ -1,0 +1,515 @@
+﻿
+@{
+    Layout = null;
+    ViewBag.Title = "图维电缆系统";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Chart</title>
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <style type="text/css">
+        .container {
+            width: 100%;
+            height: auto;
+            overflow: hidden;
+        }
+
+        .columns_big {
+            width: calc(50% - 0px);
+            float: left;
+        }
+
+        .columns_small {
+            width: calc(50% - 0px);
+            float: left;
+        }
+
+        .columns_big.deviceCount {
+            height: 350px;
+        }
+
+        .columns_small.deviceOnline {
+            height: 350px;
+        }
+
+        .columnsContainer {
+            width: 100%;
+            height: 100%;
+            float: left;
+        }
+
+        .headTitle {
+            width: 100%;
+            height: 40px;
+            background: #EEEEEE;
+            border-left: 5px solid #234D65;
+            float: left;
+        }
+
+            .headTitle img {
+                margin: 10px 0px 0px 5px;
+                float: left;
+            }
+
+            .headTitle span {
+                line-height: 40px;
+                margin-left: 5px;
+                color: #234D65;
+                font-weight: bold;
+            }
+
+        .childContainer {
+            width: 100%;
+            height: calc(100% - 40px);
+            float: left;
+        }
+
+        a {
+            color: #444;
+            text-decoration: none;
+        }
+
+            a:hover {
+                color: red;
+            }
+
+        /* tagscloud */
+        #tagscloud {
+            width: 100%;
+            height: 260px;
+            position: relative;
+            font-size: 12px;
+            color: #333;
+            margin: 20px auto 0;
+            text-align: center;
+        }
+
+            #tagscloud a {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                color: #333;
+                font-family: Arial;
+                text-decoration: none;
+                margin: 0 10px 15px 0;
+                line-height: 18px;
+                text-align: center;
+                font-size: 12px;
+                padding: 1px 5px;
+                display: inline-block;
+                border-radius: 3px;
+            }
+
+                #tagscloud a.tagc1 {
+                    background: #666;
+                    color: #fff;
+                }
+
+                #tagscloud a.tagc2 {
+                    background: #F16E50;
+                    color: #fff;
+                }
+
+                #tagscloud a.tagc3 {
+                    background: #006633;
+                    color: #fff;
+                }
+
+                #tagscloud a.tagc4 {
+                    background: #47E5F0;
+                    color: #fff;
+                }
+
+                #tagscloud a.tagc5 {
+                    background: #5267EF;
+                    color: #fff;
+                }
+
+                #tagscloud a:hover {
+                    color: #fff;
+                    background: #347EFD;
+                }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="columns_big deviceCount">
+            <div class="columnsContainer">
+                <div class="headTitle headBg">
+                    <img src="~/Images/Icon/device.png" />
+                    <span>设备在线比例</span>
+                </div>
+                <div class="childContainer" id="deviceCountChart">
+                </div>
+            </div>
+        </div>
+        <div class="columns_small deviceOnline">
+            <div class="columnsContainer">
+                <div class="headTitle headBg">
+                    <img src="~/Images/Icon/online.png" />
+                    <span>设备在线</span>
+                </div>
+                <div class="childContainer" id="deviceOnlineChart">
+                </div>
+            </div>
+        </div>
+        <div class="columns_big deviceCount">
+            <div class="columnsContainer">
+                <div class="headTitle headBg">
+                    <img src="~/Images/Icon/error.png" />
+                    <span>离线设备</span>
+                </div>
+                <div class="childContainer">
+                    <table class="layui-hide" id="deviceInfo" lay-filter="demo"></table>
+                </div>
+            </div>
+        </div>
+        <div class="columns_small deviceOnline">
+            <div class="columnsContainer">
+                <div class="headTitle headBg">
+                    <img src="~/Images/Icon/alarm.png" />
+                    <span>设备告警</span>
+                </div>
+                <div id="tagscloud">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/echarts/echarts-liquidfill.js"></script>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script src="~/Scripts/tagCloud/tagscloud.js"></script>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看设备</a>
+    </script>
+    <script type="text/javascript">
+        /*设备数量统计*/
+        var deviceOnlineBall = echarts.init(document.getElementById('deviceCountChart'));
+
+        var optionBall = {
+            title: {
+                text: '设备在线比例',
+                subtext: '设备使用状态',
+                x: 'center'
+            },
+            grid: {
+                left: '0%',
+                right: '0%',
+                bottom: '0%',
+            },
+            series: [{
+                type: 'liquidFill',
+                name: '设备',
+                animation: true,
+                waveAnimation: true,
+                data: [0.00],
+                color: ['#8AD31A'],
+                center: ['50%', '60%'],
+                waveLength: '60%',
+                amplitude: 6,
+                radius: '60%',
+                label: {
+                    normal: {
+                        formatter: function (param) {
+                            return param.seriesName + "\n\n" + Math.ceil(param.value * 100) + "%在线";
+                        },
+                        textStyle: {
+                            fontSize: 14,
+                            color: '#8AD31A'
+                        },
+                        position: ['50%', '30%']
+                    }
+                },
+                outline: {
+                    itemStyle: {
+                        borderColor: '#FF6868',
+                        borderWidth: 2
+                    },
+                    borderDistance: 0
+                },
+                itemStyle: {
+                    normal: {
+                        backgroundColor: '#fff'
+                    }
+                }
+            }]
+        };
+        deviceOnlineBall.setOption(optionBall);
+
+        binddeviceOnlineBall();
+        function binddeviceOnlineBall() {
+            var url = "/Home/GetOnline";
+            $.ajax({
+                url: url,
+                type: 'post',
+                dataType: 'json',
+                async: true,
+                success: function (data, jqxhr, txtStatus) {
+                    var Proportion = data.OnlineCount / data.DeviceCount;
+                    optionBall.series[0].data = [Proportion];
+                    deviceOnlineBall.setOption(optionBall, true);
+                }, error: function (xhr, txtstatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+        binddeviceCountChart();
+        function binddeviceCountChart() {
+            var url = "/Home/GetOnlineBar";
+            $.ajax({
+                url: url,
+                type: 'post',
+                dataType: 'json',
+                async: true,
+                success: function (data, jqxhr, txtStatus) {
+                    option.xAxis[0].data = data.xAxisData;
+                    option.series[0].data = data.offLine;
+                    option.series[1].data = data.onLine;
+                    deviceCountChart.setOption(option, true);
+                }, error: function (xhr, txtstatus) {
+                    console.log(txtStatus);
+                }
+            });
+        }
+
+        /*设备在线统计*/
+        var deviceCountChart = echarts.init(document.getElementById('deviceOnlineChart'));
+
+        var option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {
+                data: ['离线数', '在线数'],
+                align: 'right',
+                right: 10,
+                textStyle: {
+                    color: "#333333"
+                },
+                itemWidth: 10,
+                itemHeight: 10,
+                itemGap: 35
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            dataZoom: [
+                {
+                    type: 'slider',
+                    xAxisIndex: 0,
+                    filterMode: 'empty',
+                    handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+                },
+                {
+                    type: 'inside',
+                    xAxisIndex: 0,
+                    filterMode: 'empty'
+                },
+            ],
+            xAxis: [{
+                type: 'category',
+                data: null,
+                axisTick: {
+                    show: true,
+                },
+                axisLabel: {
+                    show: true,
+                    textStyle: {
+                        color: "#333333",
+                    }
+                },
+            }],
+            yAxis: [{
+                type: 'value',
+                axisTick: {
+                    show: true,
+                },
+                axisLine: {
+                    show: true,
+                    lineStyle: {
+                        color: "#333333",
+                        width: 1,
+                        type: "solid"
+                    },
+                },
+                splitLine: {
+                    show: false,
+                    lineStyle: {
+                        color: "#333333",
+                    }
+                }
+            }],
+            series: [{
+                name: '离线数',
+                type: 'bar',
+                data: null,
+                barWidth: 20, //柱子宽度
+                barGap: 1, //柱子之间间距
+                itemStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                            offset: 0,
+                            color: '#FF6868'
+                        }, {
+                            offset: 1,
+                            color: '#FF6868'
+                        }]),
+                        opacity: 1,
+                    }
+                }
+            }, {
+                name: '在线数',
+                type: 'bar',
+                data: null,
+                barWidth: 20,
+                barGap: 1,
+                itemStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                            offset: 0,
+                            color: '#8AD31A'
+                        }, {
+                            offset: 1,
+                            color: '#8AD31A'
+                        }]),
+                        opacity: 1,
+                    }
+                }
+            }]
+        };
+
+        deviceCountChart.setOption(option);
+
+        deviceCountChart.on('click', function (params) {
+            window.top.frameUrl("/Ledger/Index");
+        });
+
+        layui.use(['table'], function () {
+            var table = layui.table;
+            table.render({
+                elem: '#deviceInfo',
+                url: '/Home/GetErrorDevice',
+                cellMinWidth: 80,
+                even: 'true',
+                height: 300,
+                id: 'reload',
+                page: {
+                    layout: ['count', 'prev', 'page', 'next', 'skip'],
+                    groups: 5,
+                    first: false,
+                    last: false,
+                    theme: '#127FD1'
+                },
+                done: function (res, curr, count) {
+                    $("[data-field='Id']").css('display', 'none');
+                },
+                cols: [
+                    [
+                         {
+                             field: 'Id',
+                             title: 'ID'
+                         },
+                        {
+                            field: 'isOnline',
+                            title: '在线状态',
+                            minWidth: 90,
+                            templet: function (row) { return chkErrorStatus(row.isOnline); }
+                        },
+                        {
+                            field: 'TerminalId',
+                            title: '设备ID',
+                            width: 100,
+                        }
+                        , {
+                            field: 'deviceName',
+                            title: '设备名称',
+                            minWidth: 150,
+                        }, {
+                            field: 'ElectricName',
+                            title: '供电或公司',
+                            minWidth: 150,
+                        }, {
+                            field: 'LineName',
+                            title: '所在线路',
+                            minWidth: 150,
+                        }, {
+                            field: 'JointName',
+                            title: '所在接头',
+                            minWidth: 150,
+                        },
+                        {
+                            fixed: 'right',
+                            width: 95,
+                            toolbar: '#barDemo'
+                        }
+                    ]
+                ]
+            });
+
+            table.on('tool(demo)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'detail') {
+                    $.ajax({
+                        type: 'post',
+                        url: '/Home/GetDeviceAction',
+                        data: { TerminalId: data.TerminalId, ElectricId: data.ElectricId, LineId: data.LineId },
+                        async: true,
+                        dataType: 'json',
+                        success: function (data, jqxhr, txtStatus) {
+                            window.top.setNavName(data.title);
+                            window.top.frameUrl(data.url);
+                        }, error: function (xhr, txtStatus) {
+                            console.log(txtStatus);
+                        }
+                    })
+                }
+            });
+
+            function chkErrorStatus(value) {
+                var htmStr = "";
+                if (value) {
+                    htmStr = "<span style='color:#37F10A'>在线</span>";
+                } else {
+                    htmStr = "<span style='color:#F91414'>离线</span>";
+                }
+                return htmStr;
+            }
+        });
+
+        bindDeviceAlarm();
+        function bindDeviceAlarm() {
+            var url = "/Home/GetBestNewAlarm";
+            $.ajax({
+                url: url,
+                type: 'post',
+                dataType: 'json',
+                async: true,
+                success: function (data, jqxhr, txtStatus) {
+                    for (var i = 0; i < data.length; i++) {
+                        var number = Math.ceil(Math.random() * 5);
+                        var html = "<a class='tagc" + number + "' href='#'>" + data[i].Content + "</a>";
+                        $("#tagscloud").append(html);
+                    }
+                    inittagsCloud();
+                }, error: function (xhr, txtstatus) {
+                    console.log(txtStatus);
+                }
+
+            })
+        }
+    </script>
+</body>
+</html>

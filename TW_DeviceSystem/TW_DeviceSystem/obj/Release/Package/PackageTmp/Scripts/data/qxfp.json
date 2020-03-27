@@ -1,0 +1,84 @@
+{
+	"code": 0,
+	"msg": "",
+	"count": 10,
+	"data": [
+		{
+			"test1": 1,
+			"test2": "数据中心",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		}, {
+			"test1": 1,
+			"test2": "告警待处理",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		}, {
+			"test1": 1,
+			"test2": "告警处理中",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		}, {
+			"test1": 1,
+			"test2": "告警已处理",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		}, {
+			"test1": 1,
+			"test2": "历史告警",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		}, {
+			"test1": 1,
+			"test2": "告警管理",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		},{
+			"test1": 1,
+			"test2": "设备台账",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		}, {
+			"test1": 1,
+			"test2": "设备添加",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		},{
+			"test1": 1,
+			"test2": "设备信息",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		}, {
+			"test1": 1,
+			"test2": "维护信息",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		},{
+			"test1": 1,
+			"test2": "角色管理",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		},{
+			"test1": 1,
+			"test2": "功能管理",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		},{
+			"test1": 1,
+			"test2": "权限分配",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		},{
+			"test1": 1,
+			"test2": "用户管理",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		},{
+			"test1": 1,
+			"test2": "反馈信息",
+			"test3": "处理平台所有报警信息",
+			"test4": "baojing.ico"
+		}
+	]
+}
+	

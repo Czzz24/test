@@ -1,0 +1,238 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.js"></script>
+</head>
+<body>
+    <input type="hidden" id="TerminalId" value="@ViewBag.TerminalId" />
+    <input type="hidden" id="ElectricId" value="@ViewBag.ElectricId" />
+    <input type="hidden" id="LineId" value="@ViewBag.LineId" />
+
+    <blockquote class="layui-elem-quote layui-text" id="fjdqErrorTitle"></blockquote>
+
+    <div class="jd_detailsColumns">
+        <div class="product_Container">
+            <img src="~/Images/earthbox/jdx.jpg" />
+        </div>
+        <div class="product_Container">
+            <table>
+                <tr>
+                    <td><img src="~/Images/Error/error.png" /></td>
+                    <td><span>故障定位</span></td>
+                </tr>
+                <tr>
+                    <td>设备Id</td>
+                    <td id="deviceId">--.--</td>
+                </tr>
+                <tr>
+                    <td>故障状态</td>
+                    <td id="status">--.--</td>
+                </tr>
+                <tr>
+                    <td>网络状态</td>
+                    <td id="network">--.--</td>
+                </tr>
+                <tr>
+                    <td>设备状态更新时间</td>
+                    <td id="updateTime">--.--</td>
+                </tr>
+            </table>
+        </div>
+        <div class="product_Container">
+            <table>
+                <tr>
+                    <td>采集卡编号</td>
+                    <td id="monitorID">--.--</td>
+                </tr>
+                <tr>
+                    <td>通道编号</td>
+                    <td id="channelID">--.--</td>
+                </tr>
+                <tr>
+                    <td>采集点名称</td>
+                    <td id="name">--.--</td>
+                </tr>
+                <tr>
+                    <td>采集点位置</td>
+                    <td id="position">--.--</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="tabbar_Container">
+        <div class="layui-tab layui-tab-brief" lay-filter="demo">
+            <ul class="layui-tab-title">
+                <li class="layui-this">历史数据</li>
+            </ul>
+            <div class="layui-tab-content">
+                <!--1-->
+                <div class="layui-tab-item layui-show">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">开始时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="historystartTime" placeholder="请选择开始时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">结束时间：</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="hitoryendTime" placeholder="请选择结束时间" name="phone" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left: 10px;">
+                        <button class="layui-btn layui-btn-normal" data-type="reloadhistory" id="btnHitorySearch">查询</button>
+                    </div>
+                    <table class="layui-hide" id="historydata"></table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setInterval("getfjdqData()", 1000);
+        });
+
+        function getfjdqData() {
+            var deviceId=$("#TerminalId").val();
+            var url = "/Error/getfjdqErrorData?deviceId=" + deviceId;
+            $.ajax({
+                url: url,
+                type: 'get',
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    var result=data.data;
+                    $("#deviceId").html(result.deviceID);
+                    var statusName = result.status == 0 ? "<p style='color:#5BEE0C'>正常</p>" : "<p style='color:red'>故障</p>";
+                    $("#status").html(statusName);
+                    var networkName = result.network == 0 ? "<p style='color:red'>离线</p>" : "<p style='color:#5BEE0C'>在线</p>";
+                    $("#network").html(networkName);
+                    $("#updateTime").html(result.updateTime);
+                    $("#monitorID").html(result.monitorID);
+                    $("#channelID").html(result.channelID);
+                    $("#name").html(result.name);
+                    $("#position").html(result.position);
+                    $("#fjdqErrorTitle").html("数据接入时间:" + "<span style='color:red'>" + result.receiveTime + "</span>");
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        }
+
+        layui.use(['element', 'laydate', 'table'], function () {
+            var historyTable = layui.table;
+            historyTable.render({
+                elem: '#historydata',
+                url: '/Error/fetfjdqHistoryData',
+                cellMinWidth: 80,
+                even: 'true',
+                height: 400,
+                id: 'reloadhistory',
+                page: true,
+                cols: [
+                    [
+                        {
+                            field: 'deviceID',
+                            title: '设备ID',
+                        }
+                        ,
+                        {
+                            field: 'receiveTime',
+                            title: '接收时间'
+                        },
+                        {
+                            field: 'source',
+                            title: '数据文件名'
+                        },
+                        {
+                            field: 'value',
+                            title: '采集值'
+                        },
+                        {
+                            field: 'status',
+                            title: '故障状态'
+                        },
+                        {
+                            field: 'monitorID',
+                            title: '采集编号'
+                        },
+                        {
+                            field: 'channelID',
+                            title: '通道编号'
+                        },
+                        {
+                            field: 'name',
+                            title:'采集点命名'
+                        },
+                        {
+                            field: 'position',
+                            title: '采集位置',
+                        }
+                    ]
+                ], where: {
+                    deviceId: document.getElementById("TerminalId").value,
+                }
+            });
+
+            var $ = layui.$, active = {
+                reloadhistory: function () {
+                    var TerminalId = $("#TerminalId").val();
+                    var historystartTime = $("#historystartTime").val();
+                    var hitoryendTime = $("#hitoryendTime").val();
+                    historyTable.reload('reloadhistory', {
+                        page: { curr: 1 },
+                        where: {
+                            deviceId: TerminalId,
+                            start: historystartTime,
+                            end: hitoryendTime
+                        }
+                    });
+                },
+            };
+
+            $('#btnHitorySearch').on('click', function () {
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            var element = layui.element;
+            element.on('tab(demo)', function (data) {
+                var index = data.index;
+                switch (index) {
+                    case 0:
+                        var type = "reloadhistory";
+                        active[type] ? active[type].call(this) : '';
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            var laydate = layui.laydate;
+            //1
+            laydate.render({
+                elem: '#historystartTime',
+                type: 'datetime'
+            });
+            laydate.render({
+                elem: '#hitoryendTime',
+                type: 'datetime'
+            });
+        });
+    </script>
+</body>
+</html>

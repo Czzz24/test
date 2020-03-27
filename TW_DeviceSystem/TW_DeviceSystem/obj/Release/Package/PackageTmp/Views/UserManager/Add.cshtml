@@ -1,0 +1,253 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <link href="~/Scripts/zTree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" />
+    <style type="text/css">
+        .selectTreeTitle {
+            width: 250px;
+            height: 38px;
+            background: #F2F2F2;
+            border-left: 5px solid #127FD1;
+            float: left;
+        }
+
+            .selectTreeTitle span {
+                line-height: 40px;
+                font-size: 14px;
+                font-family: 'Microsoft YaHei';
+                padding-left: 8px;
+                color: #666666;
+            }
+
+        .selectTree {
+            width: 250px;
+            float: left;
+        }
+
+        .selectContent {
+            float: left;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sbtj_Map {
+            width: 100%;
+            height: 400px;
+        }
+
+        ul.ztree {
+            margin-top: 0 !important;
+            width: auto !important;
+            background: none !important;
+            border: none !important;
+            overflow-y: auto !important;
+        }
+
+        .layui-tab {
+            margin: 0 !important;
+        }
+
+        .button-group {
+            width: 120px;
+            height: 60px;
+            position: relative;
+            bottom: 0px;
+            left: calc(100% - 120px);
+            font-size: 12px;
+            padding: 10px;
+            z-index: 9999;
+        }
+
+            .button-group .divbtn {
+                width: 40px;
+                height: 40px;
+                background-color: #0D9BF2;
+                float: left;
+                margin-left: 10px;
+                border-radius: 3px;
+                cursor: pointer;
+            }
+
+        .divbtn img {
+            margin: 4px 0px 0px 4px;
+        }
+    </style>
+
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        用户添加
+    </blockquote>
+    <div class="layui-form">
+        <fieldset class="layui-elem-field site-demo-button" style="margin-top: 20px;">
+            <legend>用户信息</legend>
+            <div class="layui-form">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">用户名称:</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="userName" placeholder="请输入用户名称" />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">用户账号:</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="userAccount" placeholder="请输入用户账号" />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">用户角色:</label>
+                        <div class="layui-input-inline">
+                            @Html.DropDownList("userRole")
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">用户密码:</label>
+                        <div class="layui-input-inline">
+                            <input type="password" id="userPwd" placeholder="请输入用户密码" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">联系电话:</label>
+                        <div class="layui-input-inline">
+                            <input type="tel" id="Phone" class="layui-input" placeholder="请输入联系电话" />
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">邮箱Email:</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="Email" placeholder="请输入邮箱Email">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label sbtj_label">排序号:</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="orderNo" placeholder="请输入排序号">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">用户说明:</label>
+                    <div class="layui-input-block">
+                        <textarea placeholder="请输入用户说明" id="userDescription" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-normal sbtj_Submit" id="addUser">添加</button>
+            <button class="layui-btn layui-btn-primary" onclick="window.history.back()">返回</button>
+        </div>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+    <script type="text/javascript">
+        layui.use(['element', 'form', 'laydate'], function () {
+            var table = layui.table;
+            var form = layui.form;
+        });
+
+        /*添加用户*/
+        document.getElementById("addUser").addEventListener("click", function () {
+            var data = { userName: null, userAccount: null, userPwd: null, Phone: null, Email: null, orderNo: null, userDescription: null, roleId: null, isDel: false, DelTime: null, DelUser:null };
+            var userName = $("#userName").val();
+            if (userName == null || userName == "" || userName == "undefined") {
+                layer.tips('请输入用户名称', '#userName');
+                return;
+            }
+            var userAccount = $("#userAccount").val();
+            if (userAccount == null || userAccount == "" || userAccount == "undefined") {
+                layer.tips('请输入用户账号', '#userAccount');
+                return;
+            }
+            var options = $("#userRole option:selected");
+            var roleId = options.val();
+            if (roleId == null || roleId == "" || roleId == "undefined" || roleId == "0" || roleId == 0) {
+                layer.alert('请选择用户角色!', { title: "提示" });
+                return;
+            }
+            var userPwd = $("#userPwd").val();
+            if (userPwd == null || userPwd == "" || userPwd == "undefined") {
+                layer.tips('请输入用户密码', '#userPwd');
+                return;
+            }
+            data.userName = userName;
+            data.userAccount = userAccount;
+            data.userPwd = userPwd;
+            data.roleId = roleId;
+            data.userDescription = $("#userDescription").val();
+            var orderNo = $("#orderNo").val();
+            if (orderNo == "" || orderNo == null || orderNo == "undefined") {
+                data.orderNo = null;
+            } else {
+                var reg = /^\+?[1-9][0-9]*$/;
+                if (!reg.test(orderNo)) {
+                    layer.tips('请输入正整数!', '#orderNo');
+                    return;
+                } else {
+                    data.orderNo = orderNo;
+                }
+            }
+            var Phone = $("#Phone").val();
+            if (Phone == "" || Phone == null || Phone == "undefined") {
+                data.Phone = null;
+            } else {
+                var reg = /^[1][3,4,5,7,8][0-9]{9}$/;
+                if (!reg.test(Phone)) {
+                    layer.tips('请输入正确的手机号码!', '#Phone');
+                    return;
+                } else {
+                    data.Phone = Phone;
+                }
+            }
+            var Email = $("#Email").val();
+            if (Email == "" || Email == null || Email == "undefined") {
+                data.Email = null;
+            } else {
+                var reg = /^\w+@@\w+(\.[a-zA-Z]{2,3}){1,2}$/;
+                if (!reg.test(Email)) {
+                    layer.tips('请输入正确邮箱地址!', '#Email');
+                    return;
+                } else {
+                    data.Email = Email;
+                }
+            }
+            var url = "/UserManager/AddUser";
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: data,
+                async: true,
+                dataType: 'json',
+                success: function (data, jqxhr, txtStatus) {
+                    if (data.code == 0) {
+                        $("#userName").val(null);
+                        $("#userAccount").val(null);
+                        $("#userPwd").val(null);
+                        $("#userDescription").val(null);
+                        $("#Phone").val(null);
+                        $("#Email").val(null);
+                        $("#orderNo").val(null);
+                        layer.msg(data.msg);
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                }, error: function (xhr, txtStatus) {
+                    console.log(txtStatus);
+                }
+            })
+        });
+    </script>
+</body>
+</html>

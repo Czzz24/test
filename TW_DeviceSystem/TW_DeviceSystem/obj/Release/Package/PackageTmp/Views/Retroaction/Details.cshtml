@@ -1,0 +1,54 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link href="~/Content/common.css" rel="stylesheet" />
+    <link href="~/Scripts/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/echarts/echarts-liquidfill.js"></script>
+    <script src="~/Scripts/jquery-1.8.0.min.js"></script>
+</head>
+<body>
+    <blockquote class="layui-elem-quote layui-text">
+        反馈信息查看
+    </blockquote>
+    <div class="content_Area">
+        <div class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">反馈用户:</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" autofocus="autofocus" placeholder="张三" readonly="readonly" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">所在供电:</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" placeholder="1#" readonly="readonly" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">联系方式:</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" placeholder="178xxxxxxxx" readonly="readonly" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">反馈内容:</label>
+                <div class="layui-input-block">
+                    <textarea class="layui-textarea" placeholder="短路" readonly="readonly"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item fk_Submit">
+                <button class="layui-btn layui-btn-primary" onclick="window.history.back()">返回</button>
+            </div>
+        </div>
+    </div>
+    <script src="~/Scripts/layui/layui.js"></script>
+</body>
+</html>
